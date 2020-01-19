@@ -16,12 +16,11 @@ $transition-base-ease-out: all 0.3s ease-out;
 
 // 布局大小
 $header-height: 60px;
-$aside-width: 140px;
-$sub-aside-width: 290px;
+$aside-width: 200px;
+$sub-aside-width: 268px;
 
 // 基准颜色
-//$color-primary: #3e81ec;
-$color-primary: rgba(23, 69, 131, 1);
+$color-primary: $--color-primary;
 $color-white: $--color-white;
 $color-black: $--color-black;
 $color-success: $--color-success;

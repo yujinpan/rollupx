@@ -63,6 +63,7 @@ ul.list-unstyled {
   
   &::-webkit-scrollbar {
     width: 4px;
+    height: 4px;
   }
   
   &::-webkit-scrollbar-thumb {
@@ -137,6 +138,7 @@ ul.list-unstyled {
 .flex-1,
 .flex-spacer {
   flex-grow: 1;
+  @extend .overflow-hidden;
 }
 
 // 不参与弹性布局

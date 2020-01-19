@@ -1,2 +1,6 @@
 // 自定义 element-ui 的默认样式
-@import './common-variables';
+
+// fix { size: 'small' }
+.el-pagination__editor.el-input .el-input__inner {
+  line-height: 28px;
+}

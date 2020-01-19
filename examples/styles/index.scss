@@ -11,14 +11,13 @@ body {
 }
 
 body {
-  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
-    'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: $font-color;
-  font-size: $font-size-base;
-  overflow: hidden;
+  font-size: $font-size;
   line-height: 1;
+  overflow: auto;
 }
 
 *,
@@ -45,16 +44,14 @@ ol {
   padding: 0;
 }
 
-a:focus,
-a:active {
-  outline: none;
-}
-
-a,
-a:focus,
-a:hover {
+a {
   color: inherit;
   text-decoration: none;
+}
+
+a:focus,
+a:hover {
+  outline: none;
 }
 
 div:focus {
