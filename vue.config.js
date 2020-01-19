@@ -12,7 +12,8 @@ const BundleAnalyzerPlugin = argv.includes('--analyzer')
 
 module.exports = {
   indexPath: '../_layouts/default.html',
-  publicPath: process.env.VUE_APP_BASE_URL,
+  publicPath:
+    process.env.NODE_ENV === 'production' ? process.env.VUE_APP_BASE_URL : '/',
   productionSourceMap: false,
 
   // webpack config

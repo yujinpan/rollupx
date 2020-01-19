@@ -1,6 +1,1 @@
-// 自定义 element-ui 的默认样式
-
-// fix { size: 'small' }
-.el-pagination__editor.el-input .el-input__inner {
-  line-height: 28px;
-}
+// 为了不影响组件的问题暴露，实例里面取消公共样式

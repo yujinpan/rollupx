@@ -86,45 +86,45 @@
   
   // 上下居下，左右居右
   &-flex-end {
-    @extend .flex-end-align;
-    @extend .flex-end-justify;
+    @extend .your-component-flex-end-align;
+    @extend .your-component-flex-end-justify;
   }
   
   // 上下居下，左右居中
   &-flex-end-justify {
-    @extend .flex, .flex-center-justify;
+    @extend .your-component-flex, .your-component-flex-center-justify;
     align-items: flex-end;
     align-content: flex-end;
   }
   
   // 左右居右，上下居中
   &-flex-end-align {
-    @extend .flex, .flex-center-align;
+    @extend .your-component-flex, .your-component-flex-center-align;
     justify-content: flex-end;
     justify-items: flex-end;
   }
   
   // 上下左右居中
   &-flex-center {
-    @extend .flex-center-align;
-    @extend .flex-center-justify;
+    @extend .your-component-flex-center-align;
+    @extend .your-component-flex-center-justify;
   }
   
   // 左右居中
   &-flex-center-align {
-    @extend .flex;
+    @extend .your-component-flex;
     align-items: center;
   }
   
   // 上下居中
   &-flex-center-justify {
-    @extend .flex;
+    @extend .your-component-flex;
     justify-content: center;
   }
   
   // 左右拉开，上下居中
   &-flex-space-between {
-    @extend .flex;
+    @extend .your-component-flex;
     align-items: center;
     align-content: center;
     justify-content: space-between;
@@ -132,13 +132,13 @@
   
   // 换行
   &-flex-wrap {
-    @extend .flex;
+    @extend .your-component-flex;
     flex-wrap: wrap;
   }
   
   // 垂直布局
   &-flex-column {
-    @extend .flex;
+    @extend .your-component-flex;
     flex-direction: column;
   }
   
@@ -146,7 +146,7 @@
   &-flex-1,
   &-flex-spacer {
     flex-grow: 1;
-    @extend .overflow-hidden;
+    @extend .your-component-overflow-hidden;
   }
   
   // 不参与弹性布局
