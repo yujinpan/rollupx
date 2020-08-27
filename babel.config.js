@@ -1,14 +1,8 @@
 module.exports = {
-  presets: ['@vue/app'],
+  presets: ['@vue/app', '@babel/preset-typescript'],
   plugins: [
-    [
-      'component',
-      {
-        libraryName: 'element-ui',
-        styleLibraryName: 'theme-chalk'
-      }
-    ],
-    ['@babel/plugin-proposal-export-default-from']
+    '@babel/plugin-proposal-export-default-from',
+    '@babel/plugin-proposal-optional-chaining'
   ],
   exclude: 'node_modules/**'
 };

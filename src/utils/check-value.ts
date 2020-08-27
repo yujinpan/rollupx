@@ -3,7 +3,7 @@
  * @param {*} data
  * @return {boolean}
  */
-export function checkValidArray(data) {
+export function isValidArray(data: any) {
   return Array.isArray(data) && data.length;
 }
 
@@ -12,6 +12,6 @@ export function checkValidArray(data) {
  * @param {*} value
  * @return {boolean}
  */
-export function checkValidValue(value) {
+export function isValidValue(value: any) {
   return !!value || value === 0;
 }

@@ -4,10 +4,7 @@
  * [参考官网 - 按需加载](https://element.eleme.cn/#/zh-CN/component/quickstart#an-xu-yin-ru)
  */
 import Vue from 'vue';
-import { Button, Message, Loading } from 'element-ui';
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 
-Vue.use(Button);
-Vue.use(Loading.directive);
-
-Vue.prototype.$loading = Loading.service;
-Vue.prototype.$message = Message;
+Vue.use(ElementUI);

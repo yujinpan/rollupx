@@ -18,11 +18,11 @@ const defaultOutput = {
 // 多入口打包，每个文件对应一个包
 const multiOption = [
   {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: defaultOutput
   },
   {
-    input: 'src/element-ui.js',
+    input: 'src/element-ui.ts',
     output: defaultOutput
   }
 ];

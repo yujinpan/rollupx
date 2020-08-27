@@ -18,6 +18,17 @@ const externalReg = new RegExp(
   '^(' + Object.keys(pkg.dependencies).join('|') + ')(/|$)'
 );
 
+const extensions = ['.js', '.jsx', '.ts', '.tsx', '.vue'];
+
+const aliasEntries = [];
+const aliasConfig = require('../alias.config');
+for (let key in aliasConfig) {
+  aliasEntries.push({
+    find: key,
+    replacement: aliasConfig[key]
+  });
+}
+
 module.exports = {
   // input: 'src/index.js',
   // output: {
@@ -30,32 +41,18 @@ module.exports = {
     }),
     cleanup(),
     alias({
-      entries: require('../alias.config'),
-      resolve: ['.vue', '/index.js', '/index.vue']
+      entries: aliasEntries
+    }),
+    resolve({
+      extensions
     }),
     // 替换 env 文件的环境变量
     replace({
-      'process.env.NODE_ENV': toJSON('production'),
-      'process.env.VUE_APP_BASE_API': toJSON(process.env.VUE_APP_BASE_API),
-      'process.env.VUE_APP_BASE_HOST': toJSON(process.env.VUE_APP_BASE_HOST),
-      'process.env.VUE_APP_BASE_HOST_6443': toJSON(
-        process.env.VUE_APP_BASE_HOST_6443
-      ),
-      'process.env.VUE_APP_BASE_URL': toJSON(
-        process.env.VUE_APP_BASE_HOST_6443
-      ),
-      'process.env.VUE_APP_BASE_GIS_SERVER': toJSON(
-        process.env.VUE_APP_BASE_GIS_SERVER
-      )
-    }),
-    resolve({
-      extensions: ['.js', '.vue']
+      'process.env.NODE_ENV': toJSON(process.env.NODE_ENV),
+      'process.env.VUE_APP_BASE_URL': toJSON(process.env.VUE_APP_BASE_URL)
     }),
     commonjs({
       include: /node_modules/
-    }),
-    babel({
-      runtimeHelpers: true
     }),
     vue({
       css: false, // Dynamically inject css as a <style> tag
@@ -65,6 +62,11 @@ module.exports = {
           preserveWhitespace: false // 丢弃模版空格
         }
       }
+    }),
+    babel({
+      extensions,
+      include: ['src/**/*'],
+      runtimeHelpers: true
     }),
     json(),
     postcss({
