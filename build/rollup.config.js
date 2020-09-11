@@ -1,9 +1,9 @@
 const vue = require('rollup-plugin-vue'); // Handle .vue SFC files
-const babel = require('rollup-plugin-babel');
-const resolve = require('rollup-plugin-node-resolve');
+const { babel } = require('@rollup/plugin-babel');
+const { nodeResolve: resolve } = require('@rollup/plugin-node-resolve');
 const postcss = require('rollup-plugin-postcss');
 const json = require('@rollup/plugin-json');
-const commonjs = require('rollup-plugin-commonjs');
+const commonjs = require('@rollup/plugin-commonjs');
 const alias = require('@rollup/plugin-alias');
 const cleanup = require('rollup-plugin-cleanup');
 const clear = require('rollup-plugin-clear');
@@ -11,6 +11,7 @@ const pkg = require('../package.json');
 const visualizer = require('rollup-plugin-visualizer');
 const sizes = require('rollup-plugin-sizes');
 const replace = require('@rollup/plugin-replace');
+const url = require('@rollup/plugin-url');
 
 require('dotenv').config();
 
@@ -68,8 +69,9 @@ module.exports = {
     babel({
       extensions,
       include: ['src/**/*'],
-      runtimeHelpers: true
+      babelHelpers: 'runtime'
     }),
+    url(),
     json(),
     postcss({
       minimize: true
