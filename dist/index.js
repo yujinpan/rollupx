@@ -12,11 +12,13 @@ import require$$0$4 from 'core-js/library/fn/object/set-prototype-of';
 import require$$0$5 from 'core-js/library/fn/object/create';
 import require$$0$6 from 'core-js/library/fn/object/keys';
 import { Prop, Component, Vue } from 'vue-property-decorator';
+import __vue_normalize__ from 'vue-runtime-helpers/dist/normalize-component.js';
 
 var defineProperty = require$$0;
 
 function _initializerDefineProperty(target, property, descriptor, context) {
   if (!descriptor) return;
+
   defineProperty(target, property, {
     enumerable: descriptor.enumerable,
     configurable: descriptor.configurable,
@@ -45,6 +47,7 @@ function _typeof(obj) {
       return obj && typeof symbol === "function" && obj.constructor === symbol && obj !== symbol.prototype ? "symbol" : typeof obj;
     };
   }
+
   return _typeof(obj);
 }
 
@@ -52,6 +55,7 @@ function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
   }
+
   return self;
 }
 
@@ -59,6 +63,7 @@ function _possibleConstructorReturn(self, call) {
   if (call && (_typeof(call) === "object" || typeof call === "function")) {
     return call;
   }
+
   return _assertThisInitialized(self);
 }
 
@@ -80,6 +85,7 @@ function _setPrototypeOf(o, p) {
     o.__proto__ = p;
     return o;
   };
+
   return _setPrototypeOf(o, p);
 }
 
@@ -87,6 +93,7 @@ function _inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
     throw new TypeError("Super expression must either be null or a function");
   }
+
   subClass.prototype = create(superClass && superClass.prototype, {
     constructor: {
       value: subClass,
@@ -101,25 +108,33 @@ var keys = require$$0$6;
 
 function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
   var desc = {};
+
   keys(descriptor).forEach(function (key) {
     desc[key] = descriptor[key];
   });
+
   desc.enumerable = !!desc.enumerable;
   desc.configurable = !!desc.configurable;
+
   if ('value' in desc || desc.initializer) {
     desc.writable = true;
   }
+
   desc = decorators.slice().reverse().reduce(function (desc, decorator) {
     return decorator(target, property, desc) || desc;
   }, desc);
+
   if (context && desc.initializer !== void 0) {
     desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
     desc.initializer = undefined;
   }
+
   if (desc.initializer === void 0) {
     defineProperty(target, property, desc);
+
     desc = null;
   }
+
   return desc;
 }
 
@@ -158,10 +173,13 @@ function (_Vue) {
 function styleInject(css, ref) {
   if ( ref === void 0 ) ref = {};
   var insertAt = ref.insertAt;
+
   if (!css || typeof document === 'undefined') { return; }
+
   var head = document.head || document.getElementsByTagName('head')[0];
   var style = document.createElement('style');
   style.type = 'text/css';
+
   if (insertAt === 'top') {
     if (head.firstChild) {
       head.insertBefore(style, head.firstChild);
@@ -171,6 +189,7 @@ function styleInject(css, ref) {
   } else {
     head.appendChild(style);
   }
+
   if (style.styleSheet) {
     style.styleSheet.cssText = css;
   } else {
@@ -180,65 +199,6 @@ function styleInject(css, ref) {
 
 var css = "h3[data-v-a375dee2]{margin:40px 0 0}ul[data-v-a375dee2]{list-style-type:none;padding:0}li[data-v-a375dee2]{display:inline-block;margin:0 10px}a[data-v-a375dee2]{color:#42b983}";
 styleInject(css);
-
-function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
-, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
-  if (typeof shadowMode !== 'boolean') {
-    createInjectorSSR = createInjector;
-    createInjector = shadowMode;
-    shadowMode = false;
-  }
-  var options = typeof script === 'function' ? script.options : script;
-  if (template && template.render) {
-    options.render = template.render;
-    options.staticRenderFns = template.staticRenderFns;
-    options._compiled = true;
-    if (isFunctionalTemplate) {
-      options.functional = true;
-    }
-  }
-  if (scopeId) {
-    options._scopeId = scopeId;
-  }
-  var hook;
-  if (moduleIdentifier) {
-    hook = function hook(context) {
-      context = context ||
-      this.$vnode && this.$vnode.ssrContext ||
-      this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext;
-      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-        context = __VUE_SSR_CONTEXT__;
-      }
-      if (style) {
-        style.call(this, createInjectorSSR(context));
-      }
-      if (context && context._registeredComponents) {
-        context._registeredComponents.add(moduleIdentifier);
-      }
-    };
-    options._ssrRegister = hook;
-  } else if (style) {
-    hook = shadowMode ? function (context) {
-      style.call(this, createInjectorShadow(context, this.$root.$options.shadowRoot));
-    } : function (context) {
-      style.call(this, createInjector(context));
-    };
-  }
-  if (hook) {
-    if (options.functional) {
-      var originalRender = options.render;
-      options.render = function renderWithStyleInjection(h, context) {
-        hook.call(context);
-        return originalRender(h, context);
-      };
-    } else {
-      var existing = options.beforeCreate;
-      options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
-    }
-  }
-  return script;
-}
-var normalizeComponent_1 = normalizeComponent;
 
 /* script */
 var __vue_script__ = HelloWorld;
@@ -275,7 +235,7 @@ var __vue_is_functional_template__ = false;
 
 /* style inject shadow dom */
 
-var __vue_component__ = normalizeComponent_1({
+var __vue_component__ = __vue_normalize__({
   render: __vue_render__,
   staticRenderFns: __vue_staticRenderFns__
 }, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, false, undefined, undefined, undefined);
@@ -291,4 +251,3 @@ __vue_component__.install = function (vue) {
 }; // Vue.component()
 
 export default __vue_component__;
-//# sourceMappingURL=index.js.map

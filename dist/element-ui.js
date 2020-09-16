@@ -14,4 +14,3 @@ import 'element-ui/lib/theme-chalk/index.css';
  * [参考官网 - 按需加载](https://element.eleme.cn/#/zh-CN/component/quickstart#an-xu-yin-ru)
  */
 Vue.use(ElementUI);
-//# sourceMappingURL=element-ui.js.map

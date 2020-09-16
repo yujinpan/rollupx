@@ -3,7 +3,7 @@
  * @param {*} data
  * @return {boolean}
  */
-export declare function isValidArray(data: any): number;
+export declare function isValidArray(data: any): number | false;
 /**
  * 校验一个简单值
  * @param {*} value
