@@ -4,13 +4,12 @@
   "author": "your-name",
   "main": "lib/index.js",
   "files": [
-    "lib",
-    "docs",
+    "dist",
     "types"
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "cross-env NODE_ENV=production node build & npm run build:types",
+    "build": "cross-env NODE_ENV=production node build/build.js & npm run build:types",
     "build:example": "vue-cli-service build",
     "build:types": "gulp && eslint --fix 'types/**/*'",
     "lint": "vue-cli-service lint",
@@ -21,7 +20,8 @@
     "element-ui": "^2.12.0",
     "vue": "^2.6.10",
     "vue-class-component": "^7.2.3",
-    "vue-property-decorator": "^8.4.2"
+    "vue-property-decorator": "^8.4.2",
+    "vue-runtime-helpers": "^1.1.2"
   },
   "devDependencies": {
     "@babel/plugin-proposal-export-default-from": "^7.5.2",
