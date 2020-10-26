@@ -10,7 +10,7 @@
         <Highlight :code="code" lang="xml" />
       </el-col>
       <el-col class="your-component-text-left" :span="12">
-        <div class="your-component-flex-center-align">
+        <div>
           <label>Function 1:</label>
           <HelloWorld />
         </div>
