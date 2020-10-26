@@ -3,10 +3,10 @@
  * @param {*} data
  * @return {boolean}
  */
-export declare function isValidArray(data: any): number | false;
+export declare function isValidArray(data: any): data is any[];
 /**
  * 校验一个简单值
  * @param {*} value
  * @return {boolean}
  */
-export declare function isValidValue(value: any): boolean;
+export declare function isValidValue<T>(value: any): value is T;
