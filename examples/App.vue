@@ -50,7 +50,7 @@ export default {
 .app {
   .el-col {
     padding: $spacing-medium;
-    border-right: $border-base;
+    border-right: $--border-base;
     &:last-of-type {
       border-right: 0;
     }
