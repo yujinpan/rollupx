@@ -17,6 +17,7 @@
     }
   },
   "include": [
+    "global.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue"
