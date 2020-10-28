@@ -107,6 +107,10 @@
   // flex 布局
   &-flex {
     display: flex;
+  }
+
+  &-flex-start {
+    display: flex;
     align-items: flex-start;
     justify-content: flex-start;
   }
@@ -155,13 +159,13 @@
 
   // 换行
   &-flex-wrap {
-    @extend .your-component-flex;
+    display: flex;
     flex-wrap: wrap;
   }
 
   // 垂直布局
   &-flex-column {
-    @extend .your-component-flex;
+    display: flex;
     flex-direction: column;
   }
 
