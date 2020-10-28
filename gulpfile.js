@@ -11,14 +11,19 @@ function build() {
   fs.rmdirSync('types', { recursive: true });
 
   return gulp
-    .src(['./src/**/*.ts', './src/**/*.vue'])
+    .src(require('./tsconfig.json').include)
     .pipe(
       through.obj(function(file, _, cb) {
         // get scripts
         if (file.extname === '.vue') {
           const code = file.contents.toString();
           const scripts = parseComponent(code);
-          file.contents = Buffer.from(scripts.script.content.trim());
+          file.contents = Buffer.from(
+            (scripts.script
+              ? scripts.script.content
+              : createEmptyVueClass()
+            ).trim()
+          );
           file.extname = '.vue.ts';
         }
         file.contents = Buffer.from(
@@ -32,6 +37,11 @@ function build() {
     )
     .pipe(ts.createProject('./tsconfig.json')())
     .dts.pipe(gulp.dest('types'));
+}
+
+// create empty vue class
+function createEmptyVueClass(className = '') {
+  return `import { Vue } from 'vue-property-decorator';export default class ${className} extends Vue {}`;
 }
 
 // transform absolute path to relative path
