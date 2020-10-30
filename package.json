@@ -6,7 +6,8 @@
   "typings": "types/index.d.ts",
   "files": [
     "dist",
-    "types"
+    "types",
+    "src"
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
