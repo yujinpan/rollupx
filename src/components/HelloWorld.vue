@@ -7,7 +7,10 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-@Component
+@Component({
+  // 利于 IDE 自动提示
+  name: 'HelloWorld'
+})
 export default class HelloWorld extends Vue {
   @Prop() private msg!: string;
 }
