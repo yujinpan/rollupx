@@ -13,5 +13,5 @@ export function isValidArray(data: any): data is any[] {
  * @return {boolean}
  */
 export function isValidValue<T>(value: any): value is T {
-  return !['undefined', 'null'].includes(typeof value) && value !== '';
+  return ![undefined, null].includes(value) && value !== '';
 }
