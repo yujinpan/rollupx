@@ -6,7 +6,7 @@ const banner =
   ' */\n';
 
 // multi package
-const inputFiles = ['src/index.ts', 'src/element-ui.ts'];
+const inputFiles = ['src/**/!(*.d|types).*(ts|js|vue)'];
 
 module.exports = {
   banner,

@@ -6,29 +6,18 @@ const json = require('@rollup/plugin-json');
 const commonjs = require('@rollup/plugin-commonjs');
 const alias = require('@rollup/plugin-alias');
 const visualizer = require('rollup-plugin-visualizer');
-const sizes = require('rollup-plugin-sizes');
 const replace = require('@rollup/plugin-replace');
 const url = require('@rollup/plugin-url');
-
-const pkg = require('../package.json');
-const utils = require('./utils');
+const aliasConfig = require('../alias.config');
 
 require('dotenv').config();
 
-const externalReg = new RegExp(
-  '^(' + Object.keys(pkg.dependencies).join('|') + ')(/|$)'
-);
 const extensions = ['.js', '.jsx', '.ts', '.tsx', '.vue'];
 
 module.exports = {
-  // input: 'src/index.js',
-  // output: {
-  //   dir: 'lib/',
-  //   format: 'es'
-  // },
   plugins: [
     alias({
-      entries: utils.getAliasEntries()
+      entries: aliasConfig
     }),
     resolve({
       extensions
@@ -44,6 +33,7 @@ module.exports = {
       include: /node_modules/
     }),
     vue({
+      target: 'browser',
       css: false, // Dynamically inject css as a <style> tag
       compileTemplate: true, // Explicitly convert template to render function
       template: {
@@ -54,20 +44,23 @@ module.exports = {
       // https://github.com/vuejs/rollup-plugin-vue/issues/262
       normalizer: '~vue-runtime-helpers/dist/normalize-component.js'
     }),
+    postcss({
+      minimize: true
+    }),
     babel({
       extensions,
-      include: ['src/**/*'],
+      exclude: 'node_modules/**',
       babelHelpers: 'runtime'
     }),
     url(),
     json(),
-    postcss({
-      minimize: true
-    }),
-    sizes(),
     visualizer({
       filename: './stat/statistics.html'
     })
   ],
-  external: (id) => externalReg.test(id)
+  // 所有文件都打包了，所以所有的引入都作为外部
+  external: (id) =>
+    ![
+      'rollup-plugin-vue' // 编译的临时文件需要保留
+    ].some((item) => id.includes(item))
 };

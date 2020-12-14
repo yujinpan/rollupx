@@ -1,71 +1,92 @@
 const path = require('path');
-
+const glob = require('glob');
 const config = require('./config');
-const tsPaths = require('../tsconfig.json').compilerOptions.paths;
+const aliasConfig = require('../alias.config');
+const rollupConfig = require('./rollup.config');
 
 /**
  * 创建配置项
  * @param {String} filePath 例如：src/index.ts
  */
 function createRollupFileOption(filePath) {
-  const filename = filePath.split('/').pop();
-  const outputPath = filePath
-    .replace(filename, '')
-    .replace(config.inputDir, config.outputDir);
-  const outputName = `${outputPath}${filename.replace(/\.[^.]+$/g, '')}`;
+  const files = glob.sync(filePath);
+  return files.map((item) => {
+    const relativePath = path.relative('src', item);
+    const file = path.join(
+      config.outputDir,
+      path.dirname(relativePath) +
+        '/' +
+        path.basename(relativePath).replace('.ts', '.js') +
+        (item.endsWith('.vue') ? '.js' : '')
+    );
+    return {
+      ...rollupConfig,
+      plugins: rollupConfig.plugins.concat([relativePlugin()]),
+      input: item,
+      output: [
+        {
+          file: file,
+          format: 'es',
+          banner: config.banner
+        }
+      ]
+    };
+  });
+}
+
+/**
+ * 将文件中的缩写路径转换为相对路径
+ */
+function relativePlugin() {
   return {
-    input: filePath,
-    output: [
-      // {
-      //   file: `${outputName}.common.js`,
-      //   format: 'cjs',
-      //   banner: config.banner
-      // },
-      {
-        file: `${outputName}.js`,
-        format: 'es',
-        banner: config.banner
-      }
-    ]
+    name: 'rollup-plugin-relative',
+    transform(code, id) {
+      return transformToRelativePath(code, id);
+    }
   };
 }
 
-function getAliasFromTSConfig() {
-  const aliasConfig = {};
+/**
+ * transform absolute path to relative path
+ */
+function transformToRelativePath(codes, filepath) {
+  const imports = codes.match(/(from\s|require\(|import\()'@\/[^']*'\)?/g);
+  if (imports) {
+    // get source path
+    const paths = imports.map((item) =>
+      item.replace(/^(from\s|require\(|import\()'/, '').replace(/'\)?/, '')
+    );
 
-  for (const key in tsPaths) {
-    if (tsPaths[key].length > 1) {
-      console.warn(
-        'alias.config.js warn:',
-        'tsconfig.json paths value must be only one.\n'
-      );
-    }
-    // must use root path
-    aliasConfig[transformPath(key)] =
-      path.resolve('./') + '/' + transformPath(tsPaths[key][0]);
-  }
+    // get relative path
+    const relativePaths = paths
+      .map((item) => {
+        // read alias path config
+        for (let key in aliasConfig) {
+          if (item.startsWith(key)) {
+            return path.relative(
+              filepath,
+              item.replace(new RegExp('^' + key), aliasConfig[key])
+            );
+          }
+        }
+        console.warn(
+          'gulpfile.js warn:',
+          'can not find the path config:' + item
+        );
+        return item;
+      })
+      // add ./
+      .map((item) => (item.startsWith('.') ? item : './' + item));
 
-  return aliasConfig;
-}
-
-function transformPath(path) {
-  return path.replace('/*', '');
-}
-
-function getAliasEntries() {
-  const aliasEntries = [];
-  const aliasConfig = getAliasFromTSConfig();
-  for (let key in aliasConfig) {
-    aliasEntries.push({
-      find: key,
-      replacement: aliasConfig[key]
+    // replace source code
+    paths.forEach((item, index) => {
+      codes = codes.replace(item, relativePaths[index]);
     });
   }
-  return aliasEntries;
+  return codes;
 }
 
 module.exports = {
   createRollupFileOption,
-  getAliasFromTSConfig,
-  getAliasEntries
+  transformToRelativePath
 };
