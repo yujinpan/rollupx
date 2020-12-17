@@ -11,9 +11,10 @@
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "cross-env NODE_ENV=production node build/build.js & npm run build:types",
+    "build": "cross-env NODE_ENV=production node build/build.js && npm run build:types && npm run build:styles",
     "build:example": "vue-cli-service build",
     "build:types": "gulp && eslint --fix 'types/**/*'",
+    "build:styles": "node ./build/styles.js",
     "lint": "vue-cli-service lint",
     "start": "npm run serve",
     "test": "karma start test/unit/karma.config.js"
