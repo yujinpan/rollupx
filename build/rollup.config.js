@@ -9,10 +9,9 @@ const visualizer = require('rollup-plugin-visualizer');
 const replace = require('@rollup/plugin-replace');
 const url = require('@rollup/plugin-url');
 const aliasConfig = require('../alias.config');
+const config = require('./config');
 
 require('dotenv').config();
-
-const extensions = ['.js', '.jsx', '.ts', '.tsx', '.vue'];
 
 module.exports = {
   plugins: [
@@ -20,7 +19,7 @@ module.exports = {
       entries: aliasConfig
     }),
     resolve({
-      extensions
+      extensions: config.extensions
     }),
     // 替换 env 文件的环境变量
     replace({
@@ -48,7 +47,7 @@ module.exports = {
       minimize: true
     }),
     babel({
-      extensions,
+      extensions: config.extensions,
       exclude: 'node_modules/**',
       babelHelpers: 'runtime'
     }),

@@ -2,7 +2,6 @@ const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const through = require('through2');
 const fs = require('fs');
-const path = require('path');
 const { parseComponent } = require('vue-template-compiler');
 const utils = require('./build/utils');
 
@@ -27,10 +26,7 @@ function build() {
           file.extname = '.vue.ts';
         }
         file.contents = Buffer.from(
-          utils.transformToRelativePath(
-            file.contents.toString(),
-            path.resolve(file.path, '../')
-          )
+          utils.transformToRelativePath(file.contents.toString(), file.path)
         );
         cb(null, file);
       })
