@@ -4,7 +4,7 @@
  * Released under the MIT License.
  */
 
-import HelloWorld from '../components/HelloWorld.vue';
+import HelloWorld from './components/HelloWorld.vue';
 import './styles/index.scss';
 
 // 主组件

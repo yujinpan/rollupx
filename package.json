@@ -69,7 +69,7 @@
     "rollup": "^1.27.0",
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-clear": "^2.0.7",
-    "rollup-plugin-postcss": "^2.0.3",
+    "rollup-plugin-postcss": "^3.1.8",
     "rollup-plugin-visualizer": "^1.1.1",
     "rollup-plugin-vue": "^5.1.9",
     "sass-loader": "^7.1.0",

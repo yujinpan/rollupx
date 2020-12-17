@@ -4,17 +4,17 @@
  * Released under the MIT License.
  */
 
-import _initializerDefineProperty from '../../node_modules/@babel/runtime-corejs2/helpers/esm/initializerDefineProperty';
-import _classCallCheck from '../../node_modules/@babel/runtime-corejs2/helpers/esm/classCallCheck';
-import _possibleConstructorReturn from '../../node_modules/@babel/runtime-corejs2/helpers/esm/possibleConstructorReturn';
-import _getPrototypeOf from '../../node_modules/@babel/runtime-corejs2/helpers/esm/getPrototypeOf';
-import _assertThisInitialized from '../../node_modules/@babel/runtime-corejs2/helpers/esm/assertThisInitialized';
-import _inherits from '../../node_modules/@babel/runtime-corejs2/helpers/esm/inherits';
-import '../../node_modules/@babel/runtime-corejs2/helpers/esm/defineProperty';
-import _applyDecoratedDescriptor from '../../node_modules/@babel/runtime-corejs2/helpers/esm/applyDecoratedDescriptor';
-import '../../node_modules/@babel/runtime-corejs2/helpers/esm/initializerWarningHelper';
+import _initializerDefineProperty from '@babel/runtime-corejs2/helpers/esm/initializerDefineProperty';
+import _classCallCheck from '@babel/runtime-corejs2/helpers/esm/classCallCheck';
+import _possibleConstructorReturn from '@babel/runtime-corejs2/helpers/esm/possibleConstructorReturn';
+import _getPrototypeOf from '@babel/runtime-corejs2/helpers/esm/getPrototypeOf';
+import _assertThisInitialized from '@babel/runtime-corejs2/helpers/esm/assertThisInitialized';
+import _inherits from '@babel/runtime-corejs2/helpers/esm/inherits';
+import '@babel/runtime-corejs2/helpers/esm/defineProperty';
+import _applyDecoratedDescriptor from '@babel/runtime-corejs2/helpers/esm/applyDecoratedDescriptor';
+import '@babel/runtime-corejs2/helpers/esm/initializerWarningHelper';
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import styleInject from '../../node_modules/style-inject/dist/style-inject.es.js';
+import styleInject from 'style-inject/dist/style-inject.es.js';
 import __vue_normalize__ from 'vue-runtime-helpers/dist/normalize-component.js';
 
 var _dec, _dec2, _class, _class2, _descriptor, _temp;
@@ -52,8 +52,8 @@ function (_Vue) {
   initializer: null
 })), _class2)) || _class);
 
-var css = "h3[data-v-096012e6]{margin:40px 0 0}ul[data-v-096012e6]{list-style-type:none;padding:0}li[data-v-096012e6]{display:inline-block;margin:0 10px}a[data-v-096012e6]{color:#42b983}";
-styleInject(css);
+var css_248z = "h3[data-v-096012e6]{margin:40px 0 0}ul[data-v-096012e6]{list-style-type:none;padding:0}li[data-v-096012e6]{display:inline-block;margin:0 10px}a[data-v-096012e6]{color:#42b983}";
+styleInject(css_248z);
 
 /* script */
 var __vue_script__ = HelloWorld;
