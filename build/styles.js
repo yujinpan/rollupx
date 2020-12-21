@@ -7,15 +7,29 @@ const autoprefixer = require('autoprefixer');
 
 const inputDir = path.resolve(__dirname, '../src/styles');
 const output = path.resolve(__dirname, `../${config.outputDir}/styles`);
+const copyFiles = [
+  inputDir + '/common-variables.scss',
+  inputDir + '/mixins.scss'
+];
 
 build().finally(() => {
   console.log('打包 styles 完毕！');
 });
 
 async function build() {
-  const files = fs.readdirSync(inputDir).filter((item) => /.scss$/.test(item));
+  const files = fs
+    .readdirSync(inputDir)
+    .filter(
+      (item) =>
+        /.scss$/.test(item) &&
+        !copyFiles.some((file) => item.includes(path.basename(file)))
+    );
 
+  fs.rmdirSync(output, { recursive: true });
   fs.mkdirSync(output, { recursive: true });
+  copyFiles.forEach((item) => {
+    fs.copyFileSync(item, output + '/' + path.basename(item));
+  });
 
   return await Promise.all(
     files.map((filename) => {
