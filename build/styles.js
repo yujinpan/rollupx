@@ -8,8 +8,8 @@ const autoprefixer = require('autoprefixer');
 const inputDir = path.resolve(__dirname, '../src/styles');
 const output = path.resolve(__dirname, `../${config.outputDir}/styles`);
 const copyFiles = [
-  inputDir + '/common-variables.scss',
-  inputDir + '/mixins.scss'
+  inputDir + '/common-variables.scss'
+  // inputDir + '/mixins.scss'
 ];
 
 build().finally(() => {
