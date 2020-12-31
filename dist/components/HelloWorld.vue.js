@@ -4,15 +4,15 @@
  * Released under the MIT License.
  */
 
-import _initializerDefineProperty from '@babel/runtime-corejs2/helpers/esm/initializerDefineProperty';
-import _classCallCheck from '@babel/runtime-corejs2/helpers/esm/classCallCheck';
-import _possibleConstructorReturn from '@babel/runtime-corejs2/helpers/esm/possibleConstructorReturn';
-import _getPrototypeOf from '@babel/runtime-corejs2/helpers/esm/getPrototypeOf';
-import _assertThisInitialized from '@babel/runtime-corejs2/helpers/esm/assertThisInitialized';
-import _inherits from '@babel/runtime-corejs2/helpers/esm/inherits';
-import '@babel/runtime-corejs2/helpers/esm/defineProperty';
-import _applyDecoratedDescriptor from '@babel/runtime-corejs2/helpers/esm/applyDecoratedDescriptor';
-import '@babel/runtime-corejs2/helpers/esm/initializerWarningHelper';
+import 'core-js/modules/es.array.concat.js';
+import _initializerDefineProperty from '@babel/runtime/helpers/esm/initializerDefineProperty';
+import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
+import _assertThisInitialized from '@babel/runtime/helpers/esm/assertThisInitialized';
+import _inherits from '@babel/runtime/helpers/esm/inherits';
+import _createSuper from '@babel/runtime/helpers/esm/createSuper';
+import '@babel/runtime/helpers/esm/defineProperty';
+import _applyDecoratedDescriptor from '@babel/runtime/helpers/esm/applyDecoratedDescriptor';
+import '@babel/runtime/helpers/esm/initializerWarningHelper';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import styleInject from 'style-inject/dist/style-inject.es.js';
 import __vue_normalize__ from 'vue-runtime-helpers/dist/normalize-component.js';
@@ -21,14 +21,12 @@ var _dec, _dec2, _class, _class2, _descriptor, _temp;
 var HelloWorld = (_dec = Component({
   // 利于 IDE 自动提示
   name: 'HelloWorld'
-}), _dec2 = Prop(), _dec(_class = (_class2 = (_temp =
-/*#__PURE__*/
-function (_Vue) {
+}), _dec2 = Prop(), _dec(_class = (_class2 = (_temp = /*#__PURE__*/function (_Vue) {
   _inherits(HelloWorld, _Vue);
 
-  function HelloWorld() {
-    var _getPrototypeOf2;
+  var _super = _createSuper(HelloWorld);
 
+  function HelloWorld() {
     var _this;
 
     _classCallCheck(this, HelloWorld);
@@ -37,7 +35,7 @@ function (_Vue) {
       args[_key] = arguments[_key];
     }
 
-    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(HelloWorld)).call.apply(_getPrototypeOf2, [this].concat(args)));
+    _this = _super.call.apply(_super, [this].concat(args));
 
     _initializerDefineProperty(_assertThisInitialized(_this), "msg", _descriptor, _assertThisInitialized(_this));
 
@@ -90,9 +88,7 @@ var __vue_is_functional_template__ = false;
 
 /* style inject shadow dom */
 
-var __vue_component__ =
-/*#__PURE__*/
-__vue_normalize__({
+var __vue_component__ = /*#__PURE__*/__vue_normalize__({
   render: __vue_render__,
   staticRenderFns: __vue_staticRenderFns__
 }, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, false, undefined, undefined, undefined);
