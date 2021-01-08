@@ -8,7 +8,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
-    "declarationDir": "types",
+    "declarationDir": "dist",
     "baseUrl": ".",
     "paths": {
       "@/*": [

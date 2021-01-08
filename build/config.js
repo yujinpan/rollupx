@@ -13,6 +13,5 @@ module.exports = {
   inputFiles,
   inputDir: 'src',
   outputDir: 'dist',
-  typesDir: 'types',
   extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue']
 };

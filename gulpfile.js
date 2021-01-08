@@ -1,14 +1,10 @@
 const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const through = require('through2');
-const fs = require('fs');
 const { parseComponent } = require('vue-template-compiler');
 const utils = require('./build/utils');
 
 function build() {
-  // clear types folder first
-  fs.rmdirSync('types', { recursive: true });
-
   return gulp
     .src(require('./tsconfig.json').include)
     .pipe(
@@ -32,7 +28,9 @@ function build() {
       })
     )
     .pipe(ts.createProject('./tsconfig.json')())
-    .dts.pipe(gulp.dest('types'));
+    .dts.pipe(
+      gulp.dest(require('./tsconfig.json').compilerOptions.declarationDir)
+    );
 }
 
 module.exports.default = build;

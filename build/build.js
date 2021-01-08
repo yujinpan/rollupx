@@ -5,8 +5,6 @@ const config = require('./config');
 const utils = require('./utils');
 
 // 清空目录
-fs.rmdirSync(config.typesDir, { recursive: true });
-fs.mkdirSync(config.typesDir);
 fs.rmdirSync(config.outputDir, { recursive: true });
 fs.mkdirSync(config.outputDir);
 
