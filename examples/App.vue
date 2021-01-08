@@ -1,15 +1,13 @@
 <template>
-  <div class="app your-component-padding-medium your-component-text-center">
+  <div class="app cm-padding-medium cm-text-center">
     <h2>your-component</h2>
-    <p class="your-component-text-secondary">
-      author: your-name - version: v{{ version }}
-    </p>
+    <p class="cm-text-secondary">author: your-name - version: v{{ version }}</p>
     <el-divider></el-divider>
-    <el-row class="your-component-text-left" type="flex">
+    <el-row class="cm-text-left" type="flex">
       <el-col :span="12">
         <Highlight :code="code" lang="xml" />
       </el-col>
-      <el-col class="your-component-text-left" :span="12">
+      <el-col class="cm-text-left" :span="12">
         <div>
           <label>Function 1:</label>
           <HelloWorld />
