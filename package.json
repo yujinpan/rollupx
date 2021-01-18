@@ -6,7 +6,7 @@
   "typings": "dist/index.d.ts",
   "files": [
     "dist",
-    "test/src/components"
+    "src/components"
   ],
   "bin": {
     "vue-component-pack": "bin/vue-component-pack.js"

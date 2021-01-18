@@ -53,8 +53,8 @@ function getRollupConfig(aliasConfig, extensions) {
       }),
       babel({
         extensions: extensions,
-        exclude: 'node_modules/**',
-        babelHelpers: 'runtime'
+        babelHelpers: 'runtime',
+        ...require('../babel.config')
       }),
       url(),
       json(),
