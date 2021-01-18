@@ -45,9 +45,10 @@ function build(options) {
   // build types
   require('./types')(
     options.tsConfig,
+    options.inputDir,
+    options.outputDir,
     options.extensions,
-    options.aliasConfig,
-    options.outputDir
+    options.aliasConfig
   ).then(() => {
     console.log('build types completed!');
   });
