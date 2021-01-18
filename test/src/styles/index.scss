@@ -3,13 +3,13 @@
 // ** 所有公共样式都要带上组件名前缀 **
 
 // 全局的使用 border-box 模式
-[class*=' your-component-'],
-[class^='your-component-'] {
+[class*=' vue-component-pack-'],
+[class^='vue-component-pack-'] {
   box-sizing: border-box;
 }
 
 // 全局的样式
-.your-component {
+.vue-component-pack {
   &-overflow-hidden {
     overflow: hidden;
   }

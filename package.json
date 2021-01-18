@@ -1,23 +1,19 @@
 {
-  "name": "your-component",
+  "name": "vue-component-pack",
   "version": "1.1.0",
-  "author": "your-name",
-  "module": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "author": "yujinpan",
+  "main": "build/build.js",
   "files": [
-    "dist",
-    "src/components"
+    "build",
+    "alias.config.js",
+    "babel.config.js",
+    "tsconfig.json"
   ],
   "bin": {
     "vue-component-pack": "bin/vue-component-pack.js"
   },
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "cross-env NODE_ENV=production node build/index.js && eslint --fix dist/**/*.d.ts",
-    "build:example": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "start": "npm run serve",
-    "test": "karma start test/unit/karma.config.js"
+    "build": "cross-env NODE_ENV=production node build/index.js && eslint --fix dist/**/*.d.ts"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
@@ -68,22 +64,13 @@
     "vue-property-decorator": "^8.4.2",
     "vue-runtime-helpers": "^1.1.2"
   },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions"
-  ],
   "bugs": {
-    "url": "https://github.com/your-name/your-component/issues"
+    "url": "https://github.com/yujinpan/vue-component-pack/issues"
   },
-  "homepage": "https://github.com/your-name/your-component#readme",
+  "homepage": "https://github.com/yujinpan/vue-component-pack#readme",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/your-name/your-component.git"
+    "url": "git+ssh://git@github.com/yujinpan/vue-component-pack.git"
   }
 }

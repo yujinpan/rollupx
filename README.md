@@ -1,53 +1,28 @@
-# your-component
+# vue-component-pack
 
-your-component description
+js/ts/vue/scss to a library.
 
 ## Usage
 
 ### Install
 
 ```
-npm install --save your-component
+npm install --save vue-component-pack
 ```
 
-### Require element-ui
+### Config
 
-If your project does not use element-ui,
-you need to introduce a separate element-ui package, like this:
-
-```js
-import 'your-component/lib/element-ui';
-```
-
-### Global registration
+create a config file in your project.
 
 ```js
-import Vue from 'vue';
-import Component from 'your-component';
-
-Vue.use(Component);
-```
-
-### In-component registration
-
-```js
-import Component from 'your-component';
-
-export default {
-  components: {
-    Component
-  }
+// project/vue-component-pack.config.js
+module.exports = {
+  outputDir: 'dist'
 };
 ```
 
-### Complete example
+### Build
 
-```xml
-<template>
-  <div></div>
-</template>
-
-<script>
-export default {};
-</script>
+```shell
+$ vue-component-cli
 ```
