@@ -4,9 +4,9 @@ const through = require('through2');
 const { parseComponent } = require('vue-template-compiler');
 const utils = require('./utils');
 
-async function build(tsConfig, extensions, aliasConfig, declarationDir) {
+async function build(tsConfig, inputDir, outputDir, extensions, aliasConfig) {
   return gulp
-    .src(tsConfig.include)
+    .src(['/**/*.ts', '/**/*.tsx', '/**/*.vue'].map((item) => inputDir + item))
     .pipe(
       through.obj(function(file, _, cb) {
         // get scripts
@@ -33,9 +33,7 @@ async function build(tsConfig, extensions, aliasConfig, declarationDir) {
       })
     )
     .pipe(ts.createProject(tsConfig.compilerOptions)())
-    .dts.pipe(
-      gulp.dest(declarationDir || tsConfig.compilerOptions.declarationDir)
-    );
+    .dts.pipe(gulp.dest(outputDir || tsConfig.compilerOptions.declarationDir));
 }
 
 module.exports = build;
