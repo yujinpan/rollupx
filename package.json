@@ -4,10 +4,12 @@
   "author": "yujinpan",
   "main": "build/build.js",
   "files": [
+    "bin",
     "build",
     "alias.config.js",
     "babel.config.js",
-    "tsconfig.json"
+    "tsconfig.json",
+    "README.md"
   ],
   "bin": {
     "vue-component-pack": "bin/vue-component-pack.js"
