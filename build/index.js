@@ -1,5 +1,9 @@
-const config = require('./config');
+const fs = require('fs');
 
-require('dotenv').config();
+const configPath = process.cwd() + '/vue-component-pack.config.js';
+let config = {};
+if (fs.existsSync(configPath)) {
+  config = require(configPath);
+}
 
 require('./build')(config);

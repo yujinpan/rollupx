@@ -1,6 +1,7 @@
 .DS_Store
 node_modules
-stat
+test/stat
+test/test
 package-lock.json
 
 # local env files

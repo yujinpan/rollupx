@@ -1,9 +1,0 @@
-[class*=' your-component-'],
-[class^='your-component-'] {
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-}
-
-.your-component-overflow-hidden {
-  overflow: hidden;
-}
