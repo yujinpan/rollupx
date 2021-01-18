@@ -1,20 +1,31 @@
 const path = require('path');
 const glob = require('glob');
-const config = require('./config');
-const aliasConfig = require('../alias.config');
-const rollupConfig = require('./rollup.config');
+const { getRollupConfig } = require('./rollup.config');
 const resolve = require('resolve');
 
 /**
  * 创建配置项
  * @param {String} filePath 例如：src/index.ts
+ * @param {String} inputDir 例如：src
+ * @param {String} outputDir 例如：dist
+ * @param {String} banner
+ * @param {Object} aliasConfig
+ * @param {Array} extensions
  */
-function createRollupFileOption(filePath) {
+function createRollupOption(
+  filePath,
+  inputDir,
+  outputDir,
+  banner,
+  aliasConfig,
+  extensions
+) {
+  const rollupConfig = getRollupConfig(aliasConfig, extensions);
   const files = glob.sync(filePath);
   return files.map((item) => {
-    const relativePath = path.relative('src', item);
+    const relativePath = path.relative(inputDir, item);
     const file = path.join(
-      config.outputDir,
+      outputDir,
       path.dirname(relativePath) +
         '/' +
         path.basename(relativePath).replace('.ts', '.js') +
@@ -22,13 +33,15 @@ function createRollupFileOption(filePath) {
     );
     return {
       ...rollupConfig,
-      plugins: rollupConfig.plugins.concat([relativePlugin()]),
+      plugins: rollupConfig.plugins.concat([
+        relativePlugin(aliasConfig, extensions)
+      ]),
       input: item,
       output: [
         {
           file: file,
           format: 'es',
-          banner: config.banner
+          banner: banner
         }
       ]
     };
@@ -38,11 +51,11 @@ function createRollupFileOption(filePath) {
 /**
  * 将文件中的缩写路径转换为相对路径
  */
-function relativePlugin() {
+function relativePlugin(aliasConfig, extensions) {
   return {
     name: 'rollup-plugin-relative',
     transform(code, id) {
-      return transformToRelativePath(code, id);
+      return transformToRelativePath(code, id, aliasConfig, extensions);
     }
   };
 }
@@ -50,7 +63,7 @@ function relativePlugin() {
 /**
  * transform absolute path to relative path
  */
-function transformToRelativePath(codes, filepath) {
+function transformToRelativePath(codes, filepath, aliasConfig, extensions) {
   const imports = codes.match(/(from\s|require\(|import\()'@\/[^']*'\)?/g);
   if (imports) {
     // get source path
@@ -67,8 +80,9 @@ function transformToRelativePath(codes, filepath) {
             return path
               .relative(
                 path.dirname(filepath),
-                getDirname(
-                  item.replace(new RegExp('^' + key), aliasConfig[key])
+                resolve.sync(
+                  item.replace(new RegExp('^' + key), aliasConfig[key]),
+                  { extensions: extensions }
                 )
               )
               .replace(/.ts$/, '');
@@ -91,11 +105,16 @@ function transformToRelativePath(codes, filepath) {
   return codes;
 }
 
-function getDirname(p) {
-  return resolve.sync(p, { extensions: config.extensions });
+function toAbsolutePath(path) {
+  if (path[0] !== '/') {
+    return process.cwd() + '/' + path;
+  } else {
+    return path;
+  }
 }
 
 module.exports = {
-  createRollupFileOption,
-  transformToRelativePath
+  createRollupOption,
+  transformToRelativePath,
+  toAbsolutePath
 };
