@@ -13,5 +13,9 @@ module.exports = {
   inputFiles,
   inputDir: 'src',
   outputDir: 'dist',
-  extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue']
+  extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+  aliasConfig: require('../alias.config'),
+  tsConfig: require('../tsconfig.json'),
+  stylesDir: 'styles',
+  stylesCopyFiles: ['common-variables.scss']
 };

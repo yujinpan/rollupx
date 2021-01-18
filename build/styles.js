@@ -1,22 +1,10 @@
 const sass = require('node-sass');
 const fs = require('fs');
 const path = require('path');
-const config = require('./config');
 const postcss = require('postcss');
 const autoprefixer = require('autoprefixer');
 
-const inputDir = path.resolve(__dirname, '../src/styles');
-const output = path.resolve(__dirname, `../${config.outputDir}/styles`);
-const copyFiles = [
-  inputDir + '/common-variables.scss'
-  // inputDir + '/mixins.scss'
-];
-
-build().finally(() => {
-  console.log('打包 styles 完毕！');
-});
-
-async function build() {
+async function build(inputDir, output, copyFiles) {
   const files = fs
     .readdirSync(inputDir)
     .filter(
@@ -28,7 +16,7 @@ async function build() {
   fs.rmdirSync(output, { recursive: true });
   fs.mkdirSync(output, { recursive: true });
   copyFiles.forEach((item) => {
-    fs.copyFileSync(item, output + '/' + path.basename(item));
+    fs.copyFileSync(inputDir + '/' + item, output + '/' + path.basename(item));
   });
 
   return await Promise.all(
@@ -64,3 +52,5 @@ function removeElementComments(buffer) {
       )
   );
 }
+
+module.exports = build;

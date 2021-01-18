@@ -2,11 +2,11 @@ const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const through = require('through2');
 const { parseComponent } = require('vue-template-compiler');
-const utils = require('./build/utils');
+const utils = require('./utils');
 
-function build() {
+async function build(tsConfig, extensions, aliasConfig, declarationDir) {
   return gulp
-    .src(require('./tsconfig.json').include)
+    .src(tsConfig.include)
     .pipe(
       through.obj(function(file, _, cb) {
         // get scripts
@@ -22,15 +22,20 @@ function build() {
           file.extname = '.vue.ts';
         }
         file.contents = Buffer.from(
-          utils.transformToRelativePath(file.contents.toString(), file.path)
+          utils.transformToRelativePath(
+            file.contents.toString(),
+            file.path,
+            aliasConfig,
+            extensions
+          )
         );
         cb(null, file);
       })
     )
-    .pipe(ts.createProject('./tsconfig.json')())
+    .pipe(ts.createProject(tsConfig.compilerOptions)())
     .dts.pipe(
-      gulp.dest(require('./tsconfig.json').compilerOptions.declarationDir)
+      gulp.dest(declarationDir || tsConfig.compilerOptions.declarationDir)
     );
 }
 
-module.exports.default = build;
+module.exports = build;
