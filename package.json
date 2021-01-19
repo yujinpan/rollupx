@@ -11,6 +11,15 @@
     "tsconfig.json",
     "README.md"
   ],
+  "keywords": [
+    "rollup",
+    "js build",
+    "ts build",
+    "declaration build",
+    "vue build",
+    "scss build",
+    "less build"
+  ],
   "bin": {
     "rollupx": "bin/rollupx.js"
   },
