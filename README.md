@@ -57,8 +57,8 @@ $ rollupx
   - `name` your package name
   - `version` current version
   - `author` your name
-  - `main` main module
-  - `types` TS main module
+  - `module` main esm module
+  - `types` main ts module
   - `files` need to publish files
   - **`dependencies` your package required external dependencies**
 
@@ -67,7 +67,7 @@ $ rollupx
   "name": "xxx",
   "version": "1.1.1",
   "author": "your name",
-  "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
