@@ -46,7 +46,7 @@
     "typescript": "~3.9.3",
     "vue-cli-plugin-element": "^1.0.1",
     "vue-component-compiler": "^2.0.0",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.12"
   },
   "devDependencies": {
     "@babel/runtime": "^7.12.5",
