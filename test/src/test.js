@@ -1,5 +1,6 @@
 import './test.scss';
 import './test1.css';
+import 'element-ui/lib/theme-chalk/index.css';
 import png from './test.png';
 import jpg from './test.jpg';
 

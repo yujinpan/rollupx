@@ -10,6 +10,10 @@ const replace = require('@rollup/plugin-replace');
 const url = require('@rollup/plugin-url');
 
 function getRollupConfig(aliasConfig, extensions) {
+  const prefix = Object.keys(aliasConfig).concat(['\\.']);
+  const isRelative = new RegExp('^(' + prefix.join('|') + ')');
+  const isFile = /\.(png|svg|jpg|gif|scss|sass|less|css)$/;
+  const isVueFile = /rollup-plugin-vue/;
   return {
     plugins: [
       alias({
@@ -62,13 +66,11 @@ function getRollupConfig(aliasConfig, extensions) {
         filename: './stat/statistics.html'
       })
     ],
-    external: (id) =>
+    external: (id) => {
       // 1. 编译的临时文件需要保留
       // 2. 其他类型文件需要编译
-      !(
-        id.includes('rollup-plugin-vue') ||
-        /\.(png|svg|jpg|gif|scss|sass|less|css)$/.test(id)
-      )
+      return !(isVueFile.test(id) || (isRelative.test(id) && isFile.test(id)));
+    }
   };
 }
 
