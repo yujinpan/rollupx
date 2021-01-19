@@ -50,3 +50,43 @@ module.exports = {
 ```shell
 $ rollupx
 ```
+
+### Publish
+
+- update your `package.json`
+  - `name` your package name
+  - `version` current version
+  - `author` your name
+  - `main` main module
+  - `types` TS main module
+  - `files` need to publish files
+  - **`dependencies` your package required external dependencies**
+
+```json
+{
+  "name": "xxx",
+  "version": "1.1.1",
+  "author": "your name",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    // must be includes --- start
+    "@babel/runtime": "^7.12.5",
+    "core-js": "^3.8.1",
+    "style-inject": "^0.3.0",
+    "vue-runtime-helpers": "^1.1.2",
+    // must be includes --- end
+
+    // your package required external
+    "element-ui": "^2.12.0",
+    "vue": "^2.6.10",
+    "vue-class-component": "^7.2.3",
+    "vue-property-decorator": "^8.4.2"
+  }
+}
+
+```
