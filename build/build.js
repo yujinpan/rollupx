@@ -18,8 +18,8 @@ function build(options) {
   options = Object.assign(config, options);
 
   // validate
-  if (!options.inputDir || !options.outputDir || !options.stylesDir)
-    return console.log('inputDir/outputDir/stylesDir required');
+  if (!options.inputDir || !options.outputDir)
+    return console.log('inputDir/outputDir required');
   if (!/^\w+$/.test(options.inputDir + options.outputDir + options.stylesDir))
     return console.log('inputDir/outputDir/stylesDir must be a dirname');
 
@@ -53,14 +53,16 @@ function build(options) {
     console.log('build types completed!');
   });
 
-  // build styles
-  require('./styles')(
-    options.inputDir + '/' + options.stylesDir,
-    options.outputDir + '/' + options.stylesDir,
-    options.stylesCopyFiles
-  ).then(() => {
-    console.log('build styles completed!');
-  });
+  if (fs.existsSync(options.inputDir + '/' + options.stylesDir)) {
+    // build styles
+    require('./styles')(
+      options.inputDir + '/' + options.stylesDir,
+      options.outputDir + '/' + options.stylesDir,
+      options.stylesCopyFiles
+    ).then(() => {
+      console.log('build styles completed!');
+    });
+  }
 }
 
 module.exports = build;

@@ -5,11 +5,12 @@ const postcss = require('postcss');
 const autoprefixer = require('autoprefixer');
 
 async function build(inputDir, output, copyFiles) {
+  const styleReg = /.(scss|sass|less)$/;
   const files = fs
     .readdirSync(inputDir)
     .filter(
       (item) =>
-        /.scss$/.test(item) &&
+        styleReg.test(item) &&
         !copyFiles.some((file) => item.includes(path.basename(file)))
     );
 
@@ -22,7 +23,7 @@ async function build(inputDir, output, copyFiles) {
   return await Promise.all(
     files.map((filename) => {
       const filepath = inputDir + '/' + filename;
-      const outputPath = output + '/' + filename.replace(/.scss$/, '.css');
+      const outputPath = output + '/' + filename.replace(styleReg, '.css');
 
       const { css } = sass.renderSync({
         file: filepath,
