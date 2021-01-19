@@ -64,11 +64,18 @@ function relativePlugin(aliasConfig, extensions) {
  * transform absolute path to relative path
  */
 function transformToRelativePath(codes, filepath, aliasConfig, extensions) {
-  const imports = codes.match(/(from\s|require\(|import\()'@\/[^']*'\)?/g);
+  const isAliasImports = new RegExp(
+    '(from\\s|require\\(|import(\\(|\\s))(\'|")' +
+      '(' +
+      Object.keys(aliasConfig).join('|') +
+      ')(\\/[^\'"]*)?[\'"]',
+    'g'
+  );
+  const imports = codes.match(isAliasImports);
   if (imports) {
     // get source path
     const paths = imports.map((item) =>
-      item.replace(/^(from\s|require\(|import\()'/, '').replace(/'\)?/, '')
+      item.replace(/.*['"]([^'"]*)['"].*/, '$1')
     );
 
     // get relative path
@@ -105,16 +112,7 @@ function transformToRelativePath(codes, filepath, aliasConfig, extensions) {
   return codes;
 }
 
-function toAbsolutePath(path) {
-  if (path[0] !== '/') {
-    return process.cwd() + '/' + path;
-  } else {
-    return path;
-  }
-}
-
 module.exports = {
   createRollupOption,
-  transformToRelativePath,
-  toAbsolutePath
+  transformToRelativePath
 };

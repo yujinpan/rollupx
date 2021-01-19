@@ -1,6 +1,6 @@
 const fs = require('fs');
+const path = require('path');
 const config = require('./config');
-const utils = require('./utils');
 
 /**
  * @param {object} options
@@ -20,11 +20,14 @@ function build(options) {
   // validate
   if (!options.inputDir || !options.outputDir)
     return console.log('inputDir/outputDir required');
-  if (!/^\w+$/.test(options.inputDir + options.outputDir + options.stylesDir))
-    return console.log('inputDir/outputDir/stylesDir must be a dirname');
 
-  options.inputDir = utils.toAbsolutePath(options.inputDir);
-  options.outputDir = utils.toAbsolutePath(options.outputDir);
+  // resolve path
+  options.inputDir = path.resolve(options.inputDir);
+  options.outputDir = path.resolve(options.outputDir);
+  const aliasConfig = options.aliasConfig;
+  for (let key in aliasConfig) {
+    aliasConfig[key] = path.resolve(aliasConfig[key]);
+  }
 
   // clear
   fs.rmdirSync(options.outputDir, { recursive: true });

@@ -1,3 +1,7 @@
 module.exports = {
-  outputDir: 'test'
+  outputDir: 'test',
+  aliasConfig: {
+    '@': 'src',
+    test: './'
+  }
 };
