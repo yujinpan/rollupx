@@ -62,11 +62,13 @@ function getRollupConfig(aliasConfig, extensions) {
         filename: './stat/statistics.html'
       })
     ],
-    // 所有文件都打包了，所以所有的引入都作为外部
     external: (id) =>
-      ![
-        'rollup-plugin-vue' // 编译的临时文件需要保留
-      ].some((item) => id.includes(item))
+      // 1. 编译的临时文件需要保留
+      // 2. 其他类型文件需要编译
+      !(
+        id.includes('rollup-plugin-vue') ||
+        /\.(png|svg|jpg|gif|scss|sass|less|css)$/.test(id)
+      )
   };
 }
 
