@@ -1,15 +1,10 @@
-const banner =
-  '/*!\n' +
-  ` * rollupx v${require('../package.json').version}\n` +
-  ` * (c) 2019-${new Date().getFullYear()}\n` +
-  ' */\n';
-
-// multi package
-const inputFiles = ['src/**/!(*.d|types).*(ts|js|vue)'];
-
 module.exports = {
-  banner,
-  inputFiles,
+  banner:
+    '/*!\n' +
+    ` * (rollupx banner) v${require('../package.json').version}\n` +
+    ` * (c) 2019-${new Date().getFullYear()}\n` +
+    ' */\n',
+  inputFiles: ['src/**/!(*.d|types).*(ts|js|vue)'],
   inputDir: 'src',
   outputDir: 'dist',
   extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
