@@ -1,8 +1,7 @@
 const banner =
   '/*!\n' +
-  ` * vue-component-pack v${require('../package.json').version}\n` +
-  ` * (c) 2019-${new Date().getFullYear()} yujinpan\n` +
-  ' * Released under the MIT License.\n' +
+  ` * rollupx v${require('../package.json').version}\n` +
+  ` * (c) 2019-${new Date().getFullYear()}\n` +
   ' */\n';
 
 // multi package

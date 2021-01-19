@@ -1,4 +1,4 @@
-# vue-component-pack
+# rollupx
 
 js/ts/vue/scss to a library.
 
@@ -7,7 +7,7 @@ js/ts/vue/scss to a library.
 ### Install
 
 ```
-npm install --save vue-component-pack
+npm install --save rollupx
 ```
 
 ### Config
@@ -15,7 +15,7 @@ npm install --save vue-component-pack
 create a config file in your project.
 
 ```js
-// project/vue-component-pack.config.js
+// project/rollupx.config.js
 module.exports = {
   outputDir: 'dist'
 };
@@ -24,5 +24,5 @@ module.exports = {
 ### Build
 
 ```shell
-$ vue-component-cli
+$ rollupx
 ```

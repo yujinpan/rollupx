@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const configPath = process.cwd() + '/vue-component-pack.config.js';
+const configPath = process.cwd() + '/rollupx.config.js';
 let config = {};
 if (fs.existsSync(configPath)) {
   config = require(configPath);

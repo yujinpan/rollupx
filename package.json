@@ -1,5 +1,5 @@
 {
-  "name": "@yujinpan/vue-component-pack",
+  "name": "@yujinpan/rollupx",
   "version": "1.1.1",
   "author": "yujinpan",
   "main": "build/build.js",
@@ -12,7 +12,7 @@
     "README.md"
   ],
   "bin": {
-    "vue-component-pack": "bin/vue-component-pack.js"
+    "rollupx": "bin/rollupx.js"
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production node build/index.js && eslint --fix dist/**/*.d.ts"
@@ -67,12 +67,12 @@
     "vue-runtime-helpers": "^1.1.2"
   },
   "bugs": {
-    "url": "https://github.com/yujinpan/vue-component-pack/issues"
+    "url": "https://github.com/yujinpan/rollupx/issues"
   },
-  "homepage": "https://github.com/yujinpan/vue-component-pack#readme",
+  "homepage": "https://github.com/yujinpan/rollupx#readme",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/yujinpan/vue-component-pack.git"
+    "url": "git+ssh://git@github.com/yujinpan/rollupx.git"
   }
 }

@@ -3,13 +3,13 @@
 // ** 所有公共样式都要带上组件名前缀 **
 
 // 全局的使用 border-box 模式
-[class*=' vue-component-pack-'],
-[class^='vue-component-pack-'] {
+[class*=' rollupx-'],
+[class^='rollupx-'] {
   box-sizing: border-box;
 }
 
 // 全局的样式
-.vue-component-pack {
+.rollupx {
   &-overflow-hidden {
     overflow: hidden;
   }
