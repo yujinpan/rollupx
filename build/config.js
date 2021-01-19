@@ -4,7 +4,7 @@ module.exports = {
     ` * (rollupx banner) v${require('../package.json').version}\n` +
     ` * (c) 2019-${new Date().getFullYear()}\n` +
     ' */\n',
-  inputFiles: ['src/**/!(*.d|types).*(ts|js|vue)'],
+  inputFiles: ['src/**/!(*.d).*(ts|js|vue)'],
   inputDir: 'src',
   outputDir: 'dist',
   extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
