@@ -1,5 +1,5 @@
 {
-  "name": "@yujinpan/rollupx",
+  "name": "rollupx",
   "version": "1.1.1",
   "author": "yujinpan",
   "main": "build/build.js",
