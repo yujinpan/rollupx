@@ -66,7 +66,7 @@ module.exports = {
   stylesDir: '',
   stylesCopyFiles: [],
   typesOutputDir: 'types', // inherit outputDir
-  singleFile: false
+  singleFile: true
 };
 ```
 
