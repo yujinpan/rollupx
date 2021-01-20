@@ -17,7 +17,9 @@ function build(tsConfig, inputDir, outputDir, extensions, aliasConfig) {
             const code = file.contents.toString();
             const scripts = parseComponent(code);
             // must be ts
-            if (scripts.script.lang !== 'ts') return;
+            if (scripts.script.lang !== 'ts') {
+              return cb();
+            }
             file.contents = Buffer.from(
               (scripts.script
                 ? scripts.script.content
