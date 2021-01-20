@@ -55,7 +55,7 @@ module.exports = {
     ` * (c) 2019-${new Date().getFullYear()}\n` +
     ' */\n',
   // multi file
-  // inputFiles: ['src/**/!(*.d|types).*(ts|js|vue)'],
+  // inputFiles: ['src/**/!(*.d).*(ts|js|vue)'],
   // single file
   inputFiles: ['src/index.*(ts|js|vue)'],
   inputDir: 'src',
