@@ -2,6 +2,17 @@
 
 js/ts/vue/scss/less to a library.
 
+```
+- src             =>  - dist
+  - test.vue      =>    - test.vue.js
+  - test-ts.vue   =>    - test-ts.vue.js, vue-ts.vue.d.ts
+  - test.js       =>    - test.js
+  - test.ts       =>    - test.js, test.d.ts
+  - test.scss     =>    - (inline js)
+  - test.css      =>    - (inline js)
+  - test.png      =>    - (inline js OR 3dac04548057e393.png)
+```
+
 ## Usage
 
 ### Install
