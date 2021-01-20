@@ -2,6 +2,7 @@
 node_modules
 test/stat
 test/test
+test/types
 package-lock.json
 
 # local env files

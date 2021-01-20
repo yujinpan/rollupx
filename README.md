@@ -38,6 +38,7 @@ create a `rollupx.config.js` file in your project.
  * @property {object} [tsConfig] tsconfig.json 配置
  * @property {string} [stylesDir] 样式目录名，基于 inputDir
  * @property {string[]} [stylesCopyFiles] 需要拷贝的样式文件，例如 scss 变量可能需要拷贝
+ * @property {string} [typesOutputDir] 类型文件输出目录名，默认继承 outputDir
  */
 module.exports = {
   banner:
@@ -52,7 +53,8 @@ module.exports = {
   aliasConfig: require('../alias.config'),
   tsConfig: require('../tsconfig.json'),
   stylesDir: 'styles',
-  stylesCopyFiles: ['common-variables.scss']
+  stylesCopyFiles: ['common-variables.scss'],
+  typesOutputDir: '' // inherit outputDir
 };
 ```
 

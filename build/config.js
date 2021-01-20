@@ -13,5 +13,6 @@ module.exports = {
   aliasConfig: require('../alias.config'),
   tsConfig: require('../tsconfig.json'),
   stylesDir: 'styles',
-  stylesCopyFiles: ['common-variables.scss']
+  stylesCopyFiles: ['common-variables.scss'],
+  typesOutputDir: '' // inherit outputDir
 };

@@ -3,5 +3,6 @@ module.exports = {
   aliasConfig: {
     '@': 'src',
     test: './'
-  }
+  },
+  typesOutputDir: 'types'
 };

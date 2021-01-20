@@ -13,6 +13,7 @@ const config = require('./config');
  * @property {object} [tsConfig] tsconfig.json 配置
  * @property {string} [stylesDir] 样式目录名，基于 inputDir
  * @property {string[]} [stylesCopyFiles] 需要拷贝的样式文件，例如 scss 变量可能需要拷贝
+ * @property {string} [typesOutputDir] 类型文件输出目录名，默认继承 outputDir
  */
 function build(options) {
   options = Object.assign(config, options);
@@ -24,6 +25,12 @@ function build(options) {
   // resolve path
   options.inputDir = path.resolve(options.inputDir);
   options.outputDir = path.resolve(options.outputDir);
+  if (options.typesOutputDir) {
+    options.typesOutputDir = path.resolve(options.typesOutputDir);
+    // clear
+    fs.rmdirSync(options.typesOutputDir, { recursive: true });
+    fs.mkdirSync(options.typesOutputDir);
+  }
   const aliasConfig = options.aliasConfig;
   for (let key in aliasConfig) {
     aliasConfig[key] = path.resolve(aliasConfig[key]);
@@ -49,7 +56,7 @@ function build(options) {
   require('./types')(
     options.tsConfig,
     options.inputDir,
-    options.outputDir,
+    options.typesOutputDir || options.outputDir,
     options.extensions,
     options.aliasConfig
   ).then(() => {
