@@ -6,7 +6,10 @@ module.exports = {
     ` * (rollupx banner) v${require('../package.json').version}\n` +
     ` * (c) 2019-${new Date().getFullYear()}\n` +
     ' */\n',
-  inputFiles: ['src/**/!(*.d).*(' + fileTypes.join('|') + ')'],
+  // multi file
+  // inputFiles: ['src/**/!(*.d).*(' + fileTypes.join('|') + ')'],
+  // single file
+  inputFiles: ['src/index.*(' + fileTypes.join('|') + ')'],
   inputDir: 'src',
   outputDir: 'dist',
   extensions: fileTypes.map((item) => '.' + item),
@@ -14,6 +17,6 @@ module.exports = {
   tsConfig: require('../tsconfig.json'),
   stylesDir: '',
   stylesCopyFiles: [],
-  typesOutputDir: '', // inherit outputDir
-  singleFile: false
+  typesOutputDir: 'types', // inherit outputDir
+  singleFile: true
 };

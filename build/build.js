@@ -14,7 +14,7 @@ const config = require('./config');
  * @property {string} [stylesDir] 样式目录名，基于 inputDir
  * @property {string[]} [stylesCopyFiles] 需要拷贝的样式文件，例如 scss 变量可能需要拷贝
  * @property {string} [typesOutputDir] 类型文件输出目录名，默认继承 outputDir
- * @property {boolean} [singleFile] 是否打包为单文件，默认为 false
+ * @property {boolean} [singleFile] 是否打包为单文件，默认为 true
  */
 function build(options) {
   options = Object.assign(config, options);

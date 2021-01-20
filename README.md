@@ -46,6 +46,7 @@ create a `rollupx.config.js` file in your project.
  * @property {string} [stylesDir] 样式目录名，基于 inputDir
  * @property {string[]} [stylesCopyFiles] 需要拷贝的样式文件，例如 scss 变量可能需要拷贝
  * @property {string} [typesOutputDir] 类型文件输出目录名，默认继承 outputDir
+ * @property {boolean} [singleFile] 是否打包为单文件，默认为 true
  */
 module.exports = {
   banner:
@@ -53,7 +54,10 @@ module.exports = {
     ` * (rollupx banner) v${require('../package.json').version}\n` +
     ` * (c) 2019-${new Date().getFullYear()}\n` +
     ' */\n',
-  inputFiles: ['src/**/!(*.d|types).*(ts|js|vue)'],
+  // multi file
+  // inputFiles: ['src/**/!(*.d|types).*(ts|js|vue)'],
+  // single file
+  inputFiles: ['src/index.*(ts|js|vue)'],
   inputDir: 'src',
   outputDir: 'dist',
   extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
@@ -61,7 +65,7 @@ module.exports = {
   tsConfig: require('../tsconfig.json'),
   stylesDir: '',
   stylesCopyFiles: [],
-  typesOutputDir: '', // inherit outputDir
+  typesOutputDir: 'types', // inherit outputDir
   singleFile: false
 };
 ```

@@ -4,7 +4,7 @@ module.exports = {
     '@': 'src',
     test: './'
   },
-  typesOutputDir: 'types',
-  singleFile: true,
+  // typesOutputDir: 'types',
+  // singleFile: true,
   inputFiles: ['./src/index.ts']
 };
