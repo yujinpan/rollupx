@@ -12,7 +12,8 @@ module.exports = {
   extensions: fileTypes.map((item) => '.' + item),
   aliasConfig: require('../alias.config'),
   tsConfig: require('../tsconfig.json'),
-  stylesDir: 'styles',
-  stylesCopyFiles: ['common-variables.scss'],
-  typesOutputDir: '' // inherit outputDir
+  stylesDir: '',
+  stylesCopyFiles: [],
+  typesOutputDir: '', // inherit outputDir
+  singleFile: false
 };

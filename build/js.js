@@ -7,7 +7,8 @@ function build(
   outputDir,
   banner,
   aliasConfig,
-  extensions
+  extensions,
+  singleFile
 ) {
   return Promise.all(
     inputFiles
@@ -18,7 +19,8 @@ function build(
           outputDir,
           banner,
           aliasConfig,
-          extensions
+          extensions,
+          singleFile
         );
       })
       .flat()

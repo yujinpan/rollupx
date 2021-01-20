@@ -1,35 +1,29 @@
 const path = require('path');
 const glob = require('glob');
-const { getRollupConfig } = require('./rollup.config');
+const { getRollupBaseConfig } = require('./rollup.config');
 const resolve = require('resolve');
 
-/**
- * 创建配置项
- * @param {String} filePath 例如：src/index.ts
- * @param {String} inputDir 例如：src
- * @param {String} outputDir 例如：dist
- * @param {String} banner
- * @param {Object} aliasConfig
- * @param {Array} extensions
- */
 function createRollupOption(
   filePath,
   inputDir,
   outputDir,
   banner,
   aliasConfig,
-  extensions
+  extensions,
+  singleFile
 ) {
-  const rollupConfig = getRollupConfig(aliasConfig, extensions);
+  const rollupConfig = getRollupBaseConfig(aliasConfig, extensions, singleFile);
   const files = glob.sync(filePath);
   return files.map((item) => {
     const relativePath = path.relative(inputDir, item);
+    const basename = path.basename(relativePath);
     const file = path.join(
       outputDir,
       path.dirname(relativePath) +
         '/' +
-        path.basename(relativePath).replace('.ts', '.js') +
-        (item.endsWith('.vue') ? '.js' : '')
+        (basename.endsWith('.vue')
+          ? basename + '.js'
+          : basename.replace('.ts', '.js'))
     );
     return {
       ...rollupConfig,

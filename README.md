@@ -3,6 +3,13 @@
 js/ts/vue/scss/less to a library.
 
 ```
+# single file
+- src             =>  - dist
+  - test1.js      =>    - test1.js
+  - test2.js
+  - test3.js
+
+# multi file
 - src             =>  - dist
   - test.vue      =>    - test.vue.js
   - test-ts.vue   =>    - test-ts.vue.js, vue-ts.vue.d.ts
@@ -52,9 +59,10 @@ module.exports = {
   extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
   aliasConfig: require('../alias.config'),
   tsConfig: require('../tsconfig.json'),
-  stylesDir: 'styles',
-  stylesCopyFiles: ['common-variables.scss'],
-  typesOutputDir: '' // inherit outputDir
+  stylesDir: '',
+  stylesCopyFiles: [],
+  typesOutputDir: '', // inherit outputDir
+  singleFile: false
 };
 ```
 
