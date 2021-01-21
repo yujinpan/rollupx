@@ -6,7 +6,6 @@
   "files": [
     "bin",
     "build",
-    "alias.config.js",
     "babel.config.js",
     "tsconfig.json",
     "README.md"

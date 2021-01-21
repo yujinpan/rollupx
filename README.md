@@ -80,9 +80,9 @@ module.exports = {
 
 - recommend use the rollupx babel config `babel.config.js` [babel.config.js](./babel.config.js)
 
+example in your `project/babel.config.js`:
+
 ```js
-// project/babel.config.js
-// use extends
 module.exports = {
   extends: 'rollupx/babel.config.js',
   exclude: 'node_modules/**'
@@ -91,11 +91,25 @@ module.exports = {
 
 - recommend use the rollupx TS config `tsconfig.json` [tsconfig.json](./tsconfig.json)
 
-```js
-// project/tsconfig.json
-// use extends
-module.exports = {
-  extends: 'rollupx/tsconfig.json'
+example in your `project/tsconfig.json`:
+
+```json
+{
+  "extends": "rollupx/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
+  },
+  "include": [
+    "global.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue"
+  ]
 }
 ```
 

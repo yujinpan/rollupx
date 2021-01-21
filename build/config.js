@@ -13,7 +13,9 @@ module.exports = {
   inputDir: 'src',
   outputDir: 'dist',
   extensions: fileTypes.map((item) => '.' + item),
-  aliasConfig: require('../alias.config'),
+  aliasConfig: {
+    '@': 'src'
+  },
   tsConfig: require('../tsconfig.json'),
   stylesDir: '',
   stylesCopyFiles: [],
