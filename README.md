@@ -59,7 +59,7 @@ module.exports = {
   extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
 
   // 别名配置
-  aliasConfig: { '@': 'src' },
+  aliasConfig: {'@': 'src'},
 
   // TS 配置文件
   tsConfig: require('./tsconfig.json'),
@@ -84,7 +84,8 @@ module.exports = {
 // project/babel.config.js
 // use extends
 module.exports = {
-  extends: 'rollupx/babel.config.js'
+  extends: 'rollupx/babel.config.js',
+  exclude: 'node_modules/**'
 }
 ```
 
