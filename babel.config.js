@@ -5,7 +5,9 @@ module.exports = {
       // fix: @babel/plugin-transform-runtime option's absoluteRuntime default is false
       { absoluteRuntime: false }
     ],
-    '@babel/preset-typescript'
+    // fix: constructor public/private defined is lose when
+    // @babel/preset-typescript in here and project at the same time
+    ['@babel/preset-typescript', {}, 'rollupx-preset-typescript']
   ],
   plugins: [
     '@babel/plugin-proposal-export-default-from',
