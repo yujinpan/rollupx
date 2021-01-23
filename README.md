@@ -143,17 +143,17 @@ $ rollupx
   ],
   "dependencies": {
     // must be includes --- start
-    "@babel/runtime": "^7.12.5",
-    "core-js": "^3.8.1",
-    "style-inject": "^0.3.0",
-    "vue-runtime-helpers": "^1.1.2",
+    "@babel/runtime": "^7.x",
+    "core-js": "^3.x",
+    "style-inject": "^0.x",
+    "vue-runtime-helpers": "^1.x",
     // must be includes --- end
 
     // your package required external
-    "element-ui": "^2.12.0",
-    "vue": "^2.6.10",
-    "vue-class-component": "^7.2.3",
-    "vue-property-decorator": "^8.4.2"
+    "element-ui": "^2.x",
+    "vue": "^2.x",
+    "vue-class-component": "^7.x",
+    "vue-property-decorator": "^8.x"
   }
 }
 
