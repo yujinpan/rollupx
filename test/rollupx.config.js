@@ -6,5 +6,7 @@ module.exports = {
   },
   // typesOutputDir: 'types',
   // singleFile: true,
-  inputFiles: ['./src/index.ts']
+  inputFiles: ['./src/index.ts'],
+  stylesDir: 'styles',
+  stylesCopyFiles: ['index.scss']
 };

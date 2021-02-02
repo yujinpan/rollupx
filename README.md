@@ -38,40 +38,40 @@ npm install --save-dev rollupx
 module.exports = {
   // 文件头信息
   banner:
-    '/*!\n' +
-    ` * (rollupx banner) v${require('../package.json').version}\n` +
+    "/*!\n" +
+    ` * (rollupx banner) v${require("../package.json").version}\n` +
     ` * (c) 2019-${new Date().getFullYear()}\n` +
-    ' */\n',
+    " */\n",
 
   // 输入文件 [glob](https://github.com/isaacs/node-glob) 语句
   // multi file
   // inputFiles: ['src/**/!(*.d).*(ts|js|vue)'],
   // single file
-  inputFiles: ['src/index.*(ts|js|vue)'],
+  inputFiles: ["src/index.*(ts|js|vue)"],
 
   // 输入目录
-  inputDir: 'src',
+  inputDir: "src",
 
   // 输出目录
-  outputDir: 'dist',
+  outputDir: "dist",
 
   // 扩展名
-  extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+  extensions: [".js", ".jsx", ".ts", ".tsx", ".vue"],
 
   // 别名配置
-  aliasConfig: {'@': 'src'},
+  aliasConfig: { "@": "src" },
 
   // TS 配置文件
-  tsConfig: require('./tsconfig.json'),
+  tsConfig: require("./tsconfig.json"),
 
   // 样式目录
-  stylesDir: '',
+  stylesDir: "",
 
   // 需要拷贝的样式文件，例如一些 scss 变量文件
   stylesCopyFiles: [],
 
   // 类型文件输出目录
-  typesOutputDir: 'types', // inherit outputDir
+  typesOutputDir: "types", // inherit outputDir
 
   // 是否单文件（不按文件分模块）
   singleFile: true
@@ -84,9 +84,9 @@ example in your `project/babel.config.js`:
 
 ```js
 module.exports = {
-  extends: 'rollupx/babel.config.js',
-  exclude: 'node_modules/**'
-}
+  extends: "rollupx/babel.config.js",
+  exclude: "node_modules/**"
+};
 ```
 
 - recommend use the rollupx TS config `tsconfig.json` [tsconfig.json](./tsconfig.json)
@@ -99,17 +99,10 @@ example in your `project/tsconfig.json`:
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     }
   },
-  "include": [
-    "global.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue"
-  ]
+  "include": ["global.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
 }
 ```
 
@@ -137,10 +130,7 @@ $ rollupx
   "author": "your name",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "files": ["dist", "README.md"],
   "dependencies": {
     // must be includes --- start
     "@babel/runtime": "^7.x",
@@ -156,5 +146,20 @@ $ rollupx
     "vue-property-decorator": "^8.x"
   }
 }
+```
 
+## Project Config
+
+- `webpack` need support `.vue.js` extension, example in vue-cli:
+
+```js
+// vue.config.js
+module.exports = {
+  // webpack config
+  configureWebpack: {
+    resolve: {
+      extensions: [".vue.js"]
+    }
+  }
+};
 ```
