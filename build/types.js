@@ -16,8 +16,9 @@ function build(tsConfig, inputDir, outputDir, extensions, aliasConfig) {
           if (file.extname === '.vue') {
             const code = file.contents.toString();
             const scripts = parseComponent(code);
+            const lang = scripts.script.lang;
             // must be ts
-            if (scripts.script.lang !== 'ts') {
+            if (!['ts', 'tsx'].includes(lang)) {
               return cb();
             }
             file.contents = Buffer.from(
@@ -26,7 +27,7 @@ function build(tsConfig, inputDir, outputDir, extensions, aliasConfig) {
                 : `import { Vue } from 'vue-property-decorator';export default class extends Vue {}`
               ).trim()
             );
-            file.extname = '.vue.ts';
+            file.extname = '.vue.' + lang;
           }
           file.contents = Buffer.from(
             utils.transformToRelativePath(

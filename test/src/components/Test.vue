@@ -4,6 +4,11 @@
   </div>
 </template>
 
-<script>
-export default {};
+<script lang="tsx">
+export default {
+  name: 'test-tsx',
+  render() {
+    return <div>test-tsx</div>
+  }
+};
 </script>
