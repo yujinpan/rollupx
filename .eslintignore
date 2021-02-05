@@ -1,4 +1,3 @@
-lib
-dist
-stat
-test
+test/stat
+test/test
+test/types
