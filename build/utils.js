@@ -14,16 +14,12 @@ function createRollupOption(
 ) {
   const rollupConfig = getRollupBaseConfig(aliasConfig, extensions, singleFile);
   const files = glob.sync(filePath);
+  validate(files);
   return files.map((item) => {
     const relativePath = path.relative(inputDir, item);
-    const basename = path.basename(relativePath);
     const file = path.join(
       outputDir,
-      path.dirname(relativePath) +
-        '/' +
-        (basename.endsWith('.vue')
-          ? basename + '.js'
-          : basename.replace('.ts', '.js'))
+      path.dirname(relativePath) + '/' + suffixToJS(path.basename(relativePath))
     );
     return {
       ...rollupConfig,
@@ -104,6 +100,26 @@ function transformToRelativePath(codes, filepath, aliasConfig, extensions) {
     });
   }
   return codes;
+}
+
+/**
+ * 校验文件
+ */
+function validate(files) {
+  const filesBaseName = files.map(suffixToJS);
+  filesBaseName.forEach((item1, index1) => {
+    filesBaseName.forEach((item2, index2) => {
+      if (index1 !== index2 && item1 === item2) {
+        throw new Error(
+          `[rollupx] '${item1}' are multiple in the same name, when the suffix is different, the file name must also be different.`
+        );
+      }
+    });
+  });
+}
+
+function suffixToJS(file) {
+  return file.replace(/.[^.]+$/, '');
 }
 
 module.exports = {
