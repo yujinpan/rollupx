@@ -76,15 +76,16 @@ function transformToRelativePath(codes, filepath, aliasConfig, extensions) {
         // read alias path config
         for (const key in aliasConfig) {
           if (item.startsWith(key)) {
-            return path
-              .relative(
+            return suffixTo(
+              path.relative(
                 path.dirname(filepath),
                 resolve.sync(
                   item.replace(new RegExp('^' + key), aliasConfig[key]),
                   { extensions: extensions }
                 )
-              )
-              .replace(/.ts$/, '');
+              ),
+              ''
+            );
           }
         }
         console.warn(
@@ -120,7 +121,7 @@ function validate(files) {
   });
 }
 
-function suffixTo(file, suffix) {
+function suffixTo(file, suffix = '') {
   return file.replace(/.[^.]+$/, suffix);
 }
 
