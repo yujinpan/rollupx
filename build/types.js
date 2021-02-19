@@ -27,7 +27,7 @@ function build(tsConfig, inputDir, outputDir, extensions, aliasConfig) {
                 : `import { Vue } from 'vue-property-decorator';export default class extends Vue {}`
               ).trim()
             );
-            file.extname = '.vue.' + lang;
+            file.extname = '.' + lang;
           }
           file.contents = Buffer.from(
             utils.transformToRelativePath(
