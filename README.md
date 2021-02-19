@@ -73,6 +73,9 @@ module.exports = {
   // 类型文件输出目录
   typesOutputDir: "types", // inherit outputDir
 
+  // 全局的类型文件，相对于根目录
+  typesGlobal: "global.d.ts",
+
   // 是否单文件（不按文件分模块）
   singleFile: true
 };

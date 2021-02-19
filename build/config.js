@@ -20,5 +20,6 @@ module.exports = {
   stylesDir: '',
   stylesCopyFiles: [],
   typesOutputDir: 'types', // inherit outputDir
+  typesGlobal: 'global.d.ts',
   singleFile: true
 };

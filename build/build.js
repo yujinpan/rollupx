@@ -16,7 +16,7 @@ const config = require('./config');
  * @property {string} [typesOutputDir] 类型文件输出目录名，默认继承 outputDir
  * @property {boolean} [singleFile] 是否打包为单文件，默认为 true
  */
-function build(options) {
+async function build(options) {
   options = Object.assign(config, options);
 
   // validate
@@ -42,7 +42,7 @@ function build(options) {
   fs.mkdirSync(options.outputDir);
 
   // build js
-  require('./js')(
+  await require('./js')(
     options.inputFiles,
     options.inputDir,
     options.outputDir,
@@ -51,18 +51,19 @@ function build(options) {
     options.extensions,
     options.singleFile
   ).then(() => {
-    console.log('build js completed!');
+    printMsg('build js completed!');
   });
 
   // build types
-  require('./types')(
+  await require('./types')(
     options.tsConfig,
     options.inputDir,
     options.typesOutputDir || options.outputDir,
     options.extensions,
-    options.aliasConfig
+    options.aliasConfig,
+    options.typesGlobal
   ).then(() => {
-    console.log('build types completed!');
+    printMsg('build types completed!');
   });
 
   if (
@@ -70,14 +71,18 @@ function build(options) {
     fs.existsSync(options.inputDir + '/' + options.stylesDir)
   ) {
     // build styles
-    require('./styles')(
+    await require('./styles')(
       options.inputDir + '/' + options.stylesDir,
       options.outputDir + '/' + options.stylesDir,
       options.stylesCopyFiles
     ).then(() => {
-      console.log('build styles completed!');
+      printMsg('build styles completed!');
     });
   }
+}
+
+function printMsg(msg) {
+  console.log(`\x1b[32m${msg}\x1b[0m`);
 }
 
 module.exports = build;

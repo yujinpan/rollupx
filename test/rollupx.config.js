@@ -8,5 +8,6 @@ module.exports = {
   singleFile: false,
   inputFiles: ['src/**/!(*.d).*(ts|js|vue)'],
   stylesDir: 'styles',
-  stylesCopyFiles: ['index.scss']
+  stylesCopyFiles: ['index.scss'],
+  typesGlobal: 'src/global.d.ts'
 };

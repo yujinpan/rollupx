@@ -4,12 +4,21 @@ const through = require('through2');
 const { parseComponent } = require('vue-template-compiler');
 const utils = require('./utils');
 
-function build(tsConfig, inputDir, outputDir, extensions, aliasConfig) {
+function build(
+  tsConfig,
+  inputDir,
+  outputDir,
+  extensions,
+  aliasConfig,
+  globalFile
+) {
   return new Promise((resolve) => {
+    const files = ['/**/*.ts', '/**/*.tsx', '/**/*.vue'].map(
+      (item) => inputDir + item
+    );
+    if (globalFile) files.push(globalFile);
     gulp
-      .src(
-        ['/**/*.ts', '/**/*.tsx', '/**/*.vue'].map((item) => inputDir + item)
-      )
+      .src(files, { allowEmpty: true })
       .pipe(
         through.obj(function(file, _, cb) {
           // get scripts
