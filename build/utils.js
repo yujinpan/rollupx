@@ -19,7 +19,9 @@ function createRollupOption(
     const relativePath = path.relative(inputDir, item);
     const file = path.join(
       outputDir,
-      path.dirname(relativePath) + '/' + suffixToJS(path.basename(relativePath))
+      path.dirname(relativePath) +
+        '/' +
+        suffixTo(path.basename(relativePath), '.js')
     );
     return {
       ...rollupConfig,
@@ -106,7 +108,7 @@ function transformToRelativePath(codes, filepath, aliasConfig, extensions) {
  * 校验文件
  */
 function validate(files) {
-  const filesBaseName = files.map(suffixToJS);
+  const filesBaseName = files.map((item) => suffixTo(item, ''));
   filesBaseName.forEach((item1, index1) => {
     filesBaseName.forEach((item2, index2) => {
       if (index1 !== index2 && item1 === item2) {
@@ -118,8 +120,8 @@ function validate(files) {
   });
 }
 
-function suffixToJS(file) {
-  return file.replace(/.[^.]+$/, '');
+function suffixTo(file, suffix) {
+  return file.replace(/.[^.]+$/, suffix);
 }
 
 module.exports = {
