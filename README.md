@@ -147,19 +147,3 @@ $ rollupx
   }
 }
 ```
-
-## Project Config
-
-- `webpack` need support `.vue.js` extension, example in vue-cli:
-
-```js
-// vue.config.js
-module.exports = {
-  // webpack config
-  configureWebpack: {
-    resolve: {
-      extensions: [".vue.js"]
-    }
-  }
-};
-```
