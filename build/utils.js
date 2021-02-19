@@ -56,50 +56,40 @@ function relativePlugin(aliasConfig, extensions) {
  * transform absolute path to relative path
  */
 function transformToRelativePath(codes, filepath, aliasConfig, extensions) {
-  const isAliasImports = new RegExp(
-    '(from\\s|require\\(|import(\\(|\\s))(\'|")' +
-      '(' +
-      Object.keys(aliasConfig).join('|') +
-      ')(\\/[^\'"]*)?[\'"]',
-    'g'
+  const imports = codes.match(
+    new RegExp('(from\\s|require\\(|import(\\(|\\s))(\'|")[^\'"]*[\'"]', 'g')
   );
-  const imports = codes.match(isAliasImports);
   if (imports) {
-    // get source path
-    const paths = imports.map((item) =>
-      item.replace(/.*['"]([^'"]*)['"].*/, '$1')
+    // js/jsx/ts/tsx/vue to .js
+    const isJS = new RegExp('(' + extensions.join('|') + ')$');
+    // relative path
+    const isAliasImport = new RegExp(
+      '(' + Object.keys(aliasConfig).join('|') + ')(\\/|$)'
     );
-
-    // get relative path
-    const relativePaths = paths
-      .map((item) => {
+    imports.forEach((item) => {
+      const oldPath = item.replace(/.*['"]([^'"]*)['"].*/, '$1');
+      let newPath = oldPath;
+      if (isAliasImport.test(newPath)) {
         // read alias path config
         for (const key in aliasConfig) {
-          if (item.startsWith(key)) {
-            return suffixTo(
-              path.relative(
-                path.dirname(filepath),
-                resolve.sync(
-                  item.replace(new RegExp('^' + key), aliasConfig[key]),
-                  { extensions: extensions }
-                )
-              ),
-              ''
+          if (newPath.startsWith(key)) {
+            newPath = path.relative(
+              path.dirname(filepath),
+              resolve.sync(
+                newPath.replace(new RegExp('^' + key), aliasConfig[key]),
+                { extensions: extensions }
+              )
             );
+            newPath = newPath.startsWith('.') ? newPath : './' + newPath;
           }
         }
-        console.warn(
-          'gulpfile.js warn:',
-          'can not find the path config:' + item
-        );
-        return item;
-      })
-      // add ./
-      .map((item) => (item.startsWith('.') ? item : './' + item));
-
-    // replace source code
-    paths.forEach((item, index) => {
-      codes = codes.replace(item, relativePaths[index]);
+      }
+      if (!newPath.includes('rollup-plugin-vue') && isJS.test(newPath)) {
+        newPath = suffixTo(newPath, '');
+      }
+      if (oldPath !== newPath) {
+        codes = codes.replace(item, item.replace(oldPath, newPath));
+      }
     });
   }
   return codes;
