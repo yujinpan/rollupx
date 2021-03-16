@@ -50,9 +50,11 @@ async function build(options) {
     options.aliasConfig,
     options.extensions,
     options.singleFile
-  ).then(() => {
-    printMsg('build js completed!');
-  });
+  )
+    .then(() => {
+      printMsg('build js completed!');
+    })
+    .catch((e) => console.warn('build js error:', e));
 
   // build types
   await require('./types')(
@@ -62,9 +64,11 @@ async function build(options) {
     options.extensions,
     options.aliasConfig,
     options.typesGlobal
-  ).then(() => {
-    printMsg('build types completed!');
-  });
+  )
+    .then(() => {
+      printMsg('build types completed!');
+    })
+    .catch((e) => console.warn('build types error:', e));
 
   if (
     options.stylesDir &&
@@ -75,9 +79,11 @@ async function build(options) {
       options.inputDir + '/' + options.stylesDir,
       options.outputDir + '/' + options.stylesDir,
       options.stylesCopyFiles
-    ).then(() => {
-      printMsg('build styles completed!');
-    });
+    )
+      .then(() => {
+        printMsg('build styles completed!');
+      })
+      .catch((e) => console.warn('build styles error:', e));
   }
 }
 
