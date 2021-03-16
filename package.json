@@ -70,6 +70,9 @@
     "vue-property-decorator": "^8.4.2",
     "vue-runtime-helpers": "^1.1.2"
   },
+  "engines": {
+    "node": ">=12.10.0"
+  },
   "bugs": {
     "url": "https://github.com/yujinpan/rollupx/issues"
   },
