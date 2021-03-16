@@ -51,25 +51,10 @@ async function build(options) {
     options.extensions,
     options.singleFile
   )
-    .then(() => {
-      printMsg('build js completed!');
-    })
-    .catch((e) => console.warn('build js error:', e));
+    .then(() => printMsg('build js completed!'))
+    .catch((e) => printErr('build js error:', e));
 
-  // build types
-  await require('./types')(
-    options.tsConfig,
-    options.inputDir,
-    options.typesOutputDir || options.outputDir,
-    options.extensions,
-    options.aliasConfig,
-    options.typesGlobal
-  )
-    .then(() => {
-      printMsg('build types completed!');
-    })
-    .catch((e) => console.warn('build types error:', e));
-
+  // build styles
   if (
     options.stylesDir &&
     fs.existsSync(options.inputDir + '/' + options.stylesDir)
@@ -80,15 +65,29 @@ async function build(options) {
       options.outputDir + '/' + options.stylesDir,
       options.stylesCopyFiles
     )
-      .then(() => {
-        printMsg('build styles completed!');
-      })
-      .catch((e) => console.warn('build styles error:', e));
+      .then(() => printMsg('build styles completed!'))
+      .catch((e) => printErr('build styles error:', e));
   }
+
+  // build types
+  await require('./types')(
+    options.tsConfig,
+    options.inputDir,
+    options.typesOutputDir || options.outputDir,
+    options.extensions,
+    options.aliasConfig,
+    options.typesGlobal
+  )
+    .then(() => printMsg('build types completed!'))
+    .catch((e) => printErr('build types error:', e));
 }
 
 function printMsg(msg) {
-  console.log(`\x1b[32m${msg}\x1b[0m`);
+  console.log(`\x1b[32m[rollupx] ${msg}\x1b[0m`);
+}
+
+function printErr(name, err) {
+  console.log(`\x1b[31m[rollupx] ${name}\x1b[0m`, err);
 }
 
 module.exports = build;

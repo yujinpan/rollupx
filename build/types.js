@@ -12,7 +12,7 @@ function build(
   aliasConfig,
   globalFile
 ) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const files = ['/**/*.ts', '/**/*.tsx', '/**/*.vue'].map(
       (item) => inputDir + item
     );
@@ -49,11 +49,13 @@ function build(
           cb(null, file);
         })
       )
-      .pipe(ts.createProject(tsConfig.compilerOptions)())
+      .pipe(
+        ts
+          .createProject(tsConfig.compilerOptions)()
+          .on('error', reject)
+      )
       .dts.pipe(gulp.dest(outputDir || tsConfig.compilerOptions.declarationDir))
-      .on('finish', function() {
-        resolve();
-      });
+      .on('finish', resolve);
   });
 }
 
