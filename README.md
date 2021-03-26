@@ -59,7 +59,7 @@ module.exports = {
   extensions: [".js", ".jsx", ".ts", ".tsx", ".vue"],
 
   // 别名配置
-  aliasConfig: { "@": "src" },
+  aliasConfig: { "@": "src", "~": "node_modules" },
 
   // TS 配置文件
   tsConfig: require("./tsconfig.json"),
