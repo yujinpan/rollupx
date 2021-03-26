@@ -10,10 +10,11 @@ const replace = require('@rollup/plugin-replace');
 const url = require('@rollup/plugin-url');
 
 function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
+  const isNodeModules = /node_modules/;
   const prefix = Object.keys(aliasConfig)
-    .map((item) => item + '(/|$)')
+    .filter((item) => !isNodeModules.test(aliasConfig[item]))
     .concat(['\\.']);
-  const isRelative = new RegExp('^(' + prefix.join('|') + ')');
+  const isRelative = new RegExp('^(' + prefix.join('|') + ')(/|$)');
   const isFile = /\.(png|svg|jpg|gif|scss|sass|less|css)$/;
   const isVueFile = /rollup-plugin-vue/;
   return {
@@ -69,12 +70,21 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
       })
     ],
     external: (id) => {
-      // 1. 编译的临时文件需要保留
-      // 2. 其他类型文件需要编译
-      return !(
-        isVueFile.test(id) ||
-        (isRelative.test(id) && (isFile.test(id) || singleFile))
-      );
+      // 编译的临时文件需要编译
+      if (isVueFile.test(id)) return false;
+
+      if (isNodeModules.test(id)) {
+        // 其他类型文件需要编译
+        return !isFile.test(id);
+      }
+
+      // 使用相对路径与单文件模式时需要编译
+      if (isRelative.test(id)) {
+        return !singleFile;
+      }
+
+      // 绝对路径的非 node_modules 里面的文件需要编译
+      return !(id.startsWith('/') && !isNodeModules.test(id));
     }
   };
 }
