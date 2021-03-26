@@ -1,7 +1,7 @@
 const rollup = require('rollup');
 const utils = require('./utils');
 
-function build(
+async function build(
   inputFiles,
   inputDir,
   outputDir,

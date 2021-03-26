@@ -4,7 +4,7 @@ const through = require('through2');
 const { parseComponent } = require('vue-template-compiler');
 const utils = require('./utils');
 
-function build(
+async function build(
   tsConfig,
   inputDir,
   outputDir,
