@@ -5,6 +5,7 @@ const postcss = require('postcss');
 const autoprefixer = require('autoprefixer');
 
 async function build(inputDir, output, copyFiles) {
+  const nodePath = process.cwd() + '/node_modules/';
   const styleReg = /.(scss|sass|less)$/;
   const files = fs
     .readdirSync(inputDir)
@@ -20,7 +21,7 @@ async function build(inputDir, output, copyFiles) {
     fs.copyFileSync(inputDir + '/' + item, output + '/' + path.basename(item));
   });
 
-  return await Promise.all(
+  return Promise.all(
     files.map((filename) => {
       const filepath = inputDir + '/' + filename;
       const outputPath = output + '/' + filename.replace(styleReg, '.css');
@@ -28,7 +29,18 @@ async function build(inputDir, output, copyFiles) {
       const { css } = sass.renderSync({
         file: filepath,
         output: output,
-        outputStyle: 'expanded'
+        outputStyle: 'expanded',
+        importer: function(url) {
+          if (url.startsWith('~')) {
+            return {
+              file: url.replace(/^~/, nodePath)
+            };
+          } else {
+            return {
+              file: url
+            };
+          }
+        }
       });
 
       return postcss([autoprefixer])
