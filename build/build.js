@@ -16,8 +16,18 @@ const config = require('./config');
  * @property {string} [typesOutputDir] 类型文件输出目录名，默认继承 outputDir
  * @property {boolean} [singleFile] 是否打包为单文件，默认为 true
  */
-async function build(options) {
-  options = Object.assign(config, options);
+async function build(options = {}) {
+  for (let key in config) {
+    if (config.hasOwnProperty(key)) {
+      if (Array.isArray(config[key])) {
+        options[key] = (options[key] || []).concat(config[key]);
+      } else if (key !== 'inputFiles' && typeof config[key] === 'object') {
+        options[key] = Object.assign(options[key] || {}, config[key]);
+      } else {
+        options[key] = options[key] || config[key];
+      }
+    }
+  }
 
   // validate
   if (!options.inputDir || !options.outputDir)
