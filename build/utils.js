@@ -25,9 +25,9 @@ function createRollupOption(
     );
     return {
       ...rollupConfig,
-      plugins: rollupConfig.plugins.concat([
-        relativePlugin(aliasConfig, extensions)
-      ]),
+      plugins: rollupConfig.plugins.concat(
+        singleFile ? [] : [relativePlugin(aliasConfig, extensions)]
+      ),
       input: item,
       output: [
         {
