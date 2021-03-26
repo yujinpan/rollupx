@@ -19,12 +19,13 @@ const config = require('./config');
 async function build(options = {}) {
   for (let key in config) {
     if (config.hasOwnProperty(key)) {
+      const item = options[key];
       if (Array.isArray(config[key])) {
-        options[key] = (options[key] || []).concat(config[key]);
+        options[key] = (item || []).concat(config[key]);
       } else if (key !== 'inputFiles' && typeof config[key] === 'object') {
-        options[key] = Object.assign(options[key] || {}, config[key]);
+        options[key] = Object.assign(item || {}, config[key]);
       } else {
-        options[key] = options[key] || config[key];
+        options[key] = item === undefined ? config[key] : item;
       }
     }
   }
