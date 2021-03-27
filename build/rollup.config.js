@@ -12,7 +12,8 @@ const nodePath = require('path');
 const fs = require('fs');
 
 function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
-  const nodeAliasKeys = Object.keys(aliasConfig).filter((item) =>
+  const aliasKeys = Object.keys(aliasConfig);
+  const nodeAliasKeys = aliasKeys.filter((item) =>
     aliasConfig[item].includes('node_modules')
   );
   const assetsReg = /\.(png|svg|jpg|gif|scss|sass|less|css)$/;
@@ -69,12 +70,12 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
         filename: './stat/statistics.html'
       })
     ],
-    external: (id, parentId) => {
+    external: (id, parentId, resolved) => {
       // 内部 - 编译的临时文件需要编译
       if (vuePluginReg.test(id)) return false;
 
       // 外部 - 第三方模块跳过
-      if (isNodeModules(id, parentId, nodeAliasKeys)) return true;
+      if (isNodeModules(id, parentId, nodeAliasKeys, aliasKeys)) return true;
 
       // 内部 - 静态资源需要编译
       if (assetsReg.test(id)) return false;
@@ -88,14 +89,21 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
   };
 }
 
-function isNodeModules(path, parentPath, nodeAliasKeys) {
+function isNodeModules(path, parentPath, nodeAliasKeys, aliasKeys) {
   // 包含 node_modules 的直接为 true
   // 未包含的判断是否有相对模块
   return (
     path.includes('node_modules') ||
-    nodeAliasKeys.some((item) => path.startsWith(item)) ||
-    !fs.existsSync(nodePath.dirname(parentPath) + '/' + path)
+    path.startsWith('~') ||
+    nodeAliasKeys.some((item) => isStartsWidthAlias(path, item)) ||
+    (!path.startsWith('/') &&
+      !aliasKeys.some((item) => isStartsWidthAlias(path, item)) &&
+      !fs.existsSync(nodePath.dirname(parentPath) + '/' + path))
   );
+}
+
+function isStartsWidthAlias(path, alias) {
+  return path === alias || path.startsWith(alias + '/');
 }
 
 module.exports = {
