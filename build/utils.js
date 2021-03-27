@@ -55,7 +55,13 @@ function relativePlugin(aliasConfig, extensions) {
 /**
  * transform absolute path to relative path
  */
-function transformToRelativePath(codes, filepath, aliasConfig, extensions) {
+function transformToRelativePath(
+  codes,
+  filepath,
+  aliasConfig,
+  extensions,
+  newSuffix = '.js'
+) {
   const imports = codes.match(
     new RegExp('(from\\s|require\\(|import(\\(|\\s))(\'|")[^\'"]*[\'"]', 'g')
   );
@@ -85,7 +91,7 @@ function transformToRelativePath(codes, filepath, aliasConfig, extensions) {
         }
       }
       if (!newPath.includes('rollup-plugin-vue') && isJS.test(newPath)) {
-        newPath = suffixTo(newPath, '.js');
+        newPath = suffixTo(newPath, newSuffix);
       }
       if (oldPath !== newPath) {
         codes = codes.replace(item, item.replace(oldPath, newPath));

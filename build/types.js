@@ -43,7 +43,8 @@ async function build(
               file.contents.toString(),
               file.path,
               aliasConfig,
-              extensions
+              extensions,
+              ''
             )
           );
           cb(null, file);
