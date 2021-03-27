@@ -8,15 +8,15 @@ const alias = require('@rollup/plugin-alias');
 const visualizer = require('rollup-plugin-visualizer');
 const replace = require('@rollup/plugin-replace');
 const url = require('@rollup/plugin-url');
+const nodePath = require('path');
+const fs = require('fs');
 
 function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
-  const isNodeModules = /node_modules/;
-  const prefix = Object.keys(aliasConfig)
-    .filter((item) => !isNodeModules.test(aliasConfig[item]))
-    .concat(['\\.']);
-  const isRelative = new RegExp('^(' + prefix.join('|') + ')(/|$)');
-  const isFile = /\.(png|svg|jpg|gif|scss|sass|less|css)$/;
-  const isVueFile = /rollup-plugin-vue/;
+  const nodeAliasKeys = Object.keys(aliasConfig).filter((item) =>
+    aliasConfig[item].includes('node_modules')
+  );
+  const assetsReg = /\.(png|svg|jpg|gif|scss|sass|less|css)$/;
+  const vuePluginReg = /rollup-plugin-vue/;
   return {
     plugins: [
       alias({
@@ -69,24 +69,33 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
         filename: './stat/statistics.html'
       })
     ],
-    external: (id) => {
-      // 编译的临时文件需要编译
-      if (isVueFile.test(id)) return false;
+    external: (id, parentId) => {
+      // 内部 - 编译的临时文件需要编译
+      if (vuePluginReg.test(id)) return false;
 
-      if (isNodeModules.test(id)) {
-        // 其他类型文件需要编译
-        return !isFile.test(id);
-      }
+      // 外部 - 第三方模块跳过
+      if (isNodeModules(id, parentId, nodeAliasKeys)) return true;
 
-      // 使用相对路径与单文件模式时需要编译
-      if (isRelative.test(id)) {
-        return !singleFile;
-      }
+      // 内部 - 静态资源需要编译
+      if (assetsReg.test(id)) return false;
 
-      // 绝对路径的非 node_modules 里面的文件需要编译
-      return !(id.startsWith('/') && !isNodeModules.test(id));
+      // 内部 - js 文件单文件模式需要编译
+      if (singleFile) return false;
+
+      // 内部 - 多文件模式则跳过
+      return true;
     }
   };
+}
+
+function isNodeModules(path, parentPath, nodeAliasKeys) {
+  // 包含 node_modules 的直接为 true
+  // 未包含的判断是否有相对模块
+  return (
+    path.includes('node_modules') ||
+    nodeAliasKeys.some((item) => path.startsWith(item)) ||
+    !fs.existsSync(nodePath.dirname(parentPath) + '/' + path)
+  );
 }
 
 module.exports = {
