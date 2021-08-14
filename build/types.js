@@ -3,6 +3,7 @@ const ts = require('gulp-typescript');
 const through = require('through2');
 const { parseComponent } = require('vue-template-compiler');
 const utils = require('./utils');
+const fs = require('fs');
 
 async function build(
   tsConfig,
@@ -12,6 +13,8 @@ async function build(
   aliasConfig,
   globalFile
 ) {
+  fs.rmdirSync(outputDir, { recursive: true });
+  fs.mkdirSync(outputDir, { recursive: true });
   return new Promise((resolve, reject) => {
     const files = ['/**/*.ts', '/**/*.tsx', '/**/*.vue'].map(
       (item) => inputDir + item

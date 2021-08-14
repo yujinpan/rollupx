@@ -3,43 +3,52 @@ const fs = require('fs');
 const path = require('path');
 const postcss = require('postcss');
 const autoprefixer = require('autoprefixer');
+const utils = require('./utils');
 
-async function build(inputDir, output, copyFiles) {
-  const nodePath = process.cwd() + '/node_modules/';
-  const styleReg = /.(scss|sass|less)$/;
-  const files = fs
-    .readdirSync(inputDir)
-    .filter(
-      (item) =>
-        styleReg.test(item) &&
-        !copyFiles.some((file) => item.includes(path.basename(file)))
-    );
+const cssSuffixReg = /\.(scss|sass|less|css)$/;
 
-  fs.rmdirSync(output, { recursive: true });
-  fs.mkdirSync(output, { recursive: true });
+async function build(inputDir, outputDir, parseFiles, copyFiles, aliasConfig) {
+  parseFiles = utils.getFiles(parseFiles, inputDir, cssSuffixReg);
+  copyFiles = utils.getFiles(copyFiles, inputDir, cssSuffixReg);
+  const allFiles = parseFiles.concat(copyFiles);
+
+  fs.rmdirSync(outputDir, { recursive: true });
+  fs.mkdirSync(outputDir, { recursive: true });
+  utils.deDup(allFiles.map((item) => path.dirname(item))).forEach((item) => {
+    const dir = item.replace(inputDir, outputDir);
+    !fs.existsSync(dir) && fs.mkdirSync(dir);
+  });
+
   copyFiles.forEach((item) => {
-    fs.copyFileSync(inputDir + '/' + item, output + '/' + path.basename(item));
+    const code = fs.readFileSync(item).toString();
+    const dest = item.replace(inputDir, outputDir);
+    // to relative path
+    fs.writeFileSync(
+      dest,
+      utils.transformToRelativePath(code, item, aliasConfig, [
+        '.scss',
+        '.sass',
+        '.less',
+        '.css'
+      ])
+    );
   });
 
   return Promise.all(
-    files.map((filename) => {
-      const filepath = inputDir + '/' + filename;
-      const outputPath = output + '/' + filename.replace(styleReg, '.css');
+    parseFiles.map((filepath) => {
+      const outputPath = filepath
+        .replace(inputDir, outputDir)
+        .replace(cssSuffixReg, '.css');
 
+      const nodePath = process.cwd() + '/node_modules/';
       const { css } = sass.renderSync({
         file: filepath,
-        output: output,
+        output: outputDir,
         outputStyle: 'expanded',
         importer: function(url) {
-          if (url.startsWith('~')) {
-            return {
-              file: url.replace(/^~/, nodePath)
-            };
-          } else {
-            return {
-              file: url
-            };
-          }
+          return {
+            file: url.replace(/^~/, nodePath).replace(cssSuffixReg, '')
+          };
         }
       });
 

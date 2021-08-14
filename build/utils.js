@@ -1,7 +1,7 @@
 const path = require('path');
-const glob = require('glob');
 const { getRollupBaseConfig } = require('./rollup.config');
 const resolve = require('resolve');
+const glob = require('glob');
 
 function createRollupOption(
   filePath,
@@ -13,31 +13,27 @@ function createRollupOption(
   singleFile
 ) {
   const rollupConfig = getRollupBaseConfig(aliasConfig, extensions, singleFile);
-  const files = glob.sync(filePath);
-  validate(files);
-  return files.map((item) => {
-    const relativePath = path.relative(inputDir, item);
-    const file = path.join(
-      outputDir,
-      path.dirname(relativePath) +
-        '/' +
-        suffixTo(path.basename(relativePath), '.js')
-    );
-    return {
-      ...rollupConfig,
-      plugins: rollupConfig.plugins.concat(
-        singleFile ? [] : [relativePlugin(aliasConfig, extensions)]
-      ),
-      input: item,
-      output: [
-        {
-          file: file,
-          format: 'es',
-          banner: banner
-        }
-      ]
-    };
-  });
+  const relativePath = path.relative(inputDir, filePath);
+  const outputFile = path.join(
+    outputDir,
+    path.dirname(relativePath) +
+      '/' +
+      suffixTo(path.basename(relativePath), '.js')
+  );
+  return {
+    ...rollupConfig,
+    plugins: rollupConfig.plugins.concat(
+      singleFile ? [] : [relativePlugin(aliasConfig, extensions)]
+    ),
+    input: filePath,
+    output: [
+      {
+        file: outputFile,
+        format: 'es',
+        banner: banner
+      }
+    ]
+  };
 }
 
 /**
@@ -63,34 +59,40 @@ function transformToRelativePath(
   newSuffix = '.js'
 ) {
   const imports = codes.match(
-    new RegExp('(from\\s|require\\(|import(\\(|\\s))(\'|")[^\'"]*[\'"]', 'g')
+    // import {} from '...'
+    // require('...')
+    // import('...')
+    // @import('...')
+    // @import url('...')
+    new RegExp(
+      '(from\\s+|require\\(|import\\(|@import\\s+(url\\()?)(\'|")(' +
+        Object.keys(aliasConfig).join('|') +
+        ')(\\/.*)?(\'|")',
+      'g'
+    )
   );
+
   if (imports) {
-    // jsx/ts/tsx/vue to .js
-    const isJS = new RegExp('\\.(jsx|ts|tsx|vue)$');
-    // relative path
-    const isAliasImport = new RegExp(
-      '(' + Object.keys(aliasConfig).join('|') + ')(\\/|$)'
-    );
     imports.forEach((item) => {
       const oldPath = item.replace(/.*['"]([^'"]*)['"].*/, '$1');
       let newPath = oldPath;
-      if (isAliasImport.test(newPath)) {
-        // read alias path config
-        for (const key in aliasConfig) {
-          if (newPath.startsWith(key)) {
-            newPath = path.relative(
-              path.dirname(filepath),
-              resolve.sync(
-                newPath.replace(new RegExp('^' + key), aliasConfig[key]),
-                { extensions: extensions }
-              )
-            );
-            newPath = newPath.startsWith('.') ? newPath : './' + newPath;
-          }
+      // read alias path config
+      for (const key in aliasConfig) {
+        if (newPath.startsWith(key)) {
+          newPath = path.relative(
+            path.dirname(filepath),
+            resolve.sync(
+              newPath.replace(new RegExp('^' + key), aliasConfig[key]),
+              { extensions: extensions }
+            )
+          );
+          newPath = newPath.startsWith('.') ? newPath : './' + newPath;
         }
       }
-      if (!newPath.includes('rollup-plugin-vue') && isJS.test(newPath)) {
+      if (
+        !newPath.includes('rollup-plugin-vue') &&
+        /.(jsx|ts|tsx|vue)$/.test(newPath)
+      ) {
         newPath = suffixTo(newPath, newSuffix);
       }
       if (oldPath !== newPath) {
@@ -101,27 +103,47 @@ function transformToRelativePath(
   return codes;
 }
 
-/**
- * 校验文件
- */
-function validate(files) {
-  const filesBaseName = files.map((item) => suffixTo(item, ''));
-  filesBaseName.forEach((item1, index1) => {
-    filesBaseName.forEach((item2, index2) => {
-      if (index1 !== index2 && item1 === item2) {
-        throw new Error(
-          `[rollupx] '${item1}' are multiple in the same name, when the suffix is different, the file name must also be different.`
-        );
-      }
-    });
-  });
-}
-
 function suffixTo(file, suffix = '') {
   return file.replace(/.[^.]+$/, suffix);
 }
 
+function mergeProps(source, target) {
+  for (let key in source) {
+    if (key in target) {
+      const sourceItem = source[key];
+      const targetItem = target[key];
+      if (isPlainObj(sourceItem) && isPlainObj(targetItem)) {
+        mergeProps(sourceItem, targetItem);
+      } else {
+        source[key] = targetItem;
+      }
+    }
+  }
+  return source;
+}
+
+function getFiles(arrPattern, dir, reg) {
+  return deDup(
+    arrPattern
+      .map((item) => glob.sync(path.resolve(dir, item)))
+      .flat()
+      .filter((item) => reg.test(item))
+  );
+}
+
+function deDup(arr) {
+  return Array.from(new Set(arr));
+}
+
+function isPlainObj(obj) {
+  return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
+}
+
 module.exports = {
+  deDup,
+  getFiles,
+  mergeProps,
+  suffixTo,
   createRollupOption,
   transformToRelativePath
 };

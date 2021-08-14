@@ -24,7 +24,7 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
         entries: aliasConfig
       }),
       resolve({
-        extensions: extensions
+        extensions
       }),
       // 替换 env 文件的环境变量
       replace({
@@ -107,5 +107,5 @@ function isStartsWidthAlias(path, alias) {
 }
 
 module.exports = {
-  getRollupBaseConfig: getRollupBaseConfig
+  getRollupBaseConfig
 };

@@ -5,9 +5,10 @@ module.exports = {
     test: './'
   },
   // typesOutputDir: 'types',
-  singleFile: false,
-  inputFiles: ['src/**/!(*.d).*(ts|js|vue)'],
+  // singleFile: false,
+  // inputFiles: ['**/*'],
   stylesDir: 'styles',
-  stylesCopyFiles: ['index.scss'],
+  // stylesParseFiles: [],
+  stylesCopyFiles: ['**/*'],
   typesGlobal: 'src/global.d.ts'
 };

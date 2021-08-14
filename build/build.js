@@ -1,34 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('./config');
+const utils = require('./utils');
 
 /**
- * @param {object} options
- * @property {string[]} [inputFiles] 匹配输入的文件
- * @property {string} [inputDir] 输入文件根目录名
- * @property {string} [outputDir] 输出目录名
- * @property {string} [banner] 文件头信息
- * @property {object} [aliasConfig] 路径别名配置
- * @property {string[]} [extensions] 扩展名配置
- * @property {object} [tsConfig] tsconfig.json 配置
- * @property {string} [stylesDir] 样式目录名，基于 inputDir
- * @property {string[]} [stylesCopyFiles] 需要拷贝的样式文件，例如 scss 变量可能需要拷贝
- * @property {string} [typesOutputDir] 类型文件输出目录名，默认继承 outputDir
- * @property {boolean} [singleFile] 是否打包为单文件，默认为 true
+ * @param {import('./config.js').Options} options
  */
 async function build(options = {}) {
-  for (let key in config) {
-    if (config.hasOwnProperty(key)) {
-      const item = options[key];
-      if (Array.isArray(config[key])) {
-        options[key] = (item || []).concat(config[key]);
-      } else if (key !== 'inputFiles' && typeof config[key] === 'object') {
-        options[key] = Object.assign(item || {}, config[key]);
-      } else {
-        options[key] = item === undefined ? config[key] : item;
-      }
-    }
-  }
+  if (Array.isArray(options.extensions))
+    options.extensions = config.extensions.concat(options.extensions);
+  options = utils.mergeProps(config, options);
 
   // validate
   if (!options.inputDir || !options.outputDir)
@@ -37,12 +18,7 @@ async function build(options = {}) {
   // resolve path
   options.inputDir = path.resolve(options.inputDir);
   options.outputDir = path.resolve(options.outputDir);
-  if (options.typesOutputDir) {
-    options.typesOutputDir = path.resolve(options.typesOutputDir);
-    // clear
-    fs.rmdirSync(options.typesOutputDir, { recursive: true });
-    fs.mkdirSync(options.typesOutputDir);
-  }
+  options.typesOutputDir = path.resolve(options.typesOutputDir);
   const aliasConfig = options.aliasConfig;
   for (let key in aliasConfig) {
     aliasConfig[key] = path.resolve(aliasConfig[key]);
@@ -66,15 +42,15 @@ async function build(options = {}) {
     .catch((e) => printErr('build js error:', e));
 
   // build styles
-  if (
-    options.stylesDir &&
-    fs.existsSync(options.inputDir + '/' + options.stylesDir)
-  ) {
+  const stylesDir = path.resolve(options.inputDir, options.stylesDir);
+  if (fs.existsSync(stylesDir)) {
     // build styles
     await require('./styles')(
-      options.inputDir + '/' + options.stylesDir,
-      options.outputDir + '/' + options.stylesDir,
-      options.stylesCopyFiles
+      stylesDir,
+      path.resolve(options.outputDir, options.stylesDir),
+      options.stylesParseFiles,
+      options.stylesCopyFiles,
+      options.aliasConfig
     )
       .then(() => printMsg('build styles completed!'))
       .catch((e) => printErr('build styles error:', e));
@@ -84,7 +60,7 @@ async function build(options = {}) {
   await require('./types')(
     options.tsConfig,
     options.inputDir,
-    options.typesOutputDir || options.outputDir,
+    options.typesOutputDir,
     options.extensions,
     options.aliasConfig,
     options.typesGlobal

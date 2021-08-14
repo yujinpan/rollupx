@@ -43,17 +43,17 @@ module.exports = {
     ` * (c) 2019-${new Date().getFullYear()}\n` +
     " */\n",
 
-  // 输入文件 [glob](https://github.com/isaacs/node-glob) 语句
-  // multi file
-  // inputFiles: ['src/**/!(*.d).*(ts|js|vue)'],
-  // single file
-  inputFiles: ["src/index.*(ts|js|vue)"],
-
   // 输入目录
   inputDir: "src",
 
   // 输出目录
   outputDir: "dist",
+
+  // 输入文件，基于 inputDir，规则为 [glob](https://github.com/isaacs/node-glob) 语句
+  // multi file
+  // inputFiles: ['**/*'],
+  // single file
+  inputFiles: ["index.*"],
 
   // 扩展名
   extensions: [".js", ".jsx", ".ts", ".tsx", ".vue"],
@@ -64,14 +64,16 @@ module.exports = {
   // TS 配置文件
   tsConfig: require("./tsconfig.json"),
 
-  // 样式目录
-  stylesDir: "",
+  // 样式目录，基于 inputDir
+  stylesDir: "styles",
 
-  // 需要拷贝的样式文件，例如一些 scss 变量文件
-  stylesCopyFiles: [],
+  // 需要编译的文件，基于 stylesDir
+  stylesParseFiles: ["index.scss"],
+  // 需要拷贝的样式文件，基于 stylesDir，例如一些 scss 变量文件
+  stylesCopyFiles: ["var.scss"],
 
-  // 类型文件输出目录
-  typesOutputDir: "types", // inherit outputDir
+  // 类型文件输出目录，基于 inputDir
+  typesOutputDir: "types",
 
   // 全局的类型文件，相对于根目录
   typesGlobal: "global.d.ts",
