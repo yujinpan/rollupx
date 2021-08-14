@@ -13,8 +13,6 @@ async function build(
   aliasConfig,
   globalFile
 ) {
-  fs.rmdirSync(outputDir, { recursive: true });
-  fs.mkdirSync(outputDir, { recursive: true });
   return new Promise((resolve, reject) => {
     const files = ['/**/*.ts', '/**/*.tsx', '/**/*.vue'].map(
       (item) => inputDir + item

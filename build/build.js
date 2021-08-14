@@ -27,6 +27,9 @@ async function build(options = {}) {
   // clear
   fs.rmdirSync(options.outputDir, { recursive: true });
   fs.mkdirSync(options.outputDir);
+  // types 不一定在 src 下面，所以单独创建
+  fs.rmdirSync(options.typesOutputDir, { recursive: true });
+  fs.mkdirSync(options.typesOutputDir);
 
   // build js
   await require('./js')(
