@@ -65,30 +65,35 @@ function transformToRelativePath(
     // @import('...')
     // @import url('...')
     new RegExp(
-      '(from\\s+|require\\(|import\\(|@import\\s+(url\\()?)(\'|")(' +
-        Object.keys(aliasConfig).join('|') +
-        ')(\\/.*)?(\'|")',
+      '(from\\s+|require\\(|import\\(|@import\\s+(url\\()?)(\'|").+(\'|")',
       'g'
     )
   );
 
   if (imports) {
+    const isAlias = new RegExp(
+      '(' + Object.keys(aliasConfig).join('|') + ')(\\/.*)?$'
+    );
     imports.forEach((item) => {
-      const oldPath = item.replace(/.*['"]([^'"]*)['"].*/, '$1');
+      const oldPath = item.replace(/.*['"](.+)['"].*/, '$1');
       let newPath = oldPath;
-      // read alias path config
-      for (const key in aliasConfig) {
-        if (newPath.startsWith(key)) {
-          newPath = path.relative(
-            path.dirname(filepath),
-            resolve.sync(
-              newPath.replace(new RegExp('^' + key), aliasConfig[key]),
-              { extensions: extensions }
-            )
-          );
-          newPath = newPath.startsWith('.') ? newPath : './' + newPath;
+      // 别名路径转换
+      if (isAlias.test(oldPath)) {
+        // read alias path config
+        for (const key in aliasConfig) {
+          if (newPath.startsWith(key)) {
+            newPath = path.relative(
+              path.dirname(filepath),
+              resolve.sync(
+                newPath.replace(new RegExp('^' + key), aliasConfig[key]),
+                { extensions: extensions }
+              )
+            );
+            newPath = newPath.startsWith('.') ? newPath : './' + newPath;
+          }
         }
       }
+      // 尾部的 .vue 转换
       if (
         !newPath.includes('rollup-plugin-vue') &&
         /.(jsx|ts|tsx|vue)$/.test(newPath)
