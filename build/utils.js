@@ -72,7 +72,7 @@ function transformToRelativePath(
 
   if (imports) {
     const isAlias = new RegExp(
-      '(' + Object.keys(aliasConfig).join('|') + ')(\\/.*)?$'
+      '^(' + Object.keys(aliasConfig).join('|') + ')(\\/.*)?$'
     );
     imports.forEach((item) => {
       const oldPath = item.replace(/.*['"](.+)['"].*/, '$1');
@@ -96,7 +96,7 @@ function transformToRelativePath(
       // 尾部的 .vue 转换
       if (
         !newPath.includes('rollup-plugin-vue') &&
-        /.(jsx|ts|tsx|vue)$/.test(newPath)
+        /\.(jsx|ts|tsx|vue)$/.test(newPath)
       ) {
         newPath = suffixTo(newPath, newSuffix);
       }
@@ -109,7 +109,7 @@ function transformToRelativePath(
 }
 
 function suffixTo(file, suffix = '') {
-  return file.replace(/.[^.]+$/, suffix);
+  return file.replace(/\.[^.]+$/, suffix);
 }
 
 function mergeProps(source, target) {
