@@ -46,7 +46,21 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
           }
         },
         // https://github.com/vuejs/rollup-plugin-vue/issues/262
-        normalizer: '~vue-runtime-helpers/dist/normalize-component.js'
+        normalizer: '~vue-runtime-helpers/dist/normalize-component.js',
+        // https://github.com/vuejs/rollup-plugin-vue/issues/300#issuecomment-663098421
+        style: {
+          preprocessOptions: {
+            scss: {
+              importer: [
+                (url) => {
+                  return {
+                    file: url.replace(/^~/, 'node_modules/')
+                  };
+                }
+              ]
+            }
+          }
+        }
       }),
       postcss({
         minimize: true,
