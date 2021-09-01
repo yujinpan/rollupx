@@ -30,7 +30,7 @@ module.exports = {
     parser: '@typescript-eslint/parser'
   },
 
-  'extends': [
+  extends: [
     'plugin:vue/essential',
     'eslint:recommended',
     '@vue/prettier',
