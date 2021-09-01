@@ -1,10 +1,10 @@
-@import 'common-variables';
+@import "~@/styles/common-variables.scss";
 
 // ** 所有公共样式都要带上组件名前缀 **
 
 // 全局的使用 border-box 模式
-[class*=' rollupx-'],
-[class^='rollupx-'] {
+[class*=" rollupx-"],
+[class^="rollupx-"] {
   box-sizing: border-box;
 }
 
