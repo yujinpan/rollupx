@@ -4,14 +4,61 @@ const { nodeResolve: resolve } = require('@rollup/plugin-node-resolve');
 const postcss = require('rollup-plugin-postcss');
 const json = require('@rollup/plugin-json');
 const commonjs = require('@rollup/plugin-commonjs');
-const alias = require('@rollup/plugin-alias');
 const visualizer = require('rollup-plugin-visualizer');
 const replace = require('@rollup/plugin-replace');
 const url = require('@rollup/plugin-url');
 const nodePath = require('path');
 const fs = require('fs');
+const path = require('path');
+const { suffixTo, transformToRelativePath } = require('./utils');
+
+/**
+ * 生成 rollup 配置
+ */
+function generateRollupConfig(
+  filePath,
+  inputDir,
+  outputDir,
+  banner,
+  aliasConfig,
+  extensions,
+  singleFile
+) {
+  const rollupConfig = getRollupBaseConfig(aliasConfig, extensions, singleFile);
+  const relativePath = path.relative(inputDir, filePath);
+  const outputFile = path.join(
+    outputDir,
+    path.dirname(relativePath) +
+      '/' +
+      suffixTo(path.basename(relativePath), '.js')
+  );
+  return {
+    ...rollupConfig,
+    input: filePath,
+    output: [
+      {
+        file: outputFile,
+        format: 'es',
+        banner: banner
+      }
+    ]
+  };
+}
+
+/**
+ * 将文件中的缩写路径转换为相对路径
+ */
+function relativePlugin(aliasConfig, extensions) {
+  return {
+    name: 'rollup-plugin-relative',
+    transform(code, id) {
+      return transformToRelativePath(code, id, aliasConfig, extensions);
+    }
+  };
+}
 
 function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
+  const utils = require('./utils');
   const aliasKeys = Object.keys(aliasConfig);
   const nodeAliasKeys = aliasKeys.filter((item) =>
     aliasConfig[item].includes('node_modules')
@@ -20,9 +67,8 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
   const vuePluginReg = /rollup-plugin-vue/;
   return {
     plugins: [
-      alias({
-        entries: aliasConfig
-      }),
+      // 全部 js/css 文件转换为相对路径
+      relativePlugin(aliasConfig, extensions.concat(utils.styleExtensions)),
       resolve({
         extensions
       }),
@@ -52,9 +98,9 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
           preprocessOptions: {
             scss: {
               importer: [
-                (url) => {
+                (url, filepath) => {
                   return {
-                    file: url.replace(/^~/, 'node_modules/')
+                    file: utils.toRelative(filepath, url, aliasConfig)
                   };
                 }
               ]
@@ -121,5 +167,5 @@ function isStartsWidthAlias(path, alias) {
 }
 
 module.exports = {
-  getRollupBaseConfig
+  generateRollupConfig
 };

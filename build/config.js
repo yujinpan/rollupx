@@ -40,7 +40,7 @@ module.exports = {
 
   aliasConfig: {
     '@': 'src',
-    '~': 'node_modules'
+    '~': process.cwd() + '/node_modules/'
   },
   tsConfig: require('../tsconfig.json'),
 

@@ -1,5 +1,6 @@
 const rollup = require('rollup');
 const utils = require('./utils');
+const { generateRollupConfig } = require('./rollup');
 
 async function build(
   inputFiles,
@@ -21,7 +22,7 @@ async function build(
   return Promise.all(
     files
       .map((item) => {
-        return utils.createRollupOption(
+        return generateRollupConfig(
           item,
           inputDir,
           outputDir,

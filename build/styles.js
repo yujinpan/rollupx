@@ -25,12 +25,12 @@ async function build(inputDir, outputDir, parseFiles, copyFiles, aliasConfig) {
     // to relative path
     fs.writeFileSync(
       dest,
-      utils.transformToRelativePath(code, item, aliasConfig, [
-        '.scss',
-        '.sass',
-        '.less',
-        '.css'
-      ])
+      utils.transformToRelativePath(
+        code,
+        item,
+        aliasConfig,
+        utils.styleExtensions
+      )
     );
   });
 
@@ -40,14 +40,13 @@ async function build(inputDir, outputDir, parseFiles, copyFiles, aliasConfig) {
         .replace(inputDir, outputDir)
         .replace(cssSuffixReg, '.css');
 
-      const nodePath = process.cwd() + '/node_modules/';
       const { css } = sass.renderSync({
         file: filepath,
         output: outputDir,
         outputStyle: 'expanded',
         importer: function(url) {
           return {
-            file: url.replace(/^~/, nodePath).replace(cssSuffixReg, '')
+            file: utils.toRelative(filepath, url, aliasConfig)
           };
         }
       });

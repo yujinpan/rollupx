@@ -1,52 +1,8 @@
 const path = require('path');
-const { getRollupBaseConfig } = require('./rollup.config');
 const resolve = require('resolve');
 const glob = require('glob');
 
-function createRollupOption(
-  filePath,
-  inputDir,
-  outputDir,
-  banner,
-  aliasConfig,
-  extensions,
-  singleFile
-) {
-  const rollupConfig = getRollupBaseConfig(aliasConfig, extensions, singleFile);
-  const relativePath = path.relative(inputDir, filePath);
-  const outputFile = path.join(
-    outputDir,
-    path.dirname(relativePath) +
-      '/' +
-      suffixTo(path.basename(relativePath), '.js')
-  );
-  return {
-    ...rollupConfig,
-    plugins: rollupConfig.plugins.concat(
-      singleFile ? [] : [relativePlugin(aliasConfig, extensions)]
-    ),
-    input: filePath,
-    output: [
-      {
-        file: outputFile,
-        format: 'es',
-        banner: banner
-      }
-    ]
-  };
-}
-
-/**
- * 将文件中的缩写路径转换为相对路径
- */
-function relativePlugin(aliasConfig, extensions) {
-  return {
-    name: 'rollup-plugin-relative',
-    transform(code, id) {
-      return transformToRelativePath(code, id, aliasConfig, extensions);
-    }
-  };
-}
+const styleExtensions = ['.scss', '.sass', '.less', '.css'];
 
 /**
  * transform absolute path to relative path
@@ -71,28 +27,9 @@ function transformToRelativePath(
   );
 
   if (imports) {
-    const isAlias = new RegExp(
-      '^(' + Object.keys(aliasConfig).join('|') + ')(\\/.*)?$'
-    );
     imports.forEach((item) => {
       const oldPath = item.replace(/.*['"](.+)['"].*/, '$1');
-      let newPath = oldPath;
-      // 别名路径转换
-      if (isAlias.test(oldPath)) {
-        // read alias path config
-        for (const key in aliasConfig) {
-          if (newPath.startsWith(key)) {
-            newPath = path.relative(
-              path.dirname(filepath),
-              resolve.sync(
-                newPath.replace(new RegExp('^' + key), aliasConfig[key]),
-                { extensions: extensions }
-              )
-            );
-            newPath = newPath.startsWith('.') ? newPath : './' + newPath;
-          }
-        }
-      }
+      let newPath = toRelative(filepath, oldPath, aliasConfig, extensions);
       // 尾部的 .vue 转换
       if (
         !newPath.includes('rollup-plugin-vue') &&
@@ -106,6 +43,35 @@ function transformToRelativePath(
     });
   }
   return codes;
+}
+
+function toRelative(filepath, resolvePath, aliasConfig, extensions) {
+  // 调整顺序，提高多个字符的匹配度，例如：~@ 比 ～ 优先级高
+  const keys = Object.keys(aliasConfig).sort((a, b) => b.length - a.length);
+  keys.forEach((key) => {
+    // 仅有 @ 或者 @/ 或者 ~xxx 形式
+    if (
+      resolvePath === key ||
+      resolvePath.startsWith(key + '/') ||
+      (key === '~' && resolvePath.startsWith('~'))
+    ) {
+      resolvePath = path.relative(
+        path.dirname(filepath),
+        resolve.sync(
+          resolvePath.replace(
+            new RegExp('^' + key),
+            // 当前缀为 ～ 时，需要补充 /
+            aliasConfig[key] + (key === '~' ? '/' : '')
+          ),
+          { extensions }
+        )
+      );
+      resolvePath = resolvePath.startsWith('.')
+        ? resolvePath
+        : './' + resolvePath;
+    }
+  });
+  return resolvePath;
 }
 
 function suffixTo(file, suffix = '') {
@@ -149,6 +115,7 @@ module.exports = {
   getFiles,
   mergeProps,
   suffixTo,
-  createRollupOption,
-  transformToRelativePath
+  transformToRelativePath,
+  toRelative,
+  styleExtensions
 };
