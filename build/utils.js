@@ -14,7 +14,7 @@ function transformToRelativePath(
   extensions,
   newSuffix = '.js'
 ) {
-  const imports = codes.match(
+  const imports = removeComment(codes).match(
     // import {} from '...'
     // require('...')
     // import('...')
@@ -108,6 +108,17 @@ function deDup(arr) {
 
 function isPlainObj(obj) {
   return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
+}
+
+/**
+ * 移除注释代码
+ * - //
+ * - /*
+ * - *
+ * - <
+ */
+function removeComment(codes) {
+  return codes.replace(/^\\s*(\/\/|\/\*|\*|<).*$/, '');
 }
 
 module.exports = {
