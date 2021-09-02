@@ -21,7 +21,7 @@ function transformToRelativePath(
     // @import('...')
     // @import url('...')
     new RegExp(
-      '(from\\s+|require\\(|import\\(|@import\\s+(url\\()?)(\'|").+(\'|")',
+      '(^|\\s+)(from\\s+|require\\(|import\\(|@import\\s+(url\\()?)(\'|").+(\'|")',
       'g'
     )
   );
