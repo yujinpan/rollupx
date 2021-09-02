@@ -19,6 +19,9 @@ async function build(inputDir, outputDir, parseFiles, copyFiles, aliasConfig) {
     !fs.existsSync(dir) && fs.mkdirSync(dir);
   });
 
+  // 注意：由于外部引用的 node_modules 与库的目录不同，所以这里拷贝的 scss 文件的 ～ 缩写不进行替换
+  const copyAliasConfig = { ...aliasConfig };
+  delete copyAliasConfig['~'];
   copyFiles.forEach((item) => {
     const code = fs.readFileSync(item).toString();
     const dest = item.replace(inputDir, outputDir);
@@ -28,7 +31,7 @@ async function build(inputDir, outputDir, parseFiles, copyFiles, aliasConfig) {
       utils.transformToRelativePath(
         code,
         item,
-        aliasConfig,
+        copyAliasConfig,
         utils.styleExtensions
       )
     );
