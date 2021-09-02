@@ -21,7 +21,7 @@ function transformToRelativePath(
     // @import('...')
     // @import url('...')
     new RegExp(
-      '^\\s*[^/<]*(from\\s+|require\\(|import\\(|@import\\s+(url\\()?)(\'|").+(\'|")',
+      '(from\\s+|require\\(|import\\(|@import\\s+(url\\()?)(\'|").+(\'|")',
       'g'
     )
   );
@@ -118,7 +118,7 @@ function isPlainObj(obj) {
  * - <
  */
 function removeComment(codes) {
-  return codes.replace(/^\\s*(\/\/|\/\*|\*|<).*$/, '');
+  return codes.replace(/^\s*(\/\/|\/\*|\*|<).*$/gm, '');
 }
 
 module.exports = {
