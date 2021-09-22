@@ -100,7 +100,12 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
               importer: [
                 (url, filepath) => {
                   return {
-                    file: utils.toRelative(filepath, url, aliasConfig)
+                    file: utils.toRelative(
+                      filepath,
+                      url,
+                      aliasConfig,
+                      utils.styleExtensions
+                    )
                   };
                 }
               ]

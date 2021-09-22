@@ -49,7 +49,12 @@ async function build(inputDir, outputDir, parseFiles, copyFiles, aliasConfig) {
         outputStyle: 'expanded',
         importer: function(url) {
           return {
-            file: utils.toRelative(filepath, url, aliasConfig)
+            file: utils.toRelative(
+              filepath,
+              url,
+              aliasConfig,
+              utils.styleExtensions
+            )
           };
         }
       });
