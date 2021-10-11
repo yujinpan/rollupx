@@ -48,11 +48,17 @@ function generateRollupConfig(
 /**
  * 将文件中的缩写路径转换为相对路径
  */
-function relativePlugin(aliasConfig, extensions) {
+function relativePlugin(aliasConfig, extensions, newSuffix) {
   return {
     name: 'rollup-plugin-relative',
     transform(code, id) {
-      return transformToRelativePath(code, id, aliasConfig, extensions);
+      return transformToRelativePath(
+        code,
+        id,
+        aliasConfig,
+        extensions,
+        newSuffix
+      );
     }
   };
 }
@@ -68,7 +74,11 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
   return {
     plugins: [
       // 全部 js/css 文件转换为相对路径
-      relativePlugin(aliasConfig, extensions.concat(utils.styleExtensions)),
+      relativePlugin(
+        aliasConfig,
+        extensions.concat(utils.styleExtensions),
+        singleFile ? false : undefined
+      ),
       resolve({
         extensions
       }),
@@ -161,7 +171,12 @@ function isNodeModules(path, parentPath, nodeAliasKeys, aliasKeys) {
     path.includes('node_modules') ||
     path.startsWith('~') ||
     nodeAliasKeys.some((item) => isStartsWidthAlias(path, item)) ||
+    // 1. 'jquery' 可能存在 node_modules 中，也可以在当前目录中
+    // 2. 排除 / 开头
+    // 3. 排除 . 开头
+    // 4. 排除缩写路径开头
     (!path.startsWith('/') &&
+      !path.startsWith('.') &&
       !aliasKeys.some((item) => isStartsWidthAlias(path, item)) &&
       !fs.existsSync(nodePath.dirname(parentPath) + '/' + path))
   );

@@ -32,6 +32,7 @@ function transformToRelativePath(
       let newPath = toRelative(filepath, oldPath, aliasConfig, extensions);
       // 尾部的 .vue 转换
       if (
+        newSuffix !== false &&
         !newPath.includes('rollup-plugin-vue') &&
         /\.(jsx|ts|tsx|vue)$/.test(newPath)
       ) {
