@@ -16,12 +16,13 @@ function transformToRelativePath(
 ) {
   const imports = removeComment(codes).match(
     // import {} from '...'
+    // import '...'
     // require('...')
     // import('...')
     // @import('...')
     // @import url('...')
     new RegExp(
-      '(from\\s+|require\\(|import\\(|@import\\s+(url\\()?)(\'|").+(\'|")',
+      '(from\\s+|import\\s+|require\\(|import\\(|@import\\s+(url\\()?)(\'|").+(\'|")',
       'g'
     )
   );
