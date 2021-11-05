@@ -5,11 +5,11 @@ module.exports = {
     test: './'
   },
   // typesOutputDir: 'types',
-  singleFile: false,
-  inputFiles: ['**/*'],
-  stylesDir: 'styles',
-  // stylesParseFiles: [],
-  stylesCopyFiles: ['**/*'],
-  typesOutputDir: 'test',
-  typesGlobal: 'src/global.d.ts'
+  // singleFile: false,
+  // inputFiles: ['**/*'],
+  // stylesDir: 'styles',
+  // // stylesParseFiles: [],
+  stylesCopyFiles: ['**/*']
+  // typesOutputDir: 'test',
+  // typesGlobal: 'src/global.d.ts'
 };

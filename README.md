@@ -36,50 +36,50 @@ npm install --save-dev rollupx
 // project/rollupx.config.js
 // default config
 module.exports = {
-  // 文件头信息
+  // 文件头信息 String
   banner:
     "/*!\n" +
     ` * (rollupx banner) v${require("../package.json").version}\n` +
     ` * (c) 2019-${new Date().getFullYear()}\n` +
     " */\n",
 
-  // 输入目录
+  // 输入目录 String
   inputDir: "src",
 
-  // 输出目录
+  // 输出目录 String
   outputDir: "dist",
 
-  // 输入文件，基于 inputDir，规则为 [glob](https://github.com/isaacs/node-glob) 语句
+  // 输入文件 String[]，基于 inputDir，规则为 [glob](https://github.com/isaacs/node-glob) 语句
   // multi file
-  // inputFiles: ['**/*'],
+  inputFiles: ["**/*"],
   // single file
-  inputFiles: ["index.*"],
+  // inputFiles: ["index.*"],
 
-  // 扩展名
+  // 扩展名 String[]
   extensions: [".js", ".jsx", ".ts", ".tsx", ".vue"],
 
-  // 别名配置
+  // 别名配置 Object
   aliasConfig: { "@": "src", "~": "node_modules" },
 
-  // TS 配置文件
+  // TS 配置文件 Object
   tsConfig: require("./tsconfig.json"),
 
-  // 样式目录，基于 inputDir
+  // 样式目录 String，基于 inputDir
   stylesDir: "styles",
 
-  // 需要编译的文件，基于 stylesDir
-  stylesParseFiles: ["index.scss"],
-  // 需要拷贝的样式文件，基于 stylesDir，例如一些 scss 变量文件
-  stylesCopyFiles: ["var.scss"],
+  // 需要编译的文件 String[]，基于 stylesDir，例如：["index.scss"]；["**/*"] 为编译所有样式文件。
+  stylesParseFiles: [],
+  // 需要拷贝的样式文件 String[]，基于 stylesDir，例如：["var.scss"]；["**/*"] 为复制所有样式文件。
+  stylesCopyFiles: [],
 
-  // 类型文件输出目录，基于 inputDir
-  typesOutputDir: "types",
+  // 类型文件输出目录 String，继承 outputDir，例如："types"
+  typesOutputDir: "",
 
-  // 全局的类型文件，相对于根目录
+  // 全局的类型文件 String，相对于根目录
   typesGlobal: "global.d.ts",
 
-  // 是否单文件（不按文件分模块）
-  singleFile: true
+  // 是否单文件（不按文件分模块） Boolean
+  singleFile: false
 };
 ```
 

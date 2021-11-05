@@ -18,7 +18,9 @@ async function build(options = {}) {
   // resolve path
   options.inputDir = path.resolve(options.inputDir);
   options.outputDir = path.resolve(options.outputDir);
-  options.typesOutputDir = path.resolve(options.typesOutputDir);
+  options.typesOutputDir = path.resolve(
+    options.outputDir || options.typesOutputDir
+  );
   const aliasConfig = options.aliasConfig;
   for (let key in aliasConfig) {
     // ~ 为 scss @import 语法前缀

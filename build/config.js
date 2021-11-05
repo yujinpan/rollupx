@@ -33,9 +33,9 @@ module.exports = {
   outputDir: 'dist',
 
   // multi file
-  // inputFiles: ['**/*'],
+  inputFiles: ['**/*'],
   // single file
-  inputFiles: ['index.*'],
+  // inputFiles: ['index.*'],
   extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
 
   aliasConfig: {
@@ -45,11 +45,12 @@ module.exports = {
   tsConfig: require('../tsconfig.json'),
 
   stylesDir: 'styles',
-  stylesParseFiles: ['index.scss'],
-  stylesCopyFiles: ['var.scss'],
+  stylesParseFiles: [],
+  stylesCopyFiles: [],
 
-  typesOutputDir: 'types',
+  // inherit outputDir
+  typesOutputDir: '',
   typesGlobal: 'global.d.ts',
 
-  singleFile: true
+  singleFile: false
 };
