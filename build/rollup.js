@@ -14,16 +14,18 @@ const { suffixTo, transformToRelativePath } = require('./utils');
 
 /**
  * 生成 rollup 配置
+ * @param {string} filePath
+ * @param {import('./config')} options
  */
-function generateRollupConfig(
-  filePath,
-  inputDir,
-  outputDir,
-  banner,
-  aliasConfig,
-  extensions,
-  singleFile
-) {
+function generateRollupConfig(filePath, options) {
+  const {
+    inputDir,
+    outputDir,
+    banner,
+    aliasConfig,
+    extensions,
+    singleFile
+  } = options;
   const rollupConfig = getRollupBaseConfig(aliasConfig, extensions, singleFile);
   const relativePath = path.relative(inputDir, filePath);
   const outputFile = path.join(

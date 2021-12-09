@@ -7,15 +7,37 @@ const utils = require('./utils');
 
 const cssSuffixReg = /\.(scss|sass|less|css)$/;
 
-async function build(inputDir, outputDir, parseFiles, copyFiles, aliasConfig) {
-  parseFiles = utils.getFiles(parseFiles, inputDir, cssSuffixReg);
-  copyFiles = utils.getFiles(copyFiles, inputDir, cssSuffixReg);
+/**
+ * @param {import('./config')} options
+ */
+async function build(options) {
+  const {
+    inputDir,
+    outputDir,
+    stylesDir,
+    stylesParseFiles,
+    stylesCopyFiles,
+    aliasConfig
+  } = options;
+  const styleInputDir = path.resolve(inputDir, stylesDir);
+  const styleOutputDir = path.resolve(outputDir, stylesDir);
+
+  const parseFiles = utils.getFiles(
+    stylesParseFiles,
+    styleInputDir,
+    cssSuffixReg
+  );
+  const copyFiles = utils.getFiles(
+    stylesCopyFiles,
+    styleInputDir,
+    cssSuffixReg
+  );
   const allFiles = parseFiles.concat(copyFiles);
 
-  fs.rmdirSync(outputDir, { recursive: true });
-  fs.mkdirSync(outputDir, { recursive: true });
+  fs.rmdirSync(styleOutputDir, { recursive: true });
+  fs.mkdirSync(styleOutputDir, { recursive: true });
   utils.deDup(allFiles.map((item) => path.dirname(item))).forEach((item) => {
-    const dir = item.replace(inputDir, outputDir);
+    const dir = item.replace(styleInputDir, styleOutputDir);
     !fs.existsSync(dir) && fs.mkdirSync(dir);
   });
 
@@ -24,7 +46,7 @@ async function build(inputDir, outputDir, parseFiles, copyFiles, aliasConfig) {
   delete copyAliasConfig['~'];
   copyFiles.forEach((item) => {
     const code = fs.readFileSync(item).toString();
-    const dest = item.replace(inputDir, outputDir);
+    const dest = item.replace(styleInputDir, styleOutputDir);
     // to relative path
     fs.writeFileSync(
       dest,
@@ -40,12 +62,12 @@ async function build(inputDir, outputDir, parseFiles, copyFiles, aliasConfig) {
   return Promise.all(
     parseFiles.map((filepath) => {
       const outputPath = filepath
-        .replace(inputDir, outputDir)
+        .replace(styleInputDir, styleOutputDir)
         .replace(cssSuffixReg, '.css');
 
       const { css } = sass.renderSync({
         file: filepath,
-        output: outputDir,
+        output: styleOutputDir,
         outputStyle: 'expanded',
         importer: function(url) {
           return {

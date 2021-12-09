@@ -3,21 +3,24 @@ const ts = require('gulp-typescript');
 const through = require('through2');
 const { parseComponent } = require('vue-template-compiler');
 const utils = require('./utils');
-const fs = require('fs');
 
-async function build(
-  tsConfig,
-  inputDir,
-  outputDir,
-  extensions,
-  aliasConfig,
-  globalFile
-) {
+/**
+ * @param {import('./config')} options
+ */
+async function build(options) {
+  const {
+    tsConfig,
+    inputDir,
+    outputDir,
+    extensions,
+    aliasConfig,
+    typesGlobal
+  } = options;
   return new Promise((resolve, reject) => {
     const files = ['/**/*.ts', '/**/*.tsx', '/**/*.vue'].map(
       (item) => inputDir + item
     );
-    if (globalFile) files.push(globalFile);
+    if (typesGlobal) files.push(typesGlobal);
     gulp
       .src(files, { allowEmpty: true })
       .pipe(

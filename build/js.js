@@ -2,15 +2,11 @@ const rollup = require('rollup');
 const utils = require('./utils');
 const { generateRollupConfig } = require('./rollup');
 
-async function build(
-  inputFiles,
-  inputDir,
-  outputDir,
-  banner,
-  aliasConfig,
-  extensions,
-  singleFile
-) {
+/**
+ * @param {import('./config')} options
+ */
+async function build(options) {
+  const { inputFiles, inputDir, extensions } = options;
   const jsSuffixReg = new RegExp(
     `(${extensions.map((item) => '\\' + item).join('|')})$`
   );
@@ -21,17 +17,7 @@ async function build(
 
   return Promise.all(
     files
-      .map((item) => {
-        return generateRollupConfig(
-          item,
-          inputDir,
-          outputDir,
-          banner,
-          aliasConfig,
-          extensions,
-          singleFile
-        );
-      })
+      .map((item) => generateRollupConfig(item, options))
       .map((option) => {
         let { output } = option;
         if (!Array.isArray(output)) {

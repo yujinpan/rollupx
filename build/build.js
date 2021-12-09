@@ -4,7 +4,7 @@ const config = require('./config');
 const utils = require('./utils');
 
 /**
- * @param {import('./config.js').Options} options
+ * @param {import('./config.js')} options
  */
 async function build(options = {}) {
   if (Array.isArray(options.extensions))
@@ -35,42 +35,19 @@ async function build(options = {}) {
   fs.mkdirSync(options.typesOutputDir);
 
   // build js
-  await require('./js')(
-    options.inputFiles,
-    options.inputDir,
-    options.outputDir,
-    options.banner,
-    options.aliasConfig,
-    options.extensions,
-    options.singleFile
-  )
+  await require('./js')(options)
     .then(() => printMsg('build js completed!'))
     .catch((e) => printErr('build js error:', e));
 
   // build styles
-  const stylesDir = path.resolve(options.inputDir, options.stylesDir);
-  if (fs.existsSync(stylesDir)) {
-    // build styles
-    await require('./styles')(
-      stylesDir,
-      path.resolve(options.outputDir, options.stylesDir),
-      options.stylesParseFiles,
-      options.stylesCopyFiles,
-      options.aliasConfig
-    )
+  if (fs.existsSync(path.resolve(options.inputDir, options.stylesDir))) {
+    await require('./styles')(options)
       .then(() => printMsg('build styles completed!'))
       .catch((e) => printErr('build styles error:', e));
   }
 
   // build types
-  await require('./types')(
-    options.tsConfig,
-    options.inputDir,
-    options.typesOutputDir,
-    options.extensions,
-    options.aliasConfig,
-    options.typesGlobal
-  )
+  await require('./types')(options)
     .then(() => printMsg('build types completed!'))
     .catch((e) => printErr('build types error:', e));
 }
