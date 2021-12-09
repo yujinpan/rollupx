@@ -4,9 +4,17 @@ module.exports = {
     '@': 'src',
     test: './'
   },
+
+  // format: 'umd',
+  // external: ['vue'],
+  // outputName: 'MyBundle',
+  // outputGlobals: {
+  //   vue: 'Vue'
+  // },
+
   // typesOutputDir: 'types',
   // singleFile: false,
-  // inputFiles: ['**/*'],
+  // inputFiles: ['index.*'],
   // stylesDir: 'styles',
   // // stylesParseFiles: [],
   stylesCopyFiles: ['**/*']

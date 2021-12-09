@@ -7,6 +7,7 @@ const commonjs = require('@rollup/plugin-commonjs');
 const visualizer = require('rollup-plugin-visualizer');
 const replace = require('@rollup/plugin-replace');
 const url = require('@rollup/plugin-url');
+const { terser } = require('rollup-plugin-terser');
 const nodePath = require('path');
 const fs = require('fs');
 const path = require('path');
@@ -22,11 +23,12 @@ function generateRollupConfig(filePath, options) {
     inputDir,
     outputDir,
     banner,
-    aliasConfig,
-    extensions,
-    singleFile
+    format,
+    outputName,
+    outputGlobals,
+    outputPaths
   } = options;
-  const rollupConfig = getRollupBaseConfig(aliasConfig, extensions, singleFile);
+  const rollupConfig = getRollupBaseConfig(options);
   const relativePath = path.relative(inputDir, filePath);
   const outputFile = path.join(
     outputDir,
@@ -34,16 +36,28 @@ function generateRollupConfig(filePath, options) {
       '/' +
       suffixTo(path.basename(relativePath), '.js')
   );
+  let output;
+  if (format === 'es') {
+    output = {
+      file: outputFile,
+      format,
+      banner: banner
+    };
+  } else {
+    output = {
+      file: outputFile,
+      format,
+      banner: banner,
+      name: outputName,
+      globals: outputGlobals,
+      paths: outputPaths,
+      plugins: [terser()]
+    };
+  }
   return {
     ...rollupConfig,
     input: filePath,
-    output: [
-      {
-        file: outputFile,
-        format: 'es',
-        banner: banner
-      }
-    ]
+    output
   };
 }
 
@@ -65,7 +79,11 @@ function relativePlugin(aliasConfig, extensions, newSuffix) {
   };
 }
 
-function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
+/**
+ * @param {import('./config')} options
+ */
+function getRollupBaseConfig(options) {
+  const { aliasConfig, extensions, singleFile, external, format } = options;
   const utils = require('./utils');
   const aliasKeys = Object.keys(aliasConfig);
   const nodeAliasKeys = aliasKeys.filter((item) =>
@@ -73,13 +91,27 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
   );
   const assetsReg = /\.(png|svg|jpg|gif|scss|sass|less|css)$/;
   const vuePluginReg = /rollup-plugin-vue/;
+  const babelOptions = {
+    extensions: extensions,
+    babelHelpers: 'runtime',
+    ...require('../babel.config')
+  };
+  const isNotES = format !== 'es';
+
+  if (isNotES) {
+    babelOptions.babelHelpers = 'bundled';
+    babelOptions.presets.find(
+      (item) => (item[0] = '@vue/app')
+    )[1].useBuiltIns = false;
+  }
+
   return {
     plugins: [
       // 全部 js/css 文件转换为相对路径
       relativePlugin(
         aliasConfig,
         extensions.concat(utils.styleExtensions),
-        singleFile ? false : undefined
+        singleFile || isNotES ? false : undefined
       ),
       resolve({
         extensions
@@ -136,33 +168,32 @@ function getRollupBaseConfig(aliasConfig, extensions, singleFile) {
           );
         }
       }),
-      babel({
-        extensions: extensions,
-        babelHelpers: 'runtime',
-        ...require('../babel.config')
-      }),
+      babel(babelOptions),
       url(),
       json(),
       visualizer({
         filename: './stat/statistics.html'
       })
     ],
-    external: (id, parentId, resolved) => {
-      // 内部 - 编译的临时文件需要编译
-      if (vuePluginReg.test(id)) return false;
+    external: isNotES
+      ? external
+      : (id, parentId, resolved) => {
+          // 内部 - 编译的临时文件需要编译
+          if (vuePluginReg.test(id)) return false;
 
-      // 外部 - 第三方模块跳过
-      if (isNodeModules(id, parentId, nodeAliasKeys, aliasKeys)) return true;
+          // 外部 - 第三方模块跳过
+          if (isNodeModules(id, parentId, nodeAliasKeys, aliasKeys))
+            return true;
 
-      // 内部 - 静态资源需要编译
-      if (assetsReg.test(id)) return false;
+          // 内部 - 静态资源需要编译
+          if (assetsReg.test(id)) return false;
 
-      // 内部 - js 文件单文件模式需要编译
-      if (singleFile) return false;
+          // 内部 - js 文件单文件模式需要编译
+          if (singleFile) return false;
 
-      // 内部 - 多文件模式则跳过
-      return true;
-    }
+          // 内部 - 多文件模式则跳过
+          return true;
+        }
   };
 }
 

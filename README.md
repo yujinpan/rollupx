@@ -32,7 +32,7 @@ npm install --save-dev rollupx
 
 - create a `rollupx.config.js` file in your project.
 
-```js
+````js
 // project/rollupx.config.js
 // default config
 module.exports = {
@@ -48,6 +48,31 @@ module.exports = {
 
   // 输出目录 String
   outputDir: "dist",
+
+  /**
+   * 自定义打包格式，例如:
+   * ```
+   * // rollupx.config.js
+   * export default {
+   *   format: 'umd',
+   *   external: ['jquery'],
+   *   outputName: 'MyBundle',
+   *   outputGlobals: {
+   *     jquery: '$'
+   *   }
+   * }
+   * // bundle.js
+   * // var MyBundle = (function ($) {
+   * //   $.doSomeThing();
+   * // }($));
+   * ```
+   */
+  /** @type {'amd' | 'cjs' | 'es' | 'iife' | 'umd' | 'system'} */
+  format: "es",
+  outputName: undefined,
+  outputGlobals: undefined,
+  outputPaths: undefined,
+  external: undefined,
 
   // 输入文件 String[]，基于 inputDir，规则为 [glob](https://github.com/isaacs/node-glob) 语句
   // multi file
@@ -81,7 +106,7 @@ module.exports = {
   // 是否单文件（不按文件分模块） Boolean
   singleFile: false
 };
-```
+````
 
 - recommend use the rollupx babel config `babel.config.js` [babel.config.js](./babel.config.js)
 

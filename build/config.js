@@ -32,6 +32,31 @@ module.exports = {
   inputDir: 'src',
   outputDir: 'dist',
 
+  /**
+   * custom build format, example:
+   * ```
+   * // rollupx.config.js
+   * export default {
+   *   format: 'umd',
+   *   external: ['jquery'],
+   *   outputName: 'MyBundle',
+   *   outputGlobals: {
+   *     jquery: '$'
+   *   }
+   * }
+   * // bundle.js
+   * // var MyBundle = (function ($) {
+   * //   $.doSomeThing();
+   * // }($));
+   * ```
+   */
+  /** @type {'amd' | 'cjs' | 'es' | 'iife' | 'umd' | 'system'} */
+  format: 'es',
+  outputName: undefined,
+  outputGlobals: undefined,
+  outputPaths: undefined,
+  external: undefined,
+
   // multi file
   inputFiles: ['**/*'],
   // single file

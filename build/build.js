@@ -13,7 +13,12 @@ async function build(options = {}) {
 
   // validate
   if (!options.inputDir || !options.outputDir)
-    return console.log('inputDir/outputDir required');
+    return printErr('rollupx.config.js', '"inputDir/outputDir" required');
+  if (options.format !== 'es' && !options.outputName)
+    return printErr(
+      'rollupx.config.js',
+      'when "format" is not "es", "outputName" required'
+    );
 
   // resolve path
   options.inputDir = path.resolve(options.inputDir);
