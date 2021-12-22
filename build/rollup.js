@@ -121,7 +121,8 @@ function getRollupBaseConfig(options) {
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
         'process.env.VUE_APP_BASE_URL': JSON.stringify(
           process.env.VUE_APP_BASE_URL
-        )
+        ),
+        preventAssignment: true
       }),
       commonjs({
         include: /node_modules/
