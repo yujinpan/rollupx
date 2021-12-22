@@ -3,6 +3,7 @@ node_modules
 test/stat
 test/test
 test/types
+test/docs
 package-lock.json
 
 # local env files

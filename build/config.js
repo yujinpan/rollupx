@@ -13,8 +13,10 @@
  * @property {string[]} [stylesParseFiles] 需要编译的样式文件，相对于 stylesDir，例如 index.scss 入口文件
  * @property {string[]} [stylesCopyFiles] 需要拷贝的样式文件，相对于 stylesDir，例如 var.scss 变量文件
  *
- * @property {string} [typesOutputDir] 类型目录名，相对于 inputDir
+ * @property {string} [typesOutputDir] 类型目录名
  * @property {string} [typesGlobal] 全局类型文件，相对于 cwd
+ *
+ * @property {string} [docsOutputDir] 文档目录名
  *
  * @property {boolean} [singleFile] 是否打包为单文件，默认为 true
  */
@@ -76,6 +78,8 @@ module.exports = {
   // inherit outputDir
   typesOutputDir: '',
   typesGlobal: 'global.d.ts',
+
+  docsOutputDir: '',
 
   singleFile: false
 };

@@ -17,7 +17,8 @@ module.exports = {
   // inputFiles: ['index.*'],
   // stylesDir: 'styles',
   // // stylesParseFiles: [],
-  stylesCopyFiles: ['**/*']
+  stylesCopyFiles: ['**/*'],
   // typesOutputDir: 'test',
   // typesGlobal: 'src/global.d.ts'
+  docsOutputDir: 'docs'
 };

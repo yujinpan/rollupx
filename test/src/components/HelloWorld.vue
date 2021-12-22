@@ -7,12 +7,29 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
+/**
+ * 组件
+ * @class
+ */
 @Component({
   // 利于 IDE 自动提示
   name: 'HelloWorld'
 })
 export default class HelloWorld extends Vue {
   @Prop() private msg!: string;
+
+  /**
+   * 构造函数
+   * @param {string} str
+   */
+  constructor(str: any) {
+    super(str);
+  }
+
+  /**
+   * 测试
+   */
+  test() {}
 }
 </script>
 

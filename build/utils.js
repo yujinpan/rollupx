@@ -1,6 +1,8 @@
 const path = require('path');
 const resolve = require('resolve');
 const glob = require('glob');
+const through = require('through2');
+const { parseComponent } = require('vue-template-compiler');
 
 const styleExtensions = ['.scss', '.sass', '.less', '.css'];
 
@@ -123,6 +125,35 @@ function removeComment(codes) {
   return codes.replace(/^\s*(\/\/|\/\*|\*|<).*$/gm, '');
 }
 
+/**
+ * gulp 获取 vue 的 script 内容插件
+ */
+function gulpPickVueScript() {
+  return through.obj(function (file, _, cb) {
+    if (file.extname === '.vue') {
+      const code = file.contents.toString();
+      const scripts = parseComponent(code);
+      const lang = scripts.script.lang;
+      file.contents = Buffer.from(
+        (scripts.script
+          ? scripts.script.content
+          : `import { Vue } from 'vue-property-decorator';export default class extends Vue {}`
+        ).trim()
+      );
+      file.extname = '.' + lang;
+    }
+    cb(null, file);
+  });
+}
+
+function printMsg(msg) {
+  console.log(`\x1b[32m[rollupx] ${msg}\x1b[0m`);
+}
+
+function printErr(name, err) {
+  console.log(`\x1b[31m[rollupx] ${name}\x1b[0m`, err);
+}
+
 module.exports = {
   deDup,
   getFiles,
@@ -130,5 +161,8 @@ module.exports = {
   suffixTo,
   transformToRelativePath,
   toRelative,
-  styleExtensions
+  styleExtensions,
+  gulpPickVueScript,
+  printMsg,
+  printErr
 };

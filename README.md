@@ -38,16 +38,16 @@ npm install --save-dev rollupx
 module.exports = {
   // 文件头信息 String
   banner:
-    "/*!\n" +
-    ` * (rollupx banner) v${require("../package.json").version}\n` +
+    '/*!\n' +
+    ` * (rollupx banner) v${require('../package.json').version}\n` +
     ` * (c) 2019-${new Date().getFullYear()}\n` +
-    " */\n",
+    ' */\n',
 
   // 输入目录 String
-  inputDir: "src",
+  inputDir: 'src',
 
   // 输出目录 String
-  outputDir: "dist",
+  outputDir: 'dist',
 
   /**
    * 自定义打包格式，例如:
@@ -68,7 +68,7 @@ module.exports = {
    * ```
    */
   /** @type {'amd' | 'cjs' | 'es' | 'iife' | 'umd' | 'system'} */
-  format: "es",
+  format: 'es',
   outputName: undefined,
   outputGlobals: undefined,
   outputPaths: undefined,
@@ -76,21 +76,21 @@ module.exports = {
 
   // 输入文件 String[]，基于 inputDir，规则为 [glob](https://github.com/isaacs/node-glob) 语句
   // multi file
-  inputFiles: ["**/*"],
+  inputFiles: ['**/*'],
   // single file
   // inputFiles: ["index.*"],
 
   // 扩展名 String[]
-  extensions: [".js", ".jsx", ".ts", ".tsx", ".vue"],
+  extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
 
   // 别名配置 Object
-  aliasConfig: { "@": "src", "~": "node_modules" },
+  aliasConfig: { '@': 'src', '~': 'node_modules' },
 
   // TS 配置文件 Object
-  tsConfig: require("./tsconfig.json"),
+  tsConfig: require('./tsconfig.json'),
 
   // 样式目录 String，基于 inputDir
-  stylesDir: "styles",
+  stylesDir: 'styles',
 
   // 需要编译的文件 String[]，基于 stylesDir，例如：["index.scss"]；["**/*"] 为编译所有样式文件。
   stylesParseFiles: [],
@@ -98,10 +98,13 @@ module.exports = {
   stylesCopyFiles: [],
 
   // 类型文件输出目录 String，继承 outputDir，例如："types"
-  typesOutputDir: "",
+  typesOutputDir: '',
 
   // 全局的类型文件 String，相对于根目录
-  typesGlobal: "global.d.ts",
+  typesGlobal: 'global.d.ts',
+
+  // 文档目录名
+  docsOutputDir: '',
 
   // 是否单文件（不按文件分模块） Boolean
   singleFile: false
@@ -114,8 +117,8 @@ example in your `project/babel.config.js`:
 
 ```js
 module.exports = {
-  extends: "rollupx/babel.config.js",
-  exclude: "node_modules/**"
+  extends: 'rollupx/babel.config.js',
+  exclude: 'node_modules/**'
 };
 ```
 
