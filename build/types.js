@@ -24,7 +24,7 @@ async function build(options) {
     gulp
       .src(files, { allowEmpty: true })
       .pipe(
-        through.obj(function(file, _, cb) {
+        through.obj(function (file, _, cb) {
           // get scripts
           if (file.extname === '.vue') {
             const code = file.contents.toString();
@@ -54,11 +54,7 @@ async function build(options) {
           cb(null, file);
         })
       )
-      .pipe(
-        ts
-          .createProject(tsConfig.compilerOptions)()
-          .on('error', reject)
-      )
+      .pipe(ts.createProject(tsConfig.compilerOptions)().on('error', reject))
       .dts.pipe(gulp.dest(outputDir || tsConfig.compilerOptions.declarationDir))
       .on('finish', resolve);
   });

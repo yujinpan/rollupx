@@ -16,11 +16,7 @@ module.exports = {
     'prettier/prettier': [
       'error',
       // 这里自定义 prettier 的规则
-      {
-        singleQuote: true,
-        arrowParens: 'always',
-        semi: true
-      }
+      require('./.prettierrc.js')
     ],
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     eqeqeq: ['error', 'always']

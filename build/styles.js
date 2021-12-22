@@ -69,7 +69,7 @@ async function build(options) {
         file: filepath,
         output: styleOutputDir,
         outputStyle: 'expanded',
-        importer: function(url) {
+        importer: function (url) {
           return {
             file: utils.toRelative(
               filepath,
