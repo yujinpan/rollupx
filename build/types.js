@@ -20,11 +20,12 @@ async function build(options) {
 
   const compilerOptions = {
     ...tsConfig.compilerOptions,
+    strict: false,
     emitDeclarationOnly: true,
     declaration: true
   };
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const files = ['/**/*.ts', '/**/*.tsx', '/**/*.vue'].map(
       (item) => inputDir + item
     );
@@ -34,8 +35,8 @@ async function build(options) {
       .pipe(utils.gulpPickVueScript())
       .pipe(gulpToRelativePath(options))
       .pipe(ts(compilerOptions))
+      .on('error', () => {})
       .dts.pipe(gulp.dest(typesOutputDir))
-      .on('error', reject)
       .on('finish', resolve);
   });
 }
@@ -45,7 +46,7 @@ async function build(options) {
  */
 function gulpToRelativePath(options) {
   const { aliasConfig, extensions } = options;
-  return through.obj(function (file, _, cb) {
+  return through.obj(function(file, _, cb) {
     file.contents = Buffer.from(
       utils.transformToRelativePath(
         file.contents.toString(),

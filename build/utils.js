@@ -129,7 +129,7 @@ function removeComment(codes) {
  * gulp 获取 vue 的 script 内容插件
  */
 function gulpPickVueScript() {
-  return through.obj(function (file, _, cb) {
+  return through.obj(function(file, _, cb) {
     if (file.extname === '.vue') {
       const code = file.contents.toString();
       const scripts = parseComponent(code);

@@ -7,6 +7,7 @@ const fs = require('fs');
 const utils = require('./utils');
 
 const compilerOptions = {
+  strict: false,
   target: 'esnext',
   module: 'commonjs',
   isolatedModules: true,
@@ -22,7 +23,7 @@ async function build(options) {
 
   fs.rmdirSync(docsOutputDir, { recursive: true });
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const files = ['/**/*.js', '/**/*.ts', '/**/*.tsx', '/**/*.vue'].map(
       (item) => inputDir + item
     );
@@ -30,9 +31,9 @@ async function build(options) {
       .src(files, { allowEmpty: true })
       .pipe(utils.gulpPickVueScript())
       .pipe(ts(compilerOptions))
+      .on('error', () => {})
       .pipe(gulpJsToDocData())
       .pipe(gulp.dest(docsOutputDir))
-      .on('error', reject)
       .on('finish', resolve);
   });
 }
