@@ -35,27 +35,19 @@ async function build(options = {}) {
   }
 
   // build js
-  await require('./js')(options)
-    .then(() => utils.printMsg('build js completed!'))
-    .catch((e) => utils.printErr('build js error:', e));
+  await utils.runTask('build js', require('./js')(options));
 
   // build styles
   if (fs.existsSync(path.resolve(options.inputDir, options.stylesDir))) {
-    await require('./styles')(options)
-      .then(() => utils.printMsg('build styles completed!'))
-      .catch((e) => utils.printErr('build styles error:', e));
+    await utils.runTask('build styles', require('./styles')(options));
   }
 
   // build types
-  await require('./types')(options)
-    .then(() => utils.printMsg('build types completed!'))
-    .catch((e) => utils.printErr('build types error:', e));
+  await utils.runTask('build types', require('./types')(options));
 
   // build docs
   if (options.docsOutputDir) {
-    await require('./docs')(options)
-      .then(() => utils.printMsg('build docs completed!'))
-      .catch((e) => utils.printErr('build docs error:', e));
+    await utils.runTask('build docs', require('./docs')(options));
   }
 }
 

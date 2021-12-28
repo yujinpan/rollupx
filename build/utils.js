@@ -129,7 +129,7 @@ function removeComment(codes) {
  * gulp 获取 vue 的 script 内容插件
  */
 function gulpPickVueScript() {
-  return through.obj(function(file, _, cb) {
+  return through.obj(function (file, _, cb) {
     if (file.extname === '.vue') {
       const code = file.contents.toString();
       const scripts = parseComponent(code);
@@ -144,6 +144,20 @@ function gulpPickVueScript() {
     }
     cb(null, file);
   });
+}
+
+/**
+ * run task
+ * @param {string} label
+ * @param {Promise} task
+ * @return {Promise<void>}
+ */
+async function runTask(label, task) {
+  printMsg(`${label} start...`);
+  console.time(`${label} time`);
+  await task.catch((e) => printErr(`${label} error!`, e));
+  console.timeEnd(`${label} time`);
+  printMsg(`${label} completed!\n`);
 }
 
 function printMsg(msg) {
@@ -164,5 +178,6 @@ module.exports = {
   styleExtensions,
   gulpPickVueScript,
   printMsg,
-  printErr
+  printErr,
+  runTask
 };
