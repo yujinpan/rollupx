@@ -4,7 +4,7 @@ const { nodeResolve: resolve } = require('@rollup/plugin-node-resolve');
 const postcss = require('rollup-plugin-postcss');
 const json = require('@rollup/plugin-json');
 const commonjs = require('@rollup/plugin-commonjs');
-const visualizer = require('rollup-plugin-visualizer');
+const { visualizer } = require('rollup-plugin-visualizer');
 const replace = require('@rollup/plugin-replace');
 const url = require('@rollup/plugin-url');
 const { terser } = require('rollup-plugin-terser');
@@ -68,6 +68,7 @@ function relativePlugin(aliasConfig, extensions, newSuffix) {
   return {
     name: 'rollup-plugin-relative',
     transform(code, id) {
+      if (id.includes('node_modules')) return code;
       return transformToRelativePath(
         code,
         id,
@@ -114,7 +115,9 @@ function getRollupBaseConfig(options) {
         singleFile || isNotES ? false : undefined
       ),
       resolve({
-        extensions
+        extensions,
+        browser: true,
+        preferBuiltins: true
       }),
       // 替换 env 文件的环境变量
       replace({
@@ -128,9 +131,7 @@ function getRollupBaseConfig(options) {
         include: /node_modules/
       }),
       vue({
-        target: 'browser',
         css: false, // Dynamically inject css as a <style> tag
-        compileTemplate: true, // Explicitly convert template to render function
         template: {
           compilerOptions: {
             preserveWhitespace: false // 丢弃模版空格
@@ -192,9 +193,23 @@ function getRollupBaseConfig(options) {
           // 内部 - js 文件单文件模式需要编译
           if (singleFile) return false;
 
+          // 内部 - 入口文件
+          if (parentId === undefined) return false;
+
           // 内部 - 多文件模式则跳过
           return true;
-        }
+        },
+    onwarn(warning, warn) {
+      if (
+        warning.code === 'CIRCULAR_DEPENDENCY' ||
+        warning.code === 'UNUSED_EXTERNAL_IMPORT' ||
+        warning.code === 'EMPTY_BUNDLE' ||
+        warning.code === 'THIS_IS_UNDEFINED'
+      )
+        return;
+
+      warn(warning);
+    }
   };
 }
 
