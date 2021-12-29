@@ -1,12 +1,21 @@
 /**
  * @typedef {object} Options
+ * @property {string} [banner] 文件头信息
+ *
  * @property {string} [inputDir] 输入文件根目录名，相对于 cwd
  * @property {string} [outputDir] 输出目录名，相对于 cwd
  * @property {string[]} [inputFiles] 匹配输入的文件，相对于 inputDir
  *
- * @property {string} [banner] 文件头信息
- * @property {object} [aliasConfig] 路径别名配置
+ * @property {(js|styles|types|docs)[]} [outputs] 指定输出类型
+ *
+ * @property {'amd' | 'cjs' | 'es' | 'iife' | 'umd' | 'system'} [format] js 编译类型
+ * @property {string} [outputName] js 编译的导出名
+ * @property {object} [outputGlobals] 引入的全局属性，例如：{ jquery: '$' }
+ * @property {string[]} [outputPaths] 引入的外链
+ * @property {string[]} [external] 作为外部引入的库，例如：['jquery']
+ *
  * @property {string[]} [extensions] 扩展名配置
+ * @property {object} [aliasConfig] 路径别名配置
  * @property {object} [tsConfig] tsconfig.json 配置
  *
  * @property {string} [stylesDir] 样式目录名，相对于 inputDir
@@ -33,6 +42,13 @@ module.exports = {
 
   inputDir: 'src',
   outputDir: 'dist',
+  // multi file
+  inputFiles: ['**/*'],
+  // single file
+  // inputFiles: ['index.*'],
+
+  // output types
+  outputs: ['js', 'styles', 'types', 'docs'],
 
   /**
    * custom build format, example:
@@ -59,12 +75,7 @@ module.exports = {
   outputPaths: undefined,
   external: undefined,
 
-  // multi file
-  inputFiles: ['**/*'],
-  // single file
-  // inputFiles: ['index.*'],
   extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
-
   aliasConfig: {
     '@': 'src',
     '~': process.cwd() + '/node_modules/'

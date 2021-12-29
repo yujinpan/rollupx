@@ -168,6 +168,19 @@ function printErr(name, err) {
   console.log(`\x1b[31m[rollupx] ${name}\x1b[0m`, err);
 }
 
+function toLowerCamelCase(str) {
+  let result = '';
+  str = str.split('');
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === '-') {
+      str[i + 1] = str[i + 1].toUpperCase();
+    } else {
+      result += str[i];
+    }
+  }
+  return result;
+}
+
 module.exports = {
   deDup,
   getFiles,
@@ -179,5 +192,6 @@ module.exports = {
   gulpPickVueScript,
   printMsg,
   printErr,
-  runTask
+  runTask,
+  toLowerCamelCase
 };

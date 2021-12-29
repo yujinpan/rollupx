@@ -7,9 +7,25 @@ const utils = require('./utils');
  * @param {import('./config.js')} options
  */
 async function build(options = {}) {
-  if (Array.isArray(options.extensions))
+  if (Array.isArray(options.extensions)) {
     options.extensions = config.extensions.concat(options.extensions);
+  }
+
   options = utils.mergeProps(config, options);
+
+  // parse arguments
+  const args = process.argv.slice(2);
+  if (args.length) {
+    args.forEach((arg) => {
+      if (arg.startsWith('--')) {
+        let [key, val] = arg.slice(2).split('=');
+        key = utils.toLowerCamelCase(key);
+        if (key in options) {
+          options[key] = Array.isArray(options[key]) ? val.split(',') : val;
+        }
+      }
+    });
+  }
 
   // validate
   if (!options.inputDir || !options.outputDir)
@@ -28,6 +44,7 @@ async function build(options = {}) {
   fs.rmdirSync(options.outputDir, { recursive: true });
   fs.mkdirSync(options.outputDir);
 
+  // init alias
   const aliasConfig = options.aliasConfig;
   for (let key in aliasConfig) {
     // ~ 为 scss @import 语法前缀
@@ -35,18 +52,25 @@ async function build(options = {}) {
   }
 
   // build js
-  await utils.runTask('build js', require('./js')(options));
+  if (options.outputs.includes('js')) {
+    await utils.runTask('build js', require('./js')(options));
+  }
 
   // build styles
-  if (fs.existsSync(path.resolve(options.inputDir, options.stylesDir))) {
+  if (
+    options.outputs.includes('styles') &&
+    fs.existsSync(path.resolve(options.inputDir, options.stylesDir))
+  ) {
     await utils.runTask('build styles', require('./styles')(options));
   }
 
   // build types
-  await utils.runTask('build types', require('./types')(options));
+  if (options.outputs.includes('types')) {
+    await utils.runTask('build types', require('./types')(options));
+  }
 
   // build docs
-  if (options.docsOutputDir) {
+  if (options.outputs.includes('docs') && options.docsOutputDir) {
     await utils.runTask('build docs', require('./docs')(options));
   }
 }
