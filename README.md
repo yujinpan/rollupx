@@ -1,6 +1,6 @@
 # rollupx
 
-js/ts/vue/scss/less to a library.
+JS/TS/Vue/scss/less to a library, and jsdoc to a JSON.
 
 ```
 # single file
@@ -25,8 +25,17 @@ js/ts/vue/scss/less to a library.
 ### Install
 
 ```
-npm install --save-dev rollupx
+npm install --save-dev rollupx gulp postcss prettier rollup typescript core-js
 ```
+
+required packages:
+
+- gulp ^4.0.2
+- postcss 7.0.39
+- prettier >=1
+- rollup >=2
+- typescript >=3
+- core-js >=3
 
 ### Config
 
@@ -48,6 +57,15 @@ module.exports = {
 
   // 输出目录 String
   outputDir: 'dist',
+
+  // 输入文件 String[]，基于 inputDir，规则为 [glob](https://github.com/isaacs/node-glob) 语句
+  // multi file
+  inputFiles: ['**/*'],
+  // single file
+  // inputFiles: ["index.*"],
+
+  // 输出类型
+  outputs: ['js', 'styles', 'types', 'docs'],
 
   /**
    * 自定义打包格式，例如:
@@ -73,12 +91,6 @@ module.exports = {
   outputGlobals: undefined,
   outputPaths: undefined,
   external: undefined,
-
-  // 输入文件 String[]，基于 inputDir，规则为 [glob](https://github.com/isaacs/node-glob) 语句
-  // multi file
-  inputFiles: ['**/*'],
-  // single file
-  // inputFiles: ["index.*"],
 
   // 扩展名 String[]
   extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
@@ -143,7 +155,15 @@ example in your `project/tsconfig.json`:
 
 ```shell
 $ rollupx
+
+# only js
+$ rollupx --outputs=js
+
+# input files
+$ rollupx --input-files=index.ts
 ```
+
+> more args see config's field.
 
 ### Publish
 
