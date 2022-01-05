@@ -1,6 +1,6 @@
 # rollupx
 
-JS/TS/Vue/scss/less to a library, and jsdoc to a JSON.
+JS/TS/Vue/Scss/Less to a library, and jsdoc to a JSON.
 
 ```
 # single file
@@ -25,7 +25,9 @@ JS/TS/Vue/scss/less to a library, and jsdoc to a JSON.
 ### Install
 
 ```
-npm install --save-dev rollupx gulp postcss prettier rollup typescript core-js
+npm install --save-dev rollupx gulp postcss@7 prettier rollup typescript
+
+npm install --save core-js@3
 ```
 
 required packages:
