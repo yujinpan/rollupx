@@ -180,6 +180,9 @@ function getRollupBaseConfig(options) {
     external: isNotES
       ? external
       : (id, parentId, resolved) => {
+          // 内部 - 入口文件
+          if (parentId === undefined) return false;
+
           // 内部 - 编译的临时文件需要编译
           if (vuePluginReg.test(id)) return false;
 
@@ -192,9 +195,6 @@ function getRollupBaseConfig(options) {
 
           // 内部 - js 文件单文件模式需要编译
           if (singleFile) return false;
-
-          // 内部 - 入口文件
-          if (parentId === undefined) return false;
 
           // 内部 - 多文件模式则跳过
           return true;
