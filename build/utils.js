@@ -59,17 +59,21 @@ function toRelative(filepath, resolvePath, aliasConfig, extensions) {
       resolvePath.startsWith(key + '/') ||
       (key === '~' && resolvePath.startsWith('~'))
     ) {
-      resolvePath = path.relative(
-        path.dirname(filepath),
-        resolve.sync(
-          resolvePath.replace(
-            new RegExp('^' + key),
-            // 当前缀为 ～ 时，需要补充 /
-            aliasConfig[key] + (key === '~' ? '/' : '')
-          ),
-          { extensions }
+      resolvePath = path
+        .relative(
+          path.dirname(filepath),
+          resolve.sync(
+            resolvePath.replace(
+              new RegExp('^' + key),
+              // 当前缀为 ～ 时，需要补充 /
+              aliasConfig[key] + (key === '~' ? '/' : '')
+            ),
+            { extensions }
+          )
         )
-      );
+        // fix: windows path will be \
+        .split(path.sep)
+        .join('/');
       resolvePath = resolvePath.startsWith('.')
         ? resolvePath
         : './' + resolvePath;
