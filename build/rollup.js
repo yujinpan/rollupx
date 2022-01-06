@@ -8,7 +8,6 @@ const { visualizer } = require('rollup-plugin-visualizer');
 const replace = require('@rollup/plugin-replace');
 const url = require('@rollup/plugin-url');
 const { terser } = require('rollup-plugin-terser');
-const nodePath = require('path');
 const fs = require('fs');
 const path = require('path');
 const { suffixTo, transformToRelativePath } = require('./utils');
@@ -213,21 +212,21 @@ function getRollupBaseConfig(options) {
   };
 }
 
-function isNodeModules(path, parentPath, nodeAliasKeys, aliasKeys) {
+function isNodeModules(filepath, parentPath, nodeAliasKeys, aliasKeys) {
   // 包含 node_modules 的直接为 true
   // 未包含的判断是否有相对模块
   return (
-    path.includes('node_modules') ||
-    path.startsWith('~') ||
-    nodeAliasKeys.some((item) => isStartsWidthAlias(path, item)) ||
+    filepath.includes('node_modules') ||
+    filepath.startsWith('~') ||
+    nodeAliasKeys.some((item) => isStartsWidthAlias(filepath, item)) ||
     // 1. 'jquery' 可能存在 node_modules 中，也可以在当前目录中
     // 2. 排除 / 开头
     // 3. 排除 . 开头
     // 4. 排除缩写路径开头
-    (!path.startsWith('/') &&
-      !path.startsWith('.') &&
-      !aliasKeys.some((item) => isStartsWidthAlias(path, item)) &&
-      !fs.existsSync(nodePath.dirname(parentPath) + '/' + path))
+    (!filepath.startsWith('/') &&
+      !filepath.startsWith('.') &&
+      !aliasKeys.some((item) => isStartsWidthAlias(filepath, item)) &&
+      !fs.existsSync(path.dirname(parentPath) + '/' + filepath))
   );
 }
 
