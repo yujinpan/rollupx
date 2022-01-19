@@ -32,7 +32,7 @@ async function build(options) {
     if (typesGlobal) files.push(typesGlobal);
     gulp
       .src(files, { allowEmpty: true })
-      .pipe(utils.gulpPickVueScript())
+      .pipe(utils.gulpPickVueScript(['ts', 'tsx']))
       .pipe(gulpToRelativePath(options))
       .pipe(ts(compilerOptions))
       .on('error', () => {})
@@ -46,7 +46,7 @@ async function build(options) {
  */
 function gulpToRelativePath(options) {
   const { aliasConfig, extensions } = options;
-  return through.obj(function(file, _, cb) {
+  return through.obj(function (file, _, cb) {
     file.contents = Buffer.from(
       utils.transformToRelativePath(
         file.contents.toString(),
