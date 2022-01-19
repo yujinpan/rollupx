@@ -128,12 +128,15 @@ function removeComment(codes) {
 /**
  * gulp 获取 vue 的 script 内容插件
  */
-function gulpPickVueScript() {
-  return through.obj(function(file, _, cb) {
+function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
+  return through.obj(function (file, _, cb) {
     if (file.extname === '.vue') {
       const code = file.contents.toString();
       const scripts = parseComponent(code);
-      const lang = scripts.script.lang;
+      const lang = scripts.script.lang || 'js';
+
+      if (!languages.includes(lang)) return cb();
+
       file.contents = Buffer.from(
         (scripts.script
           ? scripts.script.content
