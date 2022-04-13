@@ -25,19 +25,8 @@ JS/TS/Vue/Scss/Less to a library, and jsdoc to a JSON.
 ### Install
 
 ```
-npm install --save-dev rollupx gulp postcss@7 prettier rollup typescript
-
-npm install --save core-js@3
+npm install --save-dev rollupx
 ```
-
-required packages:
-
-- gulp ^4.0.2
-- postcss 7.0.39
-- prettier >=1
-- rollup >=2
-- typescript >=3
-- core-js >=3
 
 ### Config
 
