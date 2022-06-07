@@ -51,7 +51,7 @@
     "rollup-plugin-vue": "^5.1.9",
     "style-inject": "^0",
     "through2": "^4.0.2",
-    "typescript": "^4",
+    "typescript": ">=2",
     "vue-template-compiler": "^2.6.14"
   },
   "devDependencies": {
