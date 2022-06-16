@@ -55,6 +55,9 @@ module.exports = {
   // single file
   // inputFiles: ["index.*"],
 
+  // 排除输入的文件
+  excludeFiles: ['**/+(__tests__|__specs__)/**', '**/*.spec.*'],
+
   // 输出类型
   outputs: ['js', 'styles', 'types', 'docs'],
 
