@@ -5,6 +5,7 @@
  * @property {string} [inputDir] 输入文件根目录名，相对于 cwd
  * @property {string} [outputDir] 输出目录名，相对于 cwd
  * @property {string[]} [inputFiles] 匹配输入的文件，相对于 inputDir
+ * @property {string[]} [excludeFiles] 排除输入的文件，相对于 inputDir
  *
  * @property {(js|styles|types|docs)[]} [outputs] 指定输出类型
  *
@@ -46,6 +47,8 @@ module.exports = {
   inputFiles: ['**/*'],
   // single file
   // inputFiles: ['index.*'],
+
+  excludeFiles: ['**/+(__tests__|__specs__)/**', '**/*.spec.*'],
 
   // output types
   outputs: ['js', 'styles', 'types', 'docs'],

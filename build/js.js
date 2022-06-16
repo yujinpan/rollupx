@@ -6,13 +6,14 @@ const { generateRollupConfig } = require('./rollup');
  * @param {import('./config')} options
  */
 async function build(options) {
-  const { inputFiles, inputDir, extensions } = options;
+  const { inputFiles, excludeFiles, inputDir, extensions } = options;
   const jsSuffixReg = new RegExp(
     `(${extensions.map((item) => '\\' + item).join('|')})$`
   );
-  const files = utils
-    .getFiles(inputFiles, inputDir, jsSuffixReg)
-    .filter((item) => !item.endsWith('.d.ts'));
+  const files = utils.getFiles(inputFiles, inputDir, jsSuffixReg, [
+    ...excludeFiles,
+    '**/*.d.ts'
+  ]);
   validate(files);
 
   return Promise.all(

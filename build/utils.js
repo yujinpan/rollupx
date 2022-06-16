@@ -101,12 +101,16 @@ function mergeProps(source, target) {
   return source;
 }
 
-function getFiles(arrPattern, dir, reg) {
+function getFiles(arrPattern, dir, includeReg, excludes = []) {
   return deDup(
     arrPattern
-      .map((item) => glob.sync(path.resolve(dir, item)))
+      .map((item) => {
+        return glob.sync(path.resolve(dir, item), {
+          ignore: excludes
+        });
+      })
       .flat()
-      .filter((item) => reg.test(item))
+      .filter((item) => includeReg.test(item))
   );
 }
 
@@ -133,7 +137,7 @@ function removeComment(codes) {
  * gulp 获取 vue 的 script 内容插件
  */
 function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
-  return through.obj(function (file, _, cb) {
+  return through.obj(function(file, _, cb) {
     if (file.extname === '.vue') {
       const code = file.contents.toString();
       const scripts = parseComponent(code);

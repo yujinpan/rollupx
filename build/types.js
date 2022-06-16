@@ -9,7 +9,15 @@ const path = require('path');
  * @param {import('./config')} options
  */
 async function build(options) {
-  let { tsConfig, inputDir, outputDir, typesGlobal, typesOutputDir } = options;
+  let {
+    tsConfig,
+    inputDir,
+    outputDir,
+    inputFiles,
+    excludeFiles,
+    typesGlobal,
+    typesOutputDir
+  } = options;
 
   typesOutputDir = path.resolve(outputDir || typesOutputDir);
 
@@ -26,12 +34,16 @@ async function build(options) {
   };
 
   return new Promise((resolve) => {
-    const files = ['/**/*.ts', '/**/*.tsx', '/**/*.vue'].map(
-      (item) => inputDir + item
-    );
-    if (typesGlobal) files.push(typesGlobal);
+    const files = inputFiles.map((item) => path.resolve(inputDir, item));
+    if (typesGlobal) {
+      files.push(typesGlobal);
+    }
+
     gulp
-      .src(files, { allowEmpty: true })
+      .src(files, {
+        allowEmpty: true,
+        ignore: [...excludeFiles, '**/!(*.js|*.ts|*.vue)']
+      })
       .pipe(utils.gulpPickVueScript(['ts', 'tsx']))
       .pipe(gulpToRelativePath(options))
       .pipe(ts(compilerOptions))
@@ -46,7 +58,7 @@ async function build(options) {
  */
 function gulpToRelativePath(options) {
   const { aliasConfig, extensions } = options;
-  return through.obj(function (file, _, cb) {
+  return through.obj(function(file, _, cb) {
     file.contents = Buffer.from(
       utils.transformToRelativePath(
         file.contents.toString(),
