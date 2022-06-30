@@ -13,11 +13,6 @@ async function build(options = {}) {
 
   options = utils.mergeProps(config, options);
 
-  // copy styles when use multiple files mode
-  if (!options.singleFile && !options.stylesCopyFiles.length) {
-    options.stylesCopyFiles.push('**/*');
-  }
-
   // parse arguments
   const args = process.argv.slice(2);
   if (args.length) {
