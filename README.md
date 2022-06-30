@@ -96,7 +96,7 @@ module.exports = {
   tsConfig: require('./tsconfig.json'),
 
   // 样式目录 String，基于 inputDir
-  stylesDir: 'styles',
+  stylesDir: '',
 
   // 需要编译的文件 String[]，基于 stylesDir，例如：["index.scss"]；["**/*"] 为编译所有样式文件。
   stylesParseFiles: [],

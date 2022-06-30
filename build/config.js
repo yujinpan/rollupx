@@ -85,7 +85,7 @@ module.exports = {
   },
   tsConfig: require('../tsconfig.json'),
 
-  stylesDir: 'styles',
+  stylesDir: '',
   stylesParseFiles: [],
   stylesCopyFiles: [],
 
