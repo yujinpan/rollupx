@@ -3,6 +3,7 @@ const resolve = require('resolve');
 const glob = require('glob');
 const through = require('through2');
 const { parseComponent } = require('vue-template-compiler');
+const fs = require('fs');
 
 const styleExtensions = ['.scss', '.sass', '.less', '.css'];
 
@@ -50,36 +51,57 @@ function transformToRelativePath(
 }
 
 function toRelative(filepath, resolvePath, aliasConfig, extensions) {
+  if (
+    resolvePath.startsWith('node_modules') ||
+    resolvePath.startsWith(path.sep) ||
+    resolvePath.startsWith('.')
+  ) {
+    return resolvePath;
+  }
+
   // 调整顺序，提高多个字符的匹配度，例如：~@ 比 ～ 优先级高
   const keys = Object.keys(aliasConfig).sort((a, b) => b.length - a.length);
-  keys.forEach((key) => {
-    // 仅有 @ 或者 @/ 或者 ~xxx 形式
-    if (
-      resolvePath === key ||
-      resolvePath.startsWith(key + '/') ||
-      (key === '~' && resolvePath.startsWith('~'))
-    ) {
-      resolvePath = path
-        .relative(
-          path.dirname(filepath),
-          resolve.sync(
-            resolvePath.replace(
-              new RegExp('^' + key),
-              // 当前缀为 ～ 时，需要补充 /
-              aliasConfig[key] + (key === '~' ? '/' : '')
-            ),
-            { extensions }
-          )
-        )
-        // fix: windows path will be \
-        .split(path.sep)
-        .join('/');
-      resolvePath = resolvePath.startsWith('.')
-        ? resolvePath
-        : './' + resolvePath;
-    }
+  const aliasKey = keys.find((key) => {
+    // 仅有 @ 或者 @/
+    return resolvePath === key || resolvePath.startsWith(key + '/');
   });
-  return resolvePath;
+
+  if (aliasKey) {
+    resolvePath = path
+      .relative(
+        path.dirname(filepath),
+        resolve.sync(
+          resolvePath.replace(
+            new RegExp('^' + aliasKey),
+            aliasConfig[aliasKey] +
+              (aliasConfig[aliasKey].endsWith('/') ? '' : '/')
+          ),
+          { extensions }
+        )
+      )
+      // fix: windows path will be \
+      .split(path.sep)
+      .join('/');
+    resolvePath = resolvePath.startsWith('.')
+      ? resolvePath
+      : './' + resolvePath;
+
+    return resolvePath;
+  } else {
+    // not alias path
+    if (resolvePath.startsWith('~')) {
+      return resolvePath.replace('~', 'node_modules/');
+    }
+
+    // scss & not alias path, and maybe: 1. relative path 2. node_modules
+    if (!aliasKey && /.(sass|scss)$/.test(filepath)) {
+      if (!fs.existsSync(resolvePath)) {
+        resolvePath = 'node_modules/' + resolvePath;
+      }
+    }
+
+    return resolvePath;
+  }
 }
 
 function suffixTo(file, suffix = '') {
