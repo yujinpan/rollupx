@@ -15,7 +15,7 @@ module.exports = {
   // typesOutputDir: 'types',
   // singleFile: false,
   // inputFiles: ['index.*'],
-  // stylesDir: 'styles',
+  // stylesDir: '',
   // // stylesParseFiles: [],
   stylesCopyFiles: ['**/*'],
   // typesOutputDir: 'test',
