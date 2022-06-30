@@ -34,11 +34,9 @@ async function build(options) {
   );
   const allFiles = parseFiles.concat(copyFiles);
 
-  fs.rmdirSync(styleOutputDir, { recursive: true });
-  fs.mkdirSync(styleOutputDir, { recursive: true });
   utils.deDup(allFiles.map((item) => path.dirname(item))).forEach((item) => {
     const dir = item.replace(styleInputDir, styleOutputDir);
-    !fs.existsSync(dir) && fs.mkdirSync(dir);
+    !fs.existsSync(dir) && fs.mkdirSync(dir, { recursive: true });
   });
 
   // 注意：由于外部引用的 node_modules 与库的目录不同，所以这里拷贝的 scss 文件的 ～ 缩写不进行替换
@@ -69,7 +67,7 @@ async function build(options) {
         file: filepath,
         output: styleOutputDir,
         outputStyle: 'expanded',
-        importer: function (url) {
+        importer: function(url) {
           return {
             file: utils.toRelative(
               filepath,
