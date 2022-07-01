@@ -95,7 +95,11 @@ function toRelative(filepath, resolvePath, aliasConfig, extensions) {
 
     // scss & not alias path, and maybe: 1. relative path 2. node_modules
     if (!aliasKey && /.(sass|scss)$/.test(filepath)) {
-      if (!fs.existsSync(resolvePath)) {
+      try {
+        resolve.sync(path.resolve(path.dirname(filepath), resolvePath), {
+          extensions
+        });
+      } catch (e) {
         resolvePath = 'node_modules/' + resolvePath;
       }
     }
