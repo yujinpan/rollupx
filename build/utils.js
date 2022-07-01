@@ -2,8 +2,10 @@ const path = require('path');
 const resolve = require('resolve');
 const glob = require('glob');
 const through = require('through2');
-const { parseComponent } = require('vue-template-compiler');
 const fs = require('fs');
+
+require('rollup-plugin-vue/dist/utils/descriptorCache').getDescriptor('')
+require('rollup-plugin-vue/dist/script').getResolvedScript('');
 
 const styleExtensions = ['.scss', '.sass', '.less', '.css'];
 
