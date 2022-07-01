@@ -1,6 +1,6 @@
 {
   "name": "rollupx",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "author": "yujinpan",
   "main": "build/build.js",
   "files": [
