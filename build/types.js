@@ -42,7 +42,7 @@ async function build(options) {
     gulp
       .src(files, {
         allowEmpty: true,
-        ignore: [...excludeFiles, '**/!(*.js|*.ts|*.vue)']
+        ignore: [...excludeFiles, '**/!(*.js|*.jsx|*.ts|*.tsx|*.vue)']
       })
       .pipe(utils.gulpPickVueScript(['ts', 'tsx']))
       .pipe(gulpToRelativePath(options))
