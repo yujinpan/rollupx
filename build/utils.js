@@ -3,7 +3,6 @@ const resolve = require('resolve');
 const glob = require('glob');
 const through = require('through2');
 const { parseComponent } = require('vue-template-compiler');
-const fs = require('fs');
 
 const styleExtensions = ['.scss', '.sass', '.less', '.css'];
 
@@ -90,7 +89,7 @@ function toRelative(filepath, resolvePath, aliasConfig, extensions) {
   } else {
     // not alias path
     if (resolvePath.startsWith('~')) {
-      return resolvePath.replace('~', 'node_modules/');
+      return resolvePath;
     }
 
     // scss & not alias path, and maybe: 1. relative path 2. node_modules
@@ -100,7 +99,7 @@ function toRelative(filepath, resolvePath, aliasConfig, extensions) {
           extensions
         });
       } catch (e) {
-        resolvePath = 'node_modules/' + resolvePath;
+        return '~' + resolvePath;
       }
     }
 
