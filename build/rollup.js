@@ -178,7 +178,7 @@ function getRollupBaseConfig(options) {
     ],
     external: isNotES
       ? external
-      : (id, parentId, resolved) => {
+      : (id, parentId) => {
           // 内部 - 入口文件
           if (parentId === undefined) return false;
 
