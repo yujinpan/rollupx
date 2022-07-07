@@ -204,6 +204,10 @@ function printErr(name, err) {
   console.log(`\x1b[31m[rollupx] ${name}\x1b[0m`, err);
 }
 
+function printWarn(name, warn) {
+  console.log(`\x1b[33m[rollupx] ${name}\x1b[0m`, warn);
+}
+
 function toLowerCamelCase(str) {
   let result = '';
   str = str.split('');
@@ -222,6 +226,14 @@ function sassImporter(filepath, resolvePath, aliasConfig) {
   // rollup-plugin-vue cannot parse '~', replace to 'node_modules' here
   if (file.startsWith('~')) {
     file = file.replace(/^~/, 'node_modules/');
+  }
+  // suffix .css will be not imported
+  // not suffix will be imported
+  if (/\.(scss|sass)/.test(filepath) && file.endsWith('.css')) {
+    printWarn(
+      '[sassImporter]',
+      `"@import '*.css'" in [${filepath}] will be not imported. You can remove .css suffix to import it.`
+    );
   }
   return {
     file
