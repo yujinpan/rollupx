@@ -2,7 +2,6 @@ const sass = require('node-sass');
 const fs = require('fs');
 const path = require('path');
 const postcss = require('postcss');
-const autoprefixer = require('autoprefixer');
 const utils = require('./utils');
 
 const cssSuffixReg = /\.(scss|sass|less|css)$/;
@@ -67,19 +66,10 @@ async function build(options) {
         file: filepath,
         output: styleOutputDir,
         outputStyle: 'expanded',
-        importer: function(url) {
-          return {
-            file: utils.toRelative(
-              filepath,
-              url,
-              aliasConfig,
-              utils.styleExtensions
-            )
-          };
-        }
+        importer: (url) => utils.sassImporter(filepath, url, aliasConfig)
       });
 
-      return postcss([autoprefixer])
+      return postcss(require('../postcss.config').plugins)
         .process(css, {
           from: filepath,
           to: outputPath

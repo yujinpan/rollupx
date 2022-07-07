@@ -11,7 +11,6 @@ const { terser } = require('rollup-plugin-terser');
 const fs = require('fs');
 const path = require('path');
 const { suffixTo, transformToRelativePath } = require('./utils');
-const utils = require('./utils');
 
 /**
  * 生成 rollup 配置
@@ -143,9 +142,8 @@ function getRollupBaseConfig(options) {
         style: {
           preprocessOptions: {
             scss: {
-              importer: [
-                (url, filepath) => sassImporter(filepath, url, aliasConfig)
-              ]
+              importer: (url, filepath) =>
+                utils.sassImporter(filepath, url, aliasConfig)
             }
           }
         }
@@ -159,7 +157,8 @@ function getRollupBaseConfig(options) {
             `import styleInject from 'style-inject/dist/style-inject.es.js';\n` +
             `styleInject(${cssVariableName});`
           );
-        }
+        },
+        plugins: require('../postcss.config').plugins
       }),
       babel(babelOptions),
       url(),
@@ -224,22 +223,6 @@ function isNodeModules(filepath, parentPath, nodeAliasKeys, aliasKeys) {
 
 function isStartsWidthAlias(path, alias) {
   return path === alias || path.startsWith(alias + '/');
-}
-
-function sassImporter(filepath, resolvePath, aliasConfig) {
-  let file = utils.toRelative(
-    filepath,
-    resolvePath,
-    aliasConfig,
-    utils.styleExtensions
-  );
-  // rollup-plugin-vue cannot parse '~', replace to 'node_modules' here
-  if (file.startsWith('~')) {
-    file = file.replace(/^~/, 'node_modules/');
-  }
-  return {
-    file
-  };
 }
 
 module.exports = {

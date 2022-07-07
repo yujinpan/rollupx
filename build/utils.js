@@ -217,6 +217,17 @@ function toLowerCamelCase(str) {
   return result;
 }
 
+function sassImporter(filepath, resolvePath, aliasConfig) {
+  let file = toRelative(filepath, resolvePath, aliasConfig, styleExtensions);
+  // rollup-plugin-vue cannot parse '~', replace to 'node_modules' here
+  if (file.startsWith('~')) {
+    file = file.replace(/^~/, 'node_modules/');
+  }
+  return {
+    file
+  };
+}
+
 module.exports = {
   deDup,
   getFiles,
@@ -229,5 +240,6 @@ module.exports = {
   printMsg,
   printErr,
   runTask,
-  toLowerCamelCase
+  toLowerCamelCase,
+  sassImporter
 };
