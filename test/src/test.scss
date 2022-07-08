@@ -1,3 +1,8 @@
+@import '~module2/test';
+@import './test1.css';
+@import './test2';
+@import './test3.scss';
+
 body {
   font-size: 30px;
 }
