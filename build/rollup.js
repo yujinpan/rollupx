@@ -142,8 +142,7 @@ function getRollupBaseConfig(options) {
         style: {
           preprocessOptions: {
             scss: {
-              importer: (url, filepath) =>
-                utils.sassImporter(filepath, url, aliasConfig)
+              importer: utils.getSassImporter(options)
             }
           }
         }
@@ -158,7 +157,9 @@ function getRollupBaseConfig(options) {
             `styleInject(${cssVariableName});`
           );
         },
-        plugins: require('../postcss.config').plugins
+        plugins: utils.getPostcssPlugins(options),
+        // plugins will need the path
+        to: path.resolve(options.outputDir, './index.css')
       }),
       babel(babelOptions),
       url(),

@@ -221,23 +221,44 @@ function toLowerCamelCase(str) {
   return result;
 }
 
-function sassImporter(filepath, resolvePath, aliasConfig) {
-  let file = toRelative(filepath, resolvePath, aliasConfig, styleExtensions);
-  // rollup-plugin-vue cannot parse '~', replace to 'node_modules' here
-  if (file.startsWith('~')) {
-    file = file.replace(/^~/, 'node_modules/');
-  }
-  // suffix .css will be not imported
-  // not suffix will be imported
-  if (/\.(scss|sass)/.test(filepath) && file.endsWith('.css')) {
-    printWarn(
-      '[sassImporter]',
-      `"@import '*.css'" in [${filepath}] will be not imported. You can remove .css suffix to import it.`
-    );
-  }
-  return {
-    file
+/**
+ * @param {import('./config')} options
+ */
+function getSassImporter(options) {
+  return (url, filepath) => {
+    let file = toRelative(filepath, url, options.aliasConfig, styleExtensions);
+    // rollup-plugin-vue cannot parse '~', replace to 'node_modules' here
+    if (file.startsWith('~')) {
+      file = file.replace(/^~/, 'node_modules/');
+    }
+    // suffix .css will be not imported
+    // not suffix will be imported
+    if (/\.(scss|sass)/.test(filepath) && file.endsWith('.css')) {
+      printWarn(
+        '[sassImporter]',
+        `"@import '*.css'" in [${filepath}] will be not imported. You can remove .css suffix to import it.`
+      );
+    }
+
+    return {
+      file
+    };
   };
+}
+
+/**
+ * @param {import('./config')} options
+ */
+function getPostcssPlugins(options) {
+  return [
+    require('autoprefixer')(),
+    require('postcss-url')({
+      url: 'copy',
+      relative: true,
+      basePath: options.inputDir,
+      assetsPath: options.outputDir
+    })
+  ];
 }
 
 module.exports = {
@@ -253,5 +274,6 @@ module.exports = {
   printErr,
   runTask,
   toLowerCamelCase,
-  sassImporter
+  getSassImporter,
+  getPostcssPlugins
 };

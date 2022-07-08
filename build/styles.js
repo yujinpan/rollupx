@@ -66,10 +66,10 @@ async function build(options) {
         file: filepath,
         output: styleOutputDir,
         outputStyle: 'expanded',
-        importer: (url) => utils.sassImporter(filepath, url, aliasConfig)
+        importer: utils.getSassImporter(options)
       });
 
-      return postcss(require('../postcss.config').plugins)
+      return postcss(utils.getPostcssPlugins(options))
         .process(css, {
           from: filepath,
           to: outputPath
