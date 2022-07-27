@@ -21,6 +21,7 @@ export default defineComponent({
 <style scoped lang="scss">
 @import '~module1/test.scss';
 @import '~@/styles/common-variables.scss';
+@import '@/styles/index.scss';
 @import '~element-ui/lib/theme-chalk/index.css';
 
 h3 {

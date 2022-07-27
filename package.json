@@ -66,6 +66,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.1.1",
     "node-sass": "^7.0.1",
+    "sass": "^1.54.0",
     "vue": "^3.2.37"
   },
   "engines": {

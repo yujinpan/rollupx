@@ -10,7 +10,11 @@ const url = require('@rollup/plugin-url');
 const { terser } = require('rollup-plugin-terser');
 const fs = require('fs');
 const path = require('path');
-const { suffixTo, transformToRelativePath } = require('./utils');
+const {
+  suffixTo,
+  transformToRelativePath,
+  getSassImporter
+} = require('./utils');
 
 /**
  * 生成 rollup 配置
@@ -90,7 +94,7 @@ function getRollupBaseConfig(options) {
     aliasConfig[item].includes('node_modules')
   );
   const assetsReg = /\.(png|svg|jpg|gif|scss|sass|less|css)$/;
-  const vuePluginReg = /rollup-plugin-vue/;
+  const vuePluginReg = /\?vue&/;
   const babelOptions = {
     extensions: extensions,
     babelHelpers: 'runtime',
@@ -130,21 +134,14 @@ function getRollupBaseConfig(options) {
         include: /node_modules/
       }),
       vue({
-        css: false, // Dynamically inject css as a <style> tag
-        template: {
-          compilerOptions: {
-            preserveWhitespace: false // 丢弃模版空格
-          }
+        // use "sass" preprocess
+        preprocessStyles: true,
+        preprocessOptions: {
+          // path to relative
+          importer: getSassImporter(options)
         },
-        // https://github.com/vuejs/rollup-plugin-vue/issues/262
-        normalizer: '~vue-runtime-helpers/dist/normalize-component.js',
-        // https://github.com/vuejs/rollup-plugin-vue/issues/300#issuecomment-663098421
-        style: {
-          preprocessOptions: {
-            scss: {
-              importer: utils.getSassImporter(options)
-            }
-          }
+        compilerOptions: {
+          preserveWhitespace: false
         }
       }),
       postcss({
