@@ -2,11 +2,7 @@ const path = require('path');
 const resolve = require('resolve');
 const glob = require('glob');
 const through = require('through2');
-
-const getDescriptor = require('rollup-plugin-vue/dist/utils/descriptorCache')
-  .getDescriptor;
-const getResolvedScript = require('rollup-plugin-vue/dist/script')
-  .getResolvedScript;
+const parse = require('@vue/compiler-sfc').parse;
 
 const styleExtensions = ['.scss', '.sass', '.less', '.css'];
 
@@ -40,7 +36,7 @@ function transformToRelativePath(
       // 尾部的 .vue 转换
       if (
         newSuffix !== false &&
-        !newPath.includes('rollup-plugin-vue') &&
+        !newPath.includes('?vue&') &&
         /\.(jsx|ts|tsx|vue)$/.test(newPath)
       ) {
         newPath = suffixTo(newPath, newSuffix);
@@ -170,13 +166,13 @@ function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
     if (file.extname === '.vue') {
       const code = file.contents.toString();
       const scripts = parseComponent(code);
-      const lang = scripts.lang || 'js';
+      const lang = scripts.script.lang || 'js';
 
       if (!languages.includes(lang)) return cb();
 
       file.contents = Buffer.from(
-        (scripts.content
-          ? scripts.content
+        (scripts.script.content
+          ? scripts.script.content
           : `import { defineComponent } from 'vue';export default defineComponent({});`
         ).trim()
       );
@@ -226,8 +222,7 @@ function toLowerCamelCase(str) {
 }
 
 function parseComponent(id) {
-  const descriptor = getDescriptor(id);
-  return getResolvedScript(descriptor, false);
+  return parse(id).descriptor;
 }
 
 /**
