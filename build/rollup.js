@@ -142,18 +142,7 @@ function getRollupBaseConfig(options) {
         style: {
           preprocessOptions: {
             scss: {
-              importer: [
-                (url, filepath) => {
-                  return {
-                    file: utils.toRelative(
-                      filepath,
-                      url,
-                      aliasConfig,
-                      utils.styleExtensions
-                    )
-                  };
-                }
-              ]
+              importer: utils.getSassImporter(options)
             }
           }
         }
@@ -167,7 +156,10 @@ function getRollupBaseConfig(options) {
             `import styleInject from 'style-inject/dist/style-inject.es.js';\n` +
             `styleInject(${cssVariableName});`
           );
-        }
+        },
+        plugins: utils.getPostcssPlugins(options),
+        // plugins will need the path
+        to: path.resolve(options.outputDir, './index.css')
       }),
       babel(babelOptions),
       url(),
@@ -178,7 +170,7 @@ function getRollupBaseConfig(options) {
     ],
     external: isNotES
       ? external
-      : (id, parentId, resolved) => {
+      : (id, parentId) => {
           // 内部 - 入口文件
           if (parentId === undefined) return false;
 

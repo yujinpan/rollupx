@@ -2,7 +2,6 @@ const path = require('path');
 const resolve = require('resolve');
 const glob = require('glob');
 const through = require('through2');
-const fs = require('fs');
 
 const getDescriptor = require('rollup-plugin-vue/dist/utils/descriptorCache')
   .getDescriptor;
@@ -94,13 +93,17 @@ function toRelative(filepath, resolvePath, aliasConfig, extensions) {
   } else {
     // not alias path
     if (resolvePath.startsWith('~')) {
-      return resolvePath.replace('~', 'node_modules/');
+      return resolvePath;
     }
 
     // scss & not alias path, and maybe: 1. relative path 2. node_modules
     if (!aliasKey && /.(sass|scss)$/.test(filepath)) {
-      if (!fs.existsSync(resolvePath)) {
-        resolvePath = 'node_modules/' + resolvePath;
+      try {
+        resolve.sync(path.resolve(path.dirname(filepath), resolvePath), {
+          extensions
+        });
+      } catch (e) {
+        return '~' + resolvePath;
       }
     }
 
@@ -205,6 +208,10 @@ function printErr(name, err) {
   console.log(`\x1b[31m[rollupx] ${name}\x1b[0m`, err);
 }
 
+function printWarn(name, warn) {
+  console.log(`\x1b[33m[rollupx] ${name}\x1b[0m`, warn);
+}
+
 function toLowerCamelCase(str) {
   let result = '';
   str = str.split('');
@@ -223,6 +230,46 @@ function parseComponent(id) {
   return getResolvedScript(descriptor, false);
 }
 
+/**
+ * @param {import('./config')} options
+ */
+function getSassImporter(options) {
+  return (url, filepath) => {
+    let file = toRelative(filepath, url, options.aliasConfig, styleExtensions);
+    // rollup-plugin-vue cannot parse '~', replace to 'node_modules' here
+    if (file.startsWith('~')) {
+      file = file.replace(/^~/, 'node_modules/');
+    }
+    // suffix .css will be not imported
+    // not suffix will be imported
+    if (/\.(scss|sass)/.test(filepath) && file.endsWith('.css')) {
+      printWarn(
+        '[sassImporter]',
+        `"@import '*.css'" in [${filepath}] will be not imported. You can remove .css suffix to import it.`
+      );
+    }
+
+    return {
+      file
+    };
+  };
+}
+
+/**
+ * @param {import('./config')} options
+ */
+function getPostcssPlugins(options) {
+  return [
+    require('autoprefixer')(),
+    require('postcss-url')({
+      url: 'copy',
+      relative: true,
+      basePath: options.inputDir,
+      assetsPath: options.outputDir
+    })
+  ];
+}
+
 module.exports = {
   deDup,
   getFiles,
@@ -235,5 +282,7 @@ module.exports = {
   printMsg,
   printErr,
   runTask,
-  toLowerCamelCase
+  toLowerCamelCase,
+  getSassImporter,
+  getPostcssPlugins
 };

@@ -2,8 +2,12 @@ module.exports = {
   presets: [
     [
       '@vue/app',
-      // fix: @babel/plugin-transform-runtime option's absoluteRuntime default is false
-      { absoluteRuntime: false }
+      {
+        // fix: @babel/plugin-transform-runtime option's absoluteRuntime default is false
+        absoluteRuntime: false,
+        // https://class-component.vuejs.org/guide/installation.html#manual-setup
+        loose: true
+      }
     ],
     // fix: constructor public/private defined is lose when
     // @babel/preset-typescript in here and project at the same time
