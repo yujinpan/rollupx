@@ -4,8 +4,10 @@ const glob = require('glob');
 const through = require('through2');
 const fs = require('fs');
 
-require('rollup-plugin-vue/dist/utils/descriptorCache').getDescriptor('')
-require('rollup-plugin-vue/dist/script').getResolvedScript('');
+const getDescriptor = require('rollup-plugin-vue/dist/utils/descriptorCache')
+  .getDescriptor;
+const getResolvedScript = require('rollup-plugin-vue/dist/script')
+  .getResolvedScript;
 
 const styleExtensions = ['.scss', '.sass', '.less', '.css'];
 
@@ -165,14 +167,14 @@ function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
     if (file.extname === '.vue') {
       const code = file.contents.toString();
       const scripts = parseComponent(code);
-      const lang = scripts.script.lang || 'js';
+      const lang = scripts.lang || 'js';
 
       if (!languages.includes(lang)) return cb();
 
       file.contents = Buffer.from(
-        (scripts.script
-          ? scripts.script.content
-          : `import { Vue } from 'vue-property-decorator';export default class extends Vue {}`
+        (scripts.content
+          ? scripts.content
+          : `import { defineComponent } from 'vue';export default defineComponent({});`
         ).trim()
       );
       file.extname = '.' + lang;
@@ -214,6 +216,11 @@ function toLowerCamelCase(str) {
     }
   }
   return result;
+}
+
+function parseComponent(id) {
+  const descriptor = getDescriptor(id);
+  return getResolvedScript(descriptor, false);
 }
 
 module.exports = {
