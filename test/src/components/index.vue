@@ -5,15 +5,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-@Component({
-  // 利于 IDE 自动提示
-  name: 'HelloWorld'
-})
-export default class HelloWorld extends Vue {
-  @Prop() private msg!: string;
-}
+export default defineComponent({
+  props: {
+    msg: {
+      type: String,
+      default: 'test'
+    }
+  }
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

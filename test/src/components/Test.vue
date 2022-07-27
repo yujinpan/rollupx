@@ -6,9 +6,9 @@
 
 <script lang="tsx">
 export default {
-  name: 'test-tsx',
+  name: 'TestTsx',
   render() {
-    return <div>test-tsx</div>
+    return <div>test-tsx</div>;
   }
 };
 </script>
