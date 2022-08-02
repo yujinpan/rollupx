@@ -15,6 +15,7 @@ const {
   transformToRelativePath,
   getSassImporter
 } = require('./utils');
+const sass = require('node-sass');
 
 /**
  * 生成 rollup 配置
@@ -156,7 +157,21 @@ function getRollupBaseConfig(options) {
         },
         plugins: utils.getPostcssPlugins(options),
         // plugins will need the path
-        to: path.resolve(options.outputDir, './index.css')
+        to: path.resolve(options.outputDir, './index.css'),
+        loaders: [
+          // custom sass loader
+          {
+            name: 'sass',
+            test: /\.(sass|scss)$/,
+            process({ map }) {
+              const { css } = sass.renderSync({
+                file: this.id,
+                importer: utils.getSassImporter(options)
+              });
+              return { code: css, map };
+            }
+          }
+        ]
       }),
       babel(babelOptions),
       url(),
