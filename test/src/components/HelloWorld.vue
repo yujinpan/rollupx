@@ -19,6 +19,7 @@ export default defineComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+@import 'module1/test.scss';
 @import '~module1/test.scss';
 @import '~@/styles/common-variables.scss';
 @import '@/styles/index.scss';

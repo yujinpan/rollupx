@@ -1,3 +1,5 @@
+@import 'module2/test';
+@import '~module2/test';
 @import "./plugins/index";
 
 .test3 {
