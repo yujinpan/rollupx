@@ -151,7 +151,7 @@ function getRollupBaseConfig(options) {
         // fix the postcss import path is absolute
         inject(cssVariableName) {
           return (
-            `import styleInject from 'style-inject/dist/style-inject.es.js';\n` +
+            `import styleInject from 'style-inject';\n` +
             `styleInject(${cssVariableName});`
           );
         },
