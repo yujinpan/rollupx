@@ -4,18 +4,13 @@ module.exports = {
       '@vue/app',
       {
         // fix: @babel/plugin-transform-runtime option's absoluteRuntime default is false
-        absoluteRuntime: false,
-        // https://class-component.vuejs.org/guide/installation.html#manual-setup
-        loose: true
+        absoluteRuntime: false
       }
     ],
-    // fix: constructor public/private defined is lose when
-    // @babel/preset-typescript in here and project at the same time
-    ['@babel/preset-typescript', {}, 'rollupx-preset-typescript']
+    '@babel/preset-typescript'
   ],
   plugins: [
     '@babel/plugin-proposal-export-default-from',
     '@babel/plugin-proposal-optional-chaining'
-  ],
-  exclude: 'node_modules/**'
+  ]
 };
