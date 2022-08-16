@@ -231,22 +231,26 @@ function parseComponent(id) {
 function getSassImporter(options) {
   return (url, filepath) => {
     let file = toRelative(filepath, url, options.aliasConfig, styleExtensions);
+
     // rollup-plugin-vue cannot parse '~', replace to 'node_modules' here
     if (file.startsWith('~')) {
       file = file.replace(/^~/, 'node_modules/');
-    }
-    // suffix .css will be not imported
-    // not suffix will be imported
-    if (/\.(scss|sass)/.test(filepath) && file.endsWith('.css')) {
-      printWarn(
-        '[sassImporter]',
-        `"@import '*.css'" in [${filepath}] will be not imported. You can remove .css suffix to import it.`
-      );
     }
 
     return {
       file
     };
+  };
+}
+
+/**
+ * @param {import('./config')} options
+ */
+function getSassDefaultOptions(options) {
+  return {
+    importer: getSassImporter(options),
+    // ignore warnings for symbol "/"
+    quietDeps: true
   };
 }
 
@@ -279,5 +283,6 @@ module.exports = {
   runTask,
   toLowerCamelCase,
   getSassImporter,
+  getSassDefaultOptions,
   getPostcssPlugins
 };

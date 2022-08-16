@@ -63,12 +63,10 @@ async function build(options) {
         .replace(cssSuffixReg, '.css');
 
       const { css } = sass.renderSync({
+        ...utils.getSassDefaultOptions(options),
         file: filepath,
         output: styleOutputDir,
-        outputStyle: 'expanded',
-        importer: utils.getSassImporter(options),
-        // ignore warnings for symbol "/"
-        quietDeps: true
+        outputStyle: 'expanded'
       });
 
       return postcss(utils.getPostcssPlugins(options))
