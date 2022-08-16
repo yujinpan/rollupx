@@ -15,7 +15,7 @@ const {
   transformToRelativePath,
   getSassImporter
 } = require('./utils');
-const sass = require('node-sass');
+const sass = require('sass');
 
 /**
  * 生成 rollup 配置
@@ -139,7 +139,9 @@ function getRollupBaseConfig(options) {
         preprocessStyles: true,
         preprocessOptions: {
           // path to relative
-          importer: getSassImporter(options)
+          importer: getSassImporter(options),
+          // ignore warnings for symbol "/"
+          quietDeps: true
         },
         compilerOptions: {
           preserveWhitespace: false
@@ -166,7 +168,9 @@ function getRollupBaseConfig(options) {
             process({ map }) {
               const { css } = sass.renderSync({
                 file: this.id,
-                importer: utils.getSassImporter(options)
+                importer: utils.getSassImporter(options),
+                // ignore warnings for symbol "/"
+                quietDeps: true
               });
               return { code: css, map };
             }

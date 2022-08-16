@@ -1,4 +1,4 @@
-const sass = require('node-sass');
+const sass = require('sass');
 const fs = require('fs');
 const path = require('path');
 const postcss = require('postcss');
@@ -66,7 +66,9 @@ async function build(options) {
         file: filepath,
         output: styleOutputDir,
         outputStyle: 'expanded',
-        importer: utils.getSassImporter(options)
+        importer: utils.getSassImporter(options),
+        // ignore warnings for symbol "/"
+        quietDeps: true
       });
 
       return postcss(utils.getPostcssPlugins(options))
