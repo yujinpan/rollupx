@@ -11,6 +11,7 @@ const { terser } = require('rollup-plugin-terser');
 const fs = require('fs');
 const path = require('path');
 const utils = require('./utils');
+const sass = require('sass');
 
 /**
  * 生成 rollup 配置
@@ -150,7 +151,20 @@ function getRollupBaseConfig(options) {
         plugins: utils.getPostcssPlugins(options),
         // plugins will need the path
         to: path.resolve(options.outputDir, './index.css'),
-        use: [['sass', utils.getSassDefaultOptions(options)], 'stylus', 'less']
+        loaders: [
+          // custom sass loader
+          {
+            name: 'sass',
+            test: /\.(sass|scss)$/,
+            process({ map }) {
+              const { css } = sass.renderSync({
+                file: this.id,
+                ...utils.getSassDefaultOptions(options)
+              });
+              return { code: css, map };
+            }
+          }
+        ]
       }),
       babel(babelOptions),
       url(),
