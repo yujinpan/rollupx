@@ -142,7 +142,9 @@ function getRollupBaseConfig(options) {
         style: {
           preprocessOptions: {
             scss: {
-              importer: utils.getSassImporter(options)
+              importer: utils.getSassImporter(options),
+              // ignore warnings for symbol "/"
+              quietDeps: true
             }
           }
         }
