@@ -10,7 +10,7 @@ const url = require('@rollup/plugin-url');
 const { terser } = require('rollup-plugin-terser');
 const fs = require('fs');
 const path = require('path');
-const { suffixTo, transformToRelativePath } = require('./utils');
+const utils = require('./utils');
 
 /**
  * 生成 rollup 配置
@@ -33,7 +33,7 @@ function generateRollupConfig(filePath, options) {
     outputDir,
     path.dirname(relativePath) +
       '/' +
-      suffixTo(path.basename(relativePath), '.js')
+      utils.suffixTo(path.basename(relativePath), '.js')
   );
   let output;
   if (format === 'es') {
@@ -68,7 +68,7 @@ function relativePlugin(aliasConfig, extensions, newSuffix) {
     name: 'rollup-plugin-relative',
     transform(code, id) {
       if (id.includes('node_modules')) return code;
-      return transformToRelativePath(
+      return utils.transformToRelativePath(
         code,
         id,
         aliasConfig,
@@ -84,7 +84,7 @@ function relativePlugin(aliasConfig, extensions, newSuffix) {
  */
 function getRollupBaseConfig(options) {
   const { aliasConfig, extensions, singleFile, external, format } = options;
-  const utils = require('./utils');
+
   const aliasKeys = Object.keys(aliasConfig);
   const nodeAliasKeys = aliasKeys.filter((item) =>
     aliasConfig[item].includes('node_modules')
@@ -141,11 +141,7 @@ function getRollupBaseConfig(options) {
         // https://github.com/vuejs/rollup-plugin-vue/issues/300#issuecomment-663098421
         style: {
           preprocessOptions: {
-            scss: {
-              importer: utils.getSassImporter(options),
-              // ignore warnings for symbol "/"
-              quietDeps: true
-            }
+            scss: utils.getSassDefaultOptions(options)
           }
         }
       }),
@@ -161,7 +157,8 @@ function getRollupBaseConfig(options) {
         },
         plugins: utils.getPostcssPlugins(options),
         // plugins will need the path
-        to: path.resolve(options.outputDir, './index.css')
+        to: path.resolve(options.outputDir, './index.css'),
+        use: [['sass', utils.getSassDefaultOptions(options)], 'stylus', 'less']
       }),
       babel(babelOptions),
       url(),
