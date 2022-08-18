@@ -29,8 +29,8 @@ async function build(options) {
   const compilerOptions = {
     ...tsConfig.compilerOptions,
     strict: false,
-    emitDeclarationOnly: true,
-    declaration: true
+    declaration: true,
+    noEmitOnError: true
   };
 
   return new Promise((resolve) => {
