@@ -22,7 +22,7 @@ async function build(options) {
   typesOutputDir = path.resolve(outputDir || typesOutputDir);
 
   if (typesOutputDir !== outputDir) {
-    fs.rmdirSync(typesOutputDir, { recursive: true });
+    fs.rmSync(typesOutputDir, { recursive: true });
     fs.mkdirSync(typesOutputDir);
   }
 
