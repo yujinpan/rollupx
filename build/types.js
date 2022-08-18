@@ -46,7 +46,7 @@ async function build(options) {
       })
       .pipe(utils.gulpPickVueScript(['ts', 'tsx']))
       .pipe(gulpToRelativePath(options))
-      .pipe(ts(compilerOptions))
+      .pipe(ts(compilerOptions, ts.reporter.nullReporter()))
       .on('error', () => {})
       .dts.pipe(gulp.dest(typesOutputDir))
       .on('finish', resolve);
