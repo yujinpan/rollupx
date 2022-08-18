@@ -30,7 +30,7 @@ async function build(options) {
     ...tsConfig.compilerOptions,
     strict: false,
     declaration: true,
-    noEmitOnError: true
+    emitDeclarationOnly: true
   };
 
   return new Promise((resolve) => {
