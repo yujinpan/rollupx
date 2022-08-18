@@ -22,15 +22,15 @@ async function build(options) {
   typesOutputDir = path.resolve(outputDir || typesOutputDir);
 
   if (typesOutputDir !== outputDir) {
-    fs.rmdirSync(typesOutputDir, { recursive: true });
+    fs.rmSync(typesOutputDir, { recursive: true });
     fs.mkdirSync(typesOutputDir);
   }
 
   const compilerOptions = {
     ...tsConfig.compilerOptions,
     strict: false,
-    emitDeclarationOnly: true,
-    declaration: true
+    declaration: true,
+    emitDeclarationOnly: true
   };
 
   return new Promise((resolve) => {
@@ -46,7 +46,7 @@ async function build(options) {
       })
       .pipe(utils.gulpPickVueScript(['ts', 'tsx']))
       .pipe(gulpToRelativePath(options))
-      .pipe(ts(compilerOptions))
+      .pipe(ts(compilerOptions, ts.reporter.nullReporter()))
       .on('error', () => {})
       .dts.pipe(gulp.dest(typesOutputDir))
       .on('finish', resolve);
