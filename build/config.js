@@ -28,7 +28,9 @@
  *
  * @property {string} [docsOutputDir] 文档目录名
  *
- * @property {boolean} [singleFile] 是否打包为单文件，默认为 true
+ * @property {boolean} [singleFile] 是否打包为单文件，默认为 false
+ *
+ * @property {boolean} [stat] 是否统计体积，仅在 singleFile 为 true 时生效，默认为 false
  */
 
 /**
@@ -95,5 +97,7 @@ module.exports = {
 
   docsOutputDir: '',
 
-  singleFile: false
+  singleFile: false,
+
+  stat: false
 };

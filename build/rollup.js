@@ -84,7 +84,14 @@ function relativePlugin(aliasConfig, extensions, newSuffix) {
  * @param {import('./config')} options
  */
 function getRollupBaseConfig(options) {
-  const { aliasConfig, extensions, singleFile, external, format } = options;
+  const {
+    aliasConfig,
+    extensions,
+    singleFile,
+    stat,
+    external,
+    format
+  } = options;
 
   const aliasKeys = Object.keys(aliasConfig);
   const nodeAliasKeys = aliasKeys.filter((item) =>
@@ -106,81 +113,88 @@ function getRollupBaseConfig(options) {
     )[1].useBuiltIns = false;
   }
 
-  return {
-    plugins: [
-      // 全部 js/css 文件转换为相对路径
-      relativePlugin(
-        aliasConfig,
-        extensions.concat(utils.styleExtensions),
-        singleFile || isNotES ? false : undefined
+  const plugins = [
+    // 全部 js/css 文件转换为相对路径
+    relativePlugin(
+      aliasConfig,
+      extensions.concat(utils.styleExtensions),
+      singleFile || isNotES ? false : undefined
+    ),
+    resolve({
+      extensions,
+      browser: true,
+      preferBuiltins: true
+    }),
+    // 替换 env 文件的环境变量
+    replace({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'process.env.VUE_APP_BASE_URL': JSON.stringify(
+        process.env.VUE_APP_BASE_URL
       ),
-      resolve({
-        extensions,
-        browser: true,
-        preferBuiltins: true
-      }),
-      // 替换 env 文件的环境变量
-      replace({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-        'process.env.VUE_APP_BASE_URL': JSON.stringify(
-          process.env.VUE_APP_BASE_URL
-        ),
-        preventAssignment: true
-      }),
-      commonjs({
-        include: /node_modules/
-      }),
-      vue({
-        css: false, // Dynamically inject css as a <style> tag
-        template: {
-          compilerOptions: {
-            preserveWhitespace: false // 丢弃模版空格
-          }
-        },
-        // https://github.com/vuejs/rollup-plugin-vue/issues/262
-        normalizer: '~vue-runtime-helpers/dist/normalize-component.js',
-        // https://github.com/vuejs/rollup-plugin-vue/issues/300#issuecomment-663098421
-        style: {
-          preprocessOptions: {
-            scss: utils.getSassDefaultOptions(options)
+      preventAssignment: true
+    }),
+    commonjs({
+      include: /node_modules/
+    }),
+    vue({
+      css: false, // Dynamically inject css as a <style> tag
+      template: {
+        compilerOptions: {
+          preserveWhitespace: false // 丢弃模版空格
+        }
+      },
+      // https://github.com/vuejs/rollup-plugin-vue/issues/262
+      normalizer: '~vue-runtime-helpers/dist/normalize-component.js',
+      // https://github.com/vuejs/rollup-plugin-vue/issues/300#issuecomment-663098421
+      style: {
+        preprocessOptions: {
+          scss: utils.getSassDefaultOptions(options)
+        }
+      }
+    }),
+    postcss({
+      minimize: true,
+      // custom inject，require [style-inject] package
+      // fix the postcss import path is absolute
+      inject(cssVariableName) {
+        return (
+          `import styleInject from 'style-inject/dist/style-inject.es.js';\n` +
+          `styleInject(${cssVariableName});`
+        );
+      },
+      plugins: utils.getPostcssPlugins(options),
+      // plugins will need the path
+      to: path.resolve(options.outputDir, './index.css'),
+      loaders: [
+        // custom sass loader
+        {
+          name: 'sass',
+          test: /\.(sass|scss)$/,
+          process({ map }) {
+            const { css } = sass.renderSync({
+              file: this.id,
+              ...utils.getSassDefaultOptions(options)
+            });
+            return { code: css, map };
           }
         }
-      }),
-      postcss({
-        minimize: true,
-        // custom inject，require [style-inject] package
-        // fix the postcss import path is absolute
-        inject(cssVariableName) {
-          return (
-            `import styleInject from 'style-inject/dist/style-inject.es.js';\n` +
-            `styleInject(${cssVariableName});`
-          );
-        },
-        plugins: utils.getPostcssPlugins(options),
-        // plugins will need the path
-        to: path.resolve(options.outputDir, './index.css'),
-        loaders: [
-          // custom sass loader
-          {
-            name: 'sass',
-            test: /\.(sass|scss)$/,
-            process({ map }) {
-              const { css } = sass.renderSync({
-                file: this.id,
-                ...utils.getSassDefaultOptions(options)
-              });
-              return { code: css, map };
-            }
-          }
-        ]
-      }),
-      babel(babelOptions),
-      url(),
-      json(),
+      ]
+    }),
+    babel(babelOptions),
+    url(),
+    json()
+  ];
+
+  if (stat && singleFile) {
+    plugins.push(
       visualizer({
         filename: './stat/statistics.html'
       })
-    ],
+    );
+  }
+
+  return {
+    plugins,
     external: isNotES
       ? external
       : (id, parentId) => {
