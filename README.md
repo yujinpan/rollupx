@@ -113,7 +113,10 @@ module.exports = {
   docsOutputDir: '',
 
   // 是否单文件（不按文件分模块） Boolean
-  singleFile: false
+  singleFile: false,
+
+  // 是否统计体积，仅在 singleFile 为 true 时生效，默认为 false
+  stat: false
 };
 ````
 
