@@ -8,7 +8,6 @@ const { visualizer } = require('rollup-plugin-visualizer');
 const replace = require('@rollup/plugin-replace');
 const url = require('@rollup/plugin-url');
 const { terser } = require('rollup-plugin-terser');
-const fs = require('fs');
 const path = require('path');
 const utils = require('./utils');
 const sass = require('sass');
@@ -84,12 +83,15 @@ function relativePlugin(aliasConfig, extensions, newSuffix) {
  * @param {import('./config')} options
  */
 function getRollupBaseConfig(options) {
-  const { aliasConfig, extensions, singleFile, external, format } = options;
+  const {
+    aliasConfig,
+    extensions,
+    singleFile,
+    stat,
+    external,
+    format
+  } = options;
 
-  const aliasKeys = Object.keys(aliasConfig);
-  const nodeAliasKeys = aliasKeys.filter((item) =>
-    aliasConfig[item].includes('node_modules')
-  );
   const assetsReg = /\.(png|svg|jpg|gif|scss|sass|less|css)$/;
   const vuePluginReg = /\?vue&/;
   const babelOptions = {
@@ -106,73 +108,80 @@ function getRollupBaseConfig(options) {
     )[1].useBuiltIns = false;
   }
 
-  return {
-    plugins: [
-      // 全部 js/css 文件转换为相对路径
-      relativePlugin(
-        aliasConfig,
-        extensions.concat(utils.styleExtensions),
-        singleFile || isNotES ? false : undefined
+  const plugins = [
+    // 全部 js/css 文件转换为相对路径
+    relativePlugin(
+      aliasConfig,
+      extensions.concat(utils.styleExtensions),
+      singleFile || isNotES ? false : undefined
+    ),
+    resolve({
+      extensions,
+      browser: true,
+      preferBuiltins: true
+    }),
+    // 替换 env 文件的环境变量
+    replace({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'process.env.VUE_APP_BASE_URL': JSON.stringify(
+        process.env.VUE_APP_BASE_URL
       ),
-      resolve({
-        extensions,
-        browser: true,
-        preferBuiltins: true
-      }),
-      // 替换 env 文件的环境变量
-      replace({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-        'process.env.VUE_APP_BASE_URL': JSON.stringify(
-          process.env.VUE_APP_BASE_URL
-        ),
-        preventAssignment: true
-      }),
-      commonjs({
-        include: /node_modules/
-      }),
-      vue({
-        // use "sass" preprocess
-        preprocessStyles: true,
-        preprocessOptions: utils.getSassDefaultOptions(options),
-        compilerOptions: {
-          preserveWhitespace: false
-        }
-      }),
-      postcss({
-        minimize: true,
-        // custom inject，require [style-inject] package
-        // fix the postcss import path is absolute
-        inject(cssVariableName) {
-          return (
-            `import styleInject from 'style-inject';\n` +
-            `styleInject(${cssVariableName});`
-          );
-        },
-        plugins: utils.getPostcssPlugins(options),
-        // plugins will need the path
-        to: path.resolve(options.outputDir, './index.css'),
-        loaders: [
-          // custom sass loader
-          {
-            name: 'sass',
-            test: /\.(sass|scss)$/,
-            process({ map }) {
-              const { css } = sass.renderSync({
-                file: this.id,
-                ...utils.getSassDefaultOptions(options)
-              });
-              return { code: css, map };
-            }
+      preventAssignment: true
+    }),
+    commonjs({
+      include: /node_modules/
+    }),
+    vue({
+      // use "sass" preprocess
+      preprocessStyles: true,
+      preprocessOptions: utils.getSassDefaultOptions(options),
+      compilerOptions: {
+        preserveWhitespace: false
+      }
+    }),
+    postcss({
+      minimize: true,
+      // custom inject，require [style-inject] package
+      // fix the postcss import path is absolute
+      inject(cssVariableName) {
+        return (
+          `import styleInject from 'style-inject';\n` +
+          `styleInject(${cssVariableName});`
+        );
+      },
+      plugins: utils.getPostcssPlugins(options),
+      // plugins will need the path
+      to: path.resolve(options.outputDir, './index.css'),
+      loaders: [
+        // custom sass loader
+        {
+          name: 'sass',
+          test: /\.(sass|scss)$/,
+          process({ map }) {
+            const { css } = sass.renderSync({
+              file: this.id,
+              ...utils.getSassDefaultOptions(options)
+            });
+            return { code: css, map };
           }
-        ]
-      }),
-      babel(babelOptions),
-      url(),
-      json(),
+        }
+      ]
+    }),
+    babel(babelOptions),
+    url(),
+    json()
+  ];
+
+  if (stat && singleFile) {
+    plugins.push(
       visualizer({
         filename: './stat/statistics.html'
       })
-    ],
+    );
+  }
+
+  return {
+    plugins,
     external: isNotES
       ? external
       : (id, parentId) => {
@@ -183,7 +192,7 @@ function getRollupBaseConfig(options) {
           if (vuePluginReg.test(id)) return false;
 
           // 外部 - 第三方模块跳过
-          if (isNodeModules(id, parentId, nodeAliasKeys, aliasKeys))
+          if (utils.isNodeModules(parentId, id, extensions, aliasConfig))
             return true;
 
           // 内部 - 静态资源需要编译
@@ -207,28 +216,6 @@ function getRollupBaseConfig(options) {
       warn(warning);
     }
   };
-}
-
-function isNodeModules(filepath, parentPath, nodeAliasKeys, aliasKeys) {
-  // 包含 node_modules 的直接为 true
-  // 未包含的判断是否有相对模块
-  return (
-    filepath.includes('node_modules') ||
-    filepath.startsWith('~') ||
-    nodeAliasKeys.some((item) => isStartsWidthAlias(filepath, item)) ||
-    // 1. 'jquery' 可能存在 node_modules 中，也可以在当前目录中
-    // 2. 排除 / 开头
-    // 3. 排除 . 开头
-    // 4. 排除缩写路径开头
-    (!filepath.startsWith('/') &&
-      !filepath.startsWith('.') &&
-      !aliasKeys.some((item) => isStartsWidthAlias(filepath, item)) &&
-      !fs.existsSync(path.dirname(parentPath) + '/' + filepath))
-  );
-}
-
-function isStartsWidthAlias(path, alias) {
-  return path === alias || path.startsWith(alias + '/');
 }
 
 module.exports = {
