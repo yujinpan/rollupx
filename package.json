@@ -23,6 +23,9 @@
   "bin": {
     "rollupx": "bin/rollupx.js"
   },
+  "scripts": {
+    "postversion": "npm publish"
+  },
   "dependencies": {
     "@babel/core": "^7.18.10",
     "@babel/plugin-proposal-export-default-from": "^7.18.6",
