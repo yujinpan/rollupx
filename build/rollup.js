@@ -8,7 +8,6 @@ const { visualizer } = require('rollup-plugin-visualizer');
 const replace = require('@rollup/plugin-replace');
 const url = require('@rollup/plugin-url');
 const { terser } = require('rollup-plugin-terser');
-const fs = require('fs');
 const path = require('path');
 const utils = require('./utils');
 const sass = require('sass');
@@ -93,10 +92,6 @@ function getRollupBaseConfig(options) {
     format
   } = options;
 
-  const aliasKeys = Object.keys(aliasConfig);
-  const nodeAliasKeys = aliasKeys.filter((item) =>
-    aliasConfig[item].includes('node_modules')
-  );
   const assetsReg = /\.(png|svg|jpg|gif|scss|sass|less|css)$/;
   const vuePluginReg = /rollup-plugin-vue/;
   const babelOptions = {
@@ -205,7 +200,7 @@ function getRollupBaseConfig(options) {
           if (vuePluginReg.test(id)) return false;
 
           // 外部 - 第三方模块跳过
-          if (isNodeModules(id, parentId, nodeAliasKeys, aliasKeys))
+          if (utils.isNodeModules(parentId, id, extensions, aliasConfig))
             return true;
 
           // 内部 - 静态资源需要编译
@@ -229,28 +224,6 @@ function getRollupBaseConfig(options) {
       warn(warning);
     }
   };
-}
-
-function isNodeModules(filepath, parentPath, nodeAliasKeys, aliasKeys) {
-  // 包含 node_modules 的直接为 true
-  // 未包含的判断是否有相对模块
-  return (
-    filepath.includes('node_modules') ||
-    filepath.startsWith('~') ||
-    nodeAliasKeys.some((item) => isStartsWidthAlias(filepath, item)) ||
-    // 1. 'jquery' 可能存在 node_modules 中，也可以在当前目录中
-    // 2. 排除 / 开头
-    // 3. 排除 . 开头
-    // 4. 排除缩写路径开头
-    (!filepath.startsWith('/') &&
-      !filepath.startsWith('.') &&
-      !aliasKeys.some((item) => isStartsWidthAlias(filepath, item)) &&
-      !fs.existsSync(path.dirname(parentPath) + '/' + filepath))
-  );
-}
-
-function isStartsWidthAlias(path, alias) {
-  return path === alias || path.startsWith(alias + '/');
 }
 
 module.exports = {

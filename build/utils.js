@@ -58,12 +58,7 @@ function toRelative(filepath, resolvePath, aliasConfig, extensions) {
     return resolvePath;
   }
 
-  // 调整顺序，提高多个字符的匹配度，例如：~@ 比 ～ 优先级高
-  const keys = Object.keys(aliasConfig).sort((a, b) => b.length - a.length);
-  const aliasKey = keys.find((key) => {
-    // 仅有 @ 或者 @/
-    return resolvePath === key || resolvePath.startsWith(key + '/');
-  });
+  const aliasKey = findAliasKey(resolvePath, aliasConfig);
 
   if (aliasKey) {
     resolvePath = path
@@ -93,14 +88,11 @@ function toRelative(filepath, resolvePath, aliasConfig, extensions) {
     }
 
     // scss & not alias path, and maybe: 1. relative path 2. node_modules
-    if (!aliasKey && /.(sass|scss)$/.test(filepath)) {
-      try {
-        resolve.sync(path.resolve(path.dirname(filepath), resolvePath), {
-          extensions
-        });
-      } catch (e) {
-        return '~' + resolvePath;
-      }
+    if (
+      /.(sass|scss)$/.test(filepath) &&
+      !isCurrentDir(filepath, resolvePath, extensions)
+    ) {
+      return '~' + resolvePath;
     }
 
     return resolvePath;
@@ -145,6 +137,35 @@ function deDup(arr) {
 
 function isPlainObj(obj) {
   return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
+}
+
+function isCurrentDir(currentDir, resolvePath, extensions) {
+  try {
+    resolve.sync(path.resolve(path.dirname(currentDir), resolvePath), {
+      extensions
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function findAliasKey(resolvePath, aliasConfig) {
+  // 调整顺序，提高多个字符的匹配度，例如：~@ 比 ～ 优先级高
+  const keys = Object.keys(aliasConfig).sort((a, b) => b.length - a.length);
+  return keys.find((key) => {
+    // 仅有 @ 或者 @/
+    return resolvePath === key || resolvePath.startsWith(key + '/');
+  });
+}
+
+function isNodeModules(currentDir, resolvePath, extensions, aliasConfig) {
+  if (resolvePath.includes('node_modules') || resolvePath.startsWith('~'))
+    return true;
+
+  if (findAliasKey(resolvePath, aliasConfig)) return false;
+
+  return !isCurrentDir(currentDir, resolvePath, extensions);
 }
 
 /**
@@ -276,9 +297,12 @@ module.exports = {
   gulpPickVueScript,
   printMsg,
   printErr,
+  printWarn,
   runTask,
   toLowerCamelCase,
   getSassImporter,
   getSassDefaultOptions,
-  getPostcssPlugins
+  getPostcssPlugins,
+  isCurrentDir,
+  isNodeModules
 };
