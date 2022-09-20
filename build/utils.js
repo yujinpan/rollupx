@@ -37,7 +37,8 @@ function transformToRelativePath(
       if (
         newSuffix !== false &&
         !newPath.includes('rollup-plugin-vue') &&
-        /\.(jsx|ts|tsx|vue)$/.test(newPath)
+        /\.(jsx|ts|tsx|vue)$/.test(newPath) &&
+        !isNodeModules(filepath, newPath, extensions, aliasConfig)
       ) {
         newPath = suffixTo(newPath, newSuffix);
       }
