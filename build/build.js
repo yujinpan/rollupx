@@ -41,7 +41,7 @@ async function build(options = {}) {
   options.outputDir = path.resolve(options.outputDir);
 
   // clear
-  fs.rmSync(options.outputDir, { recursive: true });
+  fs.rmSync(options.outputDir, { recursive: true, force: true });
   fs.mkdirSync(options.outputDir);
 
   // init alias
