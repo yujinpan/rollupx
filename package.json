@@ -24,7 +24,8 @@
     "rollupx": "bin/rollupx.js"
   },
   "scripts": {
-    "postversion": "npm publish"
+    "publish:beta": "npm version prerelease --preid=beta && npm publish",
+    "publish:patch": "npm version patch && npm publish"
   },
   "dependencies": {
     "@babel/core": "^7.18.10",
