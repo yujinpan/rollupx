@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-require('../build/index');
+import '../lib/index';

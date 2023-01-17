@@ -1,36 +1,36 @@
-const gulp = require('gulp');
-const ts = require('gulp-typescript');
-const through = require('through2');
-const utils = require('./utils');
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import gulp from 'gulp';
+import ts from 'gulp-typescript';
+import path from 'path';
+import through from 'through2';
 
-/**
- * @param {import('./config')} options
- */
-async function build(options) {
-  let {
+import type { Options } from './config';
+import type { TsConfig } from 'gulp-typescript/release/types';
+
+import { gulpPickVueScript, transformToRelativePath } from './utils';
+
+export async function build(options: Options) {
+  const {
     tsConfig,
     inputDir,
     outputDir,
     inputFiles,
     excludeFiles,
     typesGlobal,
-    typesOutputDir
   } = options;
 
-  typesOutputDir = path.resolve(outputDir || typesOutputDir);
+  const typesOutputDir = path.resolve(outputDir, options.typesOutputDir);
 
   if (typesOutputDir !== outputDir) {
     fs.rmSync(typesOutputDir, { recursive: true });
     fs.mkdirSync(typesOutputDir);
   }
 
-  const compilerOptions = {
+  const compilerOptions: TsConfig['compilerOptions'] = {
     ...tsConfig.compilerOptions,
     strict: false,
     declaration: true,
-    emitDeclarationOnly: true
+    emitDeclarationOnly: true,
   };
 
   return new Promise((resolve) => {
@@ -42,34 +42,29 @@ async function build(options) {
     gulp
       .src(files, {
         allowEmpty: true,
-        ignore: [...excludeFiles, '**/!(*.ts|*.tsx|*.vue)']
+        ignore: [...excludeFiles, '**/!(*.ts|*.tsx|*.vue)'],
       })
-      .pipe(utils.gulpPickVueScript(['ts', 'tsx']))
+      .pipe(gulpPickVueScript(['ts', 'tsx']))
       .pipe(gulpToRelativePath(options))
       .pipe(ts(compilerOptions, ts.reporter.nullReporter()))
-      .on('error', () => {})
+      .on('error', () => undefined)
       .dts.pipe(gulp.dest(typesOutputDir))
       .on('finish', resolve);
   });
 }
 
-/**
- * @param {import('./config')} options
- */
-function gulpToRelativePath(options) {
+function gulpToRelativePath(options: Options) {
   const { aliasConfig, extensions } = options;
-  return through.obj(function(file, _, cb) {
+  return through.obj(function (file, _, cb) {
     file.contents = Buffer.from(
-      utils.transformToRelativePath(
+      transformToRelativePath(
         file.contents.toString(),
         file.path,
         aliasConfig,
         extensions,
-        ''
-      )
+        '',
+      ),
     );
     cb(null, file);
   });
 }
-
-module.exports = build;

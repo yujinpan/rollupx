@@ -1,23 +1,34 @@
-const vue = require('rollup-plugin-vue'); // Handle .vue SFC files
-const { babel } = require('@rollup/plugin-babel');
-const { nodeResolve: resolve } = require('@rollup/plugin-node-resolve');
-const postcss = require('rollup-plugin-postcss');
-const json = require('@rollup/plugin-json');
-const commonjs = require('@rollup/plugin-commonjs');
-const { visualizer } = require('rollup-plugin-visualizer');
-const replace = require('@rollup/plugin-replace');
-const url = require('@rollup/plugin-url');
-const { terser } = require('rollup-plugin-terser');
-const path = require('path');
-const utils = require('./utils');
-const sass = require('sass');
+import { babel } from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
+import { nodeResolve as resolve } from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
+import url from '@rollup/plugin-url';
+import path from 'path';
+import postcss from 'rollup-plugin-postcss';
+import { terser } from 'rollup-plugin-terser';
+import { visualizer } from 'rollup-plugin-visualizer';
+import vue from 'rollup-plugin-vue';
+import sass from 'sass';
+
+import type { Options } from './config';
+import type { RollupBabelInputPluginOptions } from '@rollup/plugin-babel';
+import type { TemplateOptions } from '@vue/component-compiler';
+import type { RollupOptions } from 'rollup';
+
+import {
+  getPostcssPlugins,
+  getSassDefaultOptions,
+  isNodeModules,
+  styleExtensions,
+  suffixTo,
+  transformToRelativePath,
+} from './utils';
 
 /**
  * 生成 rollup 配置
- * @param {string} filePath
- * @param {import('./config')} options
  */
-function generateRollupConfig(filePath, options) {
+export function generateRollupConfig(filePath: string, options: Options) {
   const {
     inputDir,
     outputDir,
@@ -25,7 +36,7 @@ function generateRollupConfig(filePath, options) {
     format,
     outputName,
     outputGlobals,
-    outputPaths
+    outputPaths,
   } = options;
   const rollupConfig = getRollupBaseConfig(options);
   const relativePath = path.relative(inputDir, filePath);
@@ -33,14 +44,14 @@ function generateRollupConfig(filePath, options) {
     outputDir,
     path.dirname(relativePath) +
       '/' +
-      utils.suffixTo(path.basename(relativePath), '.js')
+      suffixTo(path.basename(relativePath), '.js'),
   );
   let output;
   if (format === 'es') {
     output = {
       file: outputFile,
       format,
-      banner: banner
+      banner: banner,
     };
   } else {
     output = {
@@ -50,102 +61,105 @@ function generateRollupConfig(filePath, options) {
       name: outputName,
       globals: outputGlobals,
       paths: outputPaths,
-      plugins: [terser()]
+      plugins: [terser()],
     };
   }
   return {
     ...rollupConfig,
     input: filePath,
-    output
+    output,
   };
 }
 
 /**
  * 将文件中的缩写路径转换为相对路径
  */
-function relativePlugin(aliasConfig, extensions, newSuffix) {
+function relativePlugin(
+  aliasConfig: Options['aliasConfig'],
+  extensions: Options['extensions'],
+  newSuffix: string | false,
+) {
   return {
     name: 'rollup-plugin-relative',
     transform(code, id) {
       if (id.includes('node_modules')) return code;
-      return utils.transformToRelativePath(
+      return transformToRelativePath(
         code,
         id,
         aliasConfig,
         extensions,
-        newSuffix
+        newSuffix,
       );
-    }
+    },
   };
 }
 
-/**
- * @param {import('./config')} options
- */
-function getRollupBaseConfig(options) {
-  const {
-    aliasConfig,
-    extensions,
-    singleFile,
-    stat,
-    external,
-    format
-  } = options;
+function getRollupBaseConfig(options: Options): RollupOptions {
+  const { aliasConfig, extensions, singleFile, stat, external, format } =
+    options;
 
   const assetsReg = /\.(png|svg|jpg|gif|scss|sass|less|css)$/;
   const vuePluginReg = /rollup-plugin-vue/;
-  const babelOptions = {
-    extensions: extensions,
-    babelHelpers: 'runtime',
-    ...require('../babel.config')
-  };
+
   const isNotES = format !== 'es';
+  const babelOptions: RollupBabelInputPluginOptions = {
+    extensions: extensions,
+    babelHelpers: isNotES ? 'bundled' : 'runtime',
+    presets: [
+      [
+        '@vue/app',
+        {
+          // fix: @babel/plugin-transform-runtime option's absoluteRuntime default is false
+          absoluteRuntime: false,
+          useBuiltIns: !isNotES,
+        },
+      ],
+      '@babel/preset-typescript',
+    ],
+    plugins: [
+      '@babel/plugin-proposal-export-default-from',
+      '@babel/plugin-proposal-optional-chaining',
+    ],
+  };
 
-  if (isNotES) {
-    babelOptions.babelHelpers = 'bundled';
-    babelOptions.presets.find(
-      (item) => (item[0] = '@vue/app')
-    )[1].useBuiltIns = false;
-  }
-
-  const plugins = [
+  const plugins: RollupOptions['plugins'] = [
     // 全部 js/css 文件转换为相对路径
     relativePlugin(
       aliasConfig,
-      extensions.concat(utils.styleExtensions),
-      singleFile || isNotES ? false : undefined
+      extensions.concat(styleExtensions),
+      singleFile || isNotES ? false : undefined,
     ),
     resolve({
       extensions,
       browser: true,
-      preferBuiltins: true
+      preferBuiltins: true,
     }),
     // 替换 env 文件的环境变量
     replace({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.VUE_APP_BASE_URL': JSON.stringify(
-        process.env.VUE_APP_BASE_URL
+        process.env.VUE_APP_BASE_URL,
       ),
-      preventAssignment: true
+      preventAssignment: true,
     }),
     commonjs({
-      include: /node_modules/
+      include: /node_modules/,
     }),
     vue({
       css: false, // Dynamically inject css as a <style> tag
       template: {
         compilerOptions: {
-          preserveWhitespace: false // 丢弃模版空格
-        }
-      },
+          whitespace: 'condense', // 丢弃模版空格
+        },
+      } as TemplateOptions,
       // https://github.com/vuejs/rollup-plugin-vue/issues/262
       normalizer: '~vue-runtime-helpers/dist/normalize-component.js',
       // https://github.com/vuejs/rollup-plugin-vue/issues/300#issuecomment-663098421
       style: {
         preprocessOptions: {
-          scss: utils.getSassDefaultOptions(options)
-        }
-      }
+          scss: getSassDefaultOptions(options),
+        },
+      },
     }),
     postcss({
       minimize: true,
@@ -157,7 +171,7 @@ function getRollupBaseConfig(options) {
           `styleInject(${cssVariableName});`
         );
       },
-      plugins: utils.getPostcssPlugins(options),
+      plugins: getPostcssPlugins(options),
       // plugins will need the path
       to: path.resolve(options.outputDir, './index.css'),
       loaders: [
@@ -168,23 +182,23 @@ function getRollupBaseConfig(options) {
           process({ map }) {
             const { css } = sass.renderSync({
               file: this.id,
-              ...utils.getSassDefaultOptions(options)
+              ...getSassDefaultOptions(options),
             });
             return { code: css, map };
-          }
-        }
-      ]
+          },
+        },
+      ],
     }),
     babel(babelOptions),
     url(),
-    json()
+    json(),
   ];
 
   if (stat && singleFile) {
     plugins.push(
       visualizer({
-        filename: './stat/statistics.html'
-      })
+        filename: './stat/statistics.html',
+      }),
     );
   }
 
@@ -200,8 +214,7 @@ function getRollupBaseConfig(options) {
           if (vuePluginReg.test(id)) return false;
 
           // 外部 - 第三方模块跳过
-          if (utils.isNodeModules(parentId, id, extensions, aliasConfig))
-            return true;
+          if (isNodeModules(parentId, id, extensions, aliasConfig)) return true;
 
           // 内部 - 静态资源需要编译
           if (assetsReg.test(id)) return false;
@@ -222,10 +235,6 @@ function getRollupBaseConfig(options) {
         return;
 
       warn(warning);
-    }
+    },
   };
 }
-
-module.exports = {
-  generateRollupConfig
-};

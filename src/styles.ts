@@ -1,39 +1,38 @@
-const sass = require('sass');
-const fs = require('fs');
-const path = require('path');
-const postcss = require('postcss');
-const utils = require('./utils');
+import fs from 'fs';
+import path from 'path';
+import postcss from 'postcss';
+import sass from 'sass';
+
+import type { Options } from './config';
+
+import {
+  deDup,
+  getFiles,
+  getPostcssPlugins,
+  getSassDefaultOptions,
+  styleExtensions,
+  transformToRelativePath,
+} from './utils';
 
 const cssSuffixReg = /\.(scss|sass|less|css)$/;
 
-/**
- * @param {import('./config')} options
- */
-async function build(options) {
+export async function build(options: Options) {
   const {
     inputDir,
     outputDir,
     stylesDir,
     stylesParseFiles,
     stylesCopyFiles,
-    aliasConfig
+    aliasConfig,
   } = options;
   const styleInputDir = path.resolve(inputDir, stylesDir);
   const styleOutputDir = path.resolve(outputDir, stylesDir);
 
-  const parseFiles = utils.getFiles(
-    stylesParseFiles,
-    styleInputDir,
-    cssSuffixReg
-  );
-  const copyFiles = utils.getFiles(
-    stylesCopyFiles,
-    styleInputDir,
-    cssSuffixReg
-  );
+  const parseFiles = getFiles(stylesParseFiles, styleInputDir, cssSuffixReg);
+  const copyFiles = getFiles(stylesCopyFiles, styleInputDir, cssSuffixReg);
   const allFiles = parseFiles.concat(copyFiles);
 
-  utils.deDup(allFiles.map((item) => path.dirname(item))).forEach((item) => {
+  deDup(allFiles.map((item) => path.dirname(item))).forEach((item) => {
     const dir = item.replace(styleInputDir, styleOutputDir);
     !fs.existsSync(dir) && fs.mkdirSync(dir, { recursive: true });
   });
@@ -47,12 +46,7 @@ async function build(options) {
     // to relative path
     fs.writeFileSync(
       dest,
-      utils.transformToRelativePath(
-        code,
-        item,
-        copyAliasConfig,
-        utils.styleExtensions
-      )
+      transformToRelativePath(code, item, copyAliasConfig, styleExtensions),
     );
   });
 
@@ -63,32 +57,29 @@ async function build(options) {
         .replace(cssSuffixReg, '.css');
 
       const { css } = sass.renderSync({
-        ...utils.getSassDefaultOptions(options),
+        ...getSassDefaultOptions(options),
         file: filepath,
-        output: styleOutputDir,
-        outputStyle: 'expanded'
+        outputStyle: 'expanded',
       });
 
-      return postcss(utils.getPostcssPlugins(options))
+      return postcss(getPostcssPlugins(options))
         .process(css, {
           from: filepath,
-          to: outputPath
+          to: outputPath,
         })
         .then((result) => {
           fs.writeFileSync(outputPath, removeElementComments(result.css));
         });
-    })
+    }),
   );
 }
 
-function removeElementComments(buffer) {
+function removeElementComments(css: string) {
   return Buffer.from(
-    buffer
-      .toString()
-      .replace(
-        /(@charset\s"UTF-8";\n)?\/\*\sElement\sChalk\sVariables(.|\n)*-{5,}\s?\*\/(\s|\n)?/gm,
-        ''
-      )
+    css.replace(
+      /(@charset\s"UTF-8";\n)?\/\*\sElement\sChalk\sVariables(.|\n)*-{5,}\s?\*\/(\s|\n)?/gm,
+      '',
+    ),
   );
 }
 
