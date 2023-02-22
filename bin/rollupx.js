@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-import '../lib/index';
+require('../lib/cjs/index');
