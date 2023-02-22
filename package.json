@@ -2,12 +2,13 @@
   "name": "rollupx",
   "version": "2.0.26",
   "author": "yujinpan",
-  "main": "lib/build.js",
-  "module": "lib/build.js",
-  "types": "lib/build.d.ts",
+  "main": "lib/cjs/build.js",
+  "module": "lib/es/build.js",
+  "types": "types/build.d.ts",
   "files": [
     "bin",
-    "src",
+    "lib",
+    "types",
     "babel.config.js",
     "tsconfig.json",
     "README.md"
@@ -31,7 +32,7 @@
     "version": "npm run build",
     "postversion": "git push --all && git push --tags",
     "build": "node scripts/build.js && npm run build:types",
-    "build:types": "rm -rf types && tsc --build tsconfig.types.json && eslint --fix types/*",
+    "build:types": "rm -rf types && tsc --build tsconfig.types.json && eslint --fix types/* --quiet",
     "test": "jest"
   },
   "dependencies": {
