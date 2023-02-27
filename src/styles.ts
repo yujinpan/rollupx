@@ -82,5 +82,3 @@ function removeElementComments(css: string) {
     ),
   );
 }
-
-module.exports = build;
