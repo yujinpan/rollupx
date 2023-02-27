@@ -111,7 +111,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
         {
           // fix: @babel/plugin-transform-runtime option's absoluteRuntime default is false
           absoluteRuntime: false,
-          useBuiltIns: !isNotES,
+          useBuiltIns: isNotES ? 'entry' : 'usage',
         },
       ],
       '@babel/preset-typescript',
