@@ -107,7 +107,7 @@ const defaultOptions: Options = {
     '@': 'src',
     '~': process.cwd() + '/node_modules/',
   },
-  tsConfig: require('../tsconfig.json'),
+  tsConfig: undefined,
 
   stylesDir: '',
   stylesParseFiles: [],

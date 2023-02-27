@@ -10,14 +10,10 @@ import type { TsConfig } from 'gulp-typescript/release/types';
 import { gulpPickVueScript, transformToRelativePath } from './utils';
 
 export async function build(options: Options) {
-  const {
-    tsConfig,
-    inputDir,
-    outputDir,
-    inputFiles,
-    excludeFiles,
-    typesGlobal,
-  } = options;
+  const { inputDir, outputDir, inputFiles, excludeFiles, typesGlobal } =
+    options;
+
+  const tsConfig = options.tsConfig || defaultTsConfig();
 
   const typesOutputDir = path.resolve(outputDir, options.typesOutputDir);
 
@@ -67,4 +63,19 @@ function gulpToRelativePath(options: Options) {
     );
     cb(null, file);
   });
+}
+
+function defaultTsConfig(): TsConfig {
+  return {
+    compilerOptions: {
+      target: 'ESNext',
+      module: 'ESNext',
+      jsx: 'preserve',
+      moduleResolution: 'node',
+      experimentalDecorators: true,
+      allowSyntheticDefaultImports: true,
+      skipLibCheck: true,
+      allowJs: true,
+    },
+  };
 }
