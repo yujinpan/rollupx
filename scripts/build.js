@@ -25,7 +25,6 @@ async function build() {
           format: 'cjs',
           dir: resolve(dist, 'cjs'),
           exports: 'auto',
-          footer: 'module.exports = Object.assign(exports.default, exports);',
         }),
         res.write({
           format: 'es',
