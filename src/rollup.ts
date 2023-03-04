@@ -3,7 +3,9 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import { nodeResolve as resolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
-import url from '@rollup/plugin-url';
+import { createFilter, FilterPattern } from '@rollup/pluginutils';
+import fs from 'fs';
+import makeDir from 'make-dir';
 import path from 'path';
 import postcss from 'rollup-plugin-postcss';
 import { terser } from 'rollup-plugin-terser';
@@ -98,7 +100,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
   const { aliasConfig, extensions, singleFile, stat, external, format } =
     options;
 
-  const assetsReg = /\.(png|svg|jpg|gif|scss|sass|less|css)$/;
+  const assetsReg = /\.(png|svg|jpe?g|gif|webp)$/;
   const vuePluginReg = /rollup-plugin-vue/;
 
   const isNotES = format !== 'es';
@@ -190,7 +192,9 @@ function getRollupBaseConfig(options: Options): RollupOptions {
       ],
     }),
     babel(babelOptions),
-    url(),
+    copyPlugin({
+      include: assetsReg,
+    }),
     json(),
   ];
 
@@ -216,7 +220,10 @@ function getRollupBaseConfig(options: Options): RollupOptions {
           // 外部 - 第三方模块跳过
           if (isNodeModules(parentId, id, extensions, aliasConfig)) return true;
 
-          // 内部 - 静态资源需要编译
+          // 内部 - css/json 需要编译
+          if (/\.(scss|sass|less|css|json)$/.test(id)) return false;
+
+          // 内部 - 图片资源直使用 copyPlugin
           if (assetsReg.test(id)) return false;
 
           // 内部 - js 文件单文件模式需要编译
@@ -237,4 +244,53 @@ function getRollupBaseConfig(options: Options): RollupOptions {
       warn(warning);
     },
   };
+}
+
+function copyPlugin(options: { include: FilterPattern }) {
+  const filter = createFilter(options.include);
+  const copyFiles: Record<string, string> = {};
+
+  return {
+    name: 'copy',
+    resolveId: {
+      order: 'pre' as const,
+      handler(source, importer) {
+        const id = importer
+          ? path.join(path.dirname(importer), source)
+          : source;
+
+        if (!filter(id)) return null;
+
+        copyFiles[id] = source;
+
+        return {
+          id: source,
+          external: true,
+        };
+      },
+    },
+    async generateBundle(outputOptions) {
+      const base = outputOptions.dir || path.dirname(outputOptions.file);
+
+      await makeDir(base);
+
+      await Promise.all(
+        Object.keys(copyFiles).map(async (file) => {
+          const destFile = path.join(base, copyFiles[file]);
+          return copy(file, destFile);
+        }),
+      );
+    },
+  };
+}
+
+function copy(src, dest) {
+  return new Promise((resolve, reject) => {
+    const read = fs.createReadStream(src);
+    read.on('error', reject);
+    const write = fs.createWriteStream(dest);
+    write.on('error', reject);
+    write.on('finish', resolve);
+    read.pipe(write);
+  });
 }
