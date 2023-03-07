@@ -1,18 +1,18 @@
-const rollup = require('rollup');
-const utils = require('./utils');
-const { generateRollupConfig } = require('./rollup');
+import rollup from 'rollup';
 
-/**
- * @param {import('./config')} options
- */
-async function build(options) {
+import type { Options } from './config';
+
+import { generateRollupConfig } from './rollup';
+import { getFiles, suffixTo } from './utils';
+
+export async function build(options: Options) {
   const { inputFiles, excludeFiles, inputDir, extensions } = options;
   const jsSuffixReg = new RegExp(
-    `(${extensions.map((item) => '\\' + item).join('|')})$`
+    `(${extensions.map((item) => '\\' + item).join('|')})$`,
   );
-  const files = utils.getFiles(inputFiles, inputDir, jsSuffixReg, [
+  const files = getFiles(inputFiles, inputDir, jsSuffixReg, [
     ...excludeFiles,
-    '**/*.d.ts'
+    '**/*.d.ts',
   ]);
   validate(files);
 
@@ -27,24 +27,22 @@ async function build(options) {
         return rollup.rollup(option).then((bundle) => {
           return Promise.all(output.map(bundle.write));
         });
-      })
+      }),
   );
 }
 
 /**
  * 校验文件
  */
-function validate(files) {
-  const filesBaseName = files.map((item) => utils.suffixTo(item, ''));
+function validate(files: string[]) {
+  const filesBaseName = files.map((item) => suffixTo(item, ''));
   filesBaseName.forEach((item1, index1) => {
     filesBaseName.forEach((item2, index2) => {
       if (index1 !== index2 && item1 === item2) {
         throw new Error(
-          `[rollupx] '${item1}' are multiple in the same name, when the suffix is different, the file name must also be different.`
+          `[rollupx] '${item1}' are multiple in the same name, when the suffix is different, the file name must also be different.`,
         );
       }
     });
   });
 }
-
-module.exports = build;

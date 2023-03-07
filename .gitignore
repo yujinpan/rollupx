@@ -5,6 +5,8 @@ test/test
 test/types
 test/docs
 package-lock.json
+lib
+types
 
 # local env files
 .env.local

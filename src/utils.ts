@@ -1,20 +1,24 @@
-const path = require('path');
-const resolve = require('resolve');
-const glob = require('glob');
-const through = require('through2');
-const { parseComponent } = require('vue-template-compiler');
+import autoprefixer from 'autoprefixer';
+import glob from 'glob';
+import path from 'path';
+import postcssUrl from 'postcss-url';
+import resolve from 'resolve';
+import through from 'through2';
+import { parseComponent } from 'vue-template-compiler';
 
-const styleExtensions = ['.scss', '.sass', '.less', '.css'];
+import type { Options } from './config';
+
+export const styleExtensions = ['.scss', '.sass', '.less', '.css'];
 
 /**
  * transform absolute path to relative path
  */
-function transformToRelativePath(
-  codes,
-  filepath,
-  aliasConfig,
-  extensions,
-  newSuffix = '.js'
+export function transformToRelativePath(
+  codes: string,
+  filepath: string,
+  aliasConfig: Options['aliasConfig'],
+  extensions: Options['extensions'],
+  newSuffix: string | false = '.js',
 ) {
   const imports = removeComment(codes).match(
     // import {} from '...'
@@ -25,8 +29,8 @@ function transformToRelativePath(
     // @import url('...')
     new RegExp(
       '(from\\s+|import\\s+|require\\(|import\\(|@import\\s+(url\\()?)(\'|").+(\'|")',
-      'g'
-    )
+      'g',
+    ),
   );
 
   if (imports) {
@@ -50,7 +54,12 @@ function transformToRelativePath(
   return codes;
 }
 
-function toRelative(filepath, resolvePath, aliasConfig, extensions) {
+export function toRelative(
+  filepath: string,
+  resolvePath: string,
+  aliasConfig: Options['aliasConfig'],
+  extensions: Options['extensions'],
+) {
   if (
     resolvePath.startsWith('node_modules') ||
     resolvePath.startsWith(path.sep) ||
@@ -69,10 +78,10 @@ function toRelative(filepath, resolvePath, aliasConfig, extensions) {
           resolvePath.replace(
             new RegExp('^' + aliasKey),
             aliasConfig[aliasKey] +
-              (aliasConfig[aliasKey].endsWith('/') ? '' : '/')
+              (aliasConfig[aliasKey].endsWith('/') ? '' : '/'),
           ),
-          { extensions }
-        )
+          { extensions },
+        ),
       )
       // fix: windows path will be \
       .split(path.sep)
@@ -100,17 +109,17 @@ function toRelative(filepath, resolvePath, aliasConfig, extensions) {
   }
 }
 
-function suffixTo(file, suffix = '') {
+export function suffixTo(file: string, suffix = '') {
   return file.replace(/\.[^.]+$/, suffix);
 }
 
-function mergeProps(source, target) {
-  for (let key in source) {
+export function mergeProps<T extends object>(source: T, target: T): T {
+  for (const key in source) {
     if (key in target) {
       const sourceItem = source[key];
       const targetItem = target[key];
       if (isPlainObj(sourceItem) && isPlainObj(targetItem)) {
-        mergeProps(sourceItem, targetItem);
+        mergeProps(sourceItem as object, targetItem as object);
       } else {
         source[key] = targetItem;
       }
@@ -119,31 +128,35 @@ function mergeProps(source, target) {
   return source;
 }
 
-function getFiles(arrPattern, dir, includeReg, excludes = []) {
+export function getFiles(arrPattern, dir, includeReg, excludes = []) {
   return deDup(
     arrPattern
       .map((item) => {
         return glob.sync(path.resolve(dir, item), {
-          ignore: excludes
+          ignore: excludes,
         });
       })
       .flat()
-      .filter((item) => includeReg.test(item))
+      .filter((item) => includeReg.test(item)),
   );
 }
 
-function deDup(arr) {
+export function deDup(arr: any[]) {
   return Array.from(new Set(arr));
 }
 
-function isPlainObj(obj) {
+export function isPlainObj(obj: any) {
   return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
 }
 
-function isCurrentDir(currentDir, resolvePath, extensions) {
+export function isCurrentDir(
+  currentDir: string,
+  resolvePath: string,
+  extensions: Options['extensions'],
+) {
   try {
     resolve.sync(path.resolve(path.dirname(currentDir), resolvePath), {
-      extensions
+      extensions,
     });
     return true;
   } catch (e) {
@@ -151,7 +164,10 @@ function isCurrentDir(currentDir, resolvePath, extensions) {
   }
 }
 
-function findAliasKey(resolvePath, aliasConfig) {
+export function findAliasKey(
+  resolvePath: string,
+  aliasConfig: Options['aliasConfig'],
+) {
   // 调整顺序，提高多个字符的匹配度，例如：~@ 比 ～ 优先级高
   const keys = Object.keys(aliasConfig).sort((a, b) => b.length - a.length);
   return keys.find((key) => {
@@ -160,7 +176,12 @@ function findAliasKey(resolvePath, aliasConfig) {
   });
 }
 
-function isNodeModules(currentDir, resolvePath, extensions, aliasConfig) {
+export function isNodeModules(
+  currentDir: string,
+  resolvePath: string,
+  extensions: Options['extensions'],
+  aliasConfig: Options['aliasConfig'],
+) {
   if (resolvePath.includes('node_modules') || resolvePath.startsWith('~'))
     return true;
 
@@ -176,15 +197,15 @@ function isNodeModules(currentDir, resolvePath, extensions, aliasConfig) {
  * - *
  * - <
  */
-function removeComment(codes) {
+export function removeComment(codes: string) {
   return codes.replace(/^\s*(\/\/|\/\*|\*|<).*$/gm, '');
 }
 
 /**
  * gulp 获取 vue 的 script 内容插件
  */
-function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
-  return through.obj(function(file, _, cb) {
+export function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
+  return through.obj(function (file, _, cb) {
     if (file.extname === '.vue') {
       const code = file.contents.toString();
       const scripts = parseComponent(code);
@@ -196,7 +217,7 @@ function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
         (scripts.script
           ? scripts.script.content
           : `import { Vue } from 'vue-property-decorator';export default class extends Vue {}`
-        ).trim()
+        ).trim(),
       );
       file.extname = '.' + lang;
     }
@@ -210,43 +231,46 @@ function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
  * @param {Promise} task
  * @return {Promise<void>}
  */
-async function runTask(label, task) {
+export async function runTask(label: string, task: Promise<any>) {
   printMsg(`${label} start...`);
+  // eslint-disable-next-line no-console
   console.time(`${label} time`);
   await task.catch((e) => printErr(`${label} error!`, e));
+  // eslint-disable-next-line no-console
   console.timeEnd(`${label} time`);
   printMsg(`${label} completed!\n`);
 }
 
-function printMsg(msg) {
+export function printMsg(msg: string) {
+  // eslint-disable-next-line no-console
   console.log(`\x1b[32m[rollupx] ${msg}\x1b[0m`);
 }
 
-function printErr(name, err) {
+export function printErr(name: string, err: any) {
+  // eslint-disable-next-line no-console
   console.log(`\x1b[31m[rollupx] ${name}\x1b[0m`, err);
 }
 
-function printWarn(name, warn) {
+export function printWarn(name: string, warn: any) {
+  // eslint-disable-next-line no-console
   console.log(`\x1b[33m[rollupx] ${name}\x1b[0m`, warn);
 }
 
-function toLowerCamelCase(str) {
+export function toLowerCamelCase(str: string) {
+  const words = str.split('');
+
   let result = '';
-  str = str.split('');
-  for (let i = 0; i < str.length; i++) {
-    if (str[i] === '-') {
-      str[i + 1] = str[i + 1].toUpperCase();
+  for (let i = 0; i < words.length; i++) {
+    if (words[i] === '-') {
+      words[i + 1] = words[i + 1].toUpperCase();
     } else {
-      result += str[i];
+      result += words[i];
     }
   }
   return result;
 }
 
-/**
- * @param {import('./config')} options
- */
-function getSassImporter(options) {
+export function getSassImporter(options: Options) {
   return (url, filepath) => {
     let file = toRelative(filepath, url, options.aliasConfig, styleExtensions);
 
@@ -256,54 +280,27 @@ function getSassImporter(options) {
     }
 
     return {
-      file
+      file,
     };
   };
 }
 
-/**
- * @param {import('./config')} options
- */
-function getSassDefaultOptions(options) {
+export function getSassDefaultOptions(options: Options) {
   return {
     importer: getSassImporter(options),
     // ignore warnings for symbol "/"
-    quietDeps: true
+    quietDeps: true,
   };
 }
 
-/**
- * @param {import('./config')} options
- */
-function getPostcssPlugins(options) {
+export function getPostcssPlugins(options: Options) {
   return [
-    require('autoprefixer')(),
-    require('postcss-url')({
+    autoprefixer(),
+    postcssUrl({
       url: 'copy',
       relative: true,
       basePath: options.inputDir,
-      assetsPath: options.outputDir
-    })
+      assetsPath: options.outputDir,
+    }),
   ];
 }
-
-module.exports = {
-  deDup,
-  getFiles,
-  mergeProps,
-  suffixTo,
-  transformToRelativePath,
-  toRelative,
-  styleExtensions,
-  gulpPickVueScript,
-  printMsg,
-  printErr,
-  printWarn,
-  runTask,
-  toLowerCamelCase,
-  getSassImporter,
-  getSassDefaultOptions,
-  getPostcssPlugins,
-  isCurrentDir,
-  isNodeModules
-};
