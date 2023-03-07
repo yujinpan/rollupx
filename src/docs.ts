@@ -21,7 +21,7 @@ const compilerOptions = {
 export async function build(options: Options) {
   const { inputDir, docsOutputDir } = options;
 
-  fs.rmSync(docsOutputDir, { recursive: true });
+  fs.rmSync(docsOutputDir, { recursive: true, force: true });
 
   return new Promise((resolve) => {
     const files = ['/**/*.js', '/**/*.ts', '/**/*.tsx', '/**/*.vue'].map(
