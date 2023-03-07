@@ -15,7 +15,10 @@ export async function build(options: Options) {
 
   const tsConfig = options.tsConfig || defaultTsConfig();
 
-  const typesOutputDir = path.resolve(options.typesOutputDir);
+  let typesOutputDir = path.resolve(options.typesOutputDir);
+  if (typesOutputDir === process.cwd()) {
+    typesOutputDir = outputDir;
+  }
 
   if (typesOutputDir !== outputDir) {
     fs.rmSync(typesOutputDir, { recursive: true });
