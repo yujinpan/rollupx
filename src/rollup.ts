@@ -272,11 +272,12 @@ function copyPlugin(options: { include: FilterPattern }) {
     async generateBundle(outputOptions) {
       const base = outputOptions.dir || path.dirname(outputOptions.file);
 
-      await makeDir(base);
-
       await Promise.all(
         Object.keys(copyFiles).map(async (file) => {
           const destFile = path.join(base, copyFiles[file]);
+
+          await makeDir(path.dirname(destFile));
+
           return copy(file, destFile);
         }),
       );
