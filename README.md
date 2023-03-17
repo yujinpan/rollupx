@@ -2,24 +2,6 @@
 
 JS/TS/Vue/Scss/Less to a library, and jsdoc to a JSON.
 
-```
-# single file
-- src             =>  - dist
-  - test1.js      =>    - test1.js
-  - test2.js
-  - test3.js
-
-# multi file
-- src             =>  - dist
-  - test.vue      =>    - test.vue.js
-  - test-ts.vue   =>    - test-ts.vue.js, vue-ts.vue.d.ts
-  - test.js       =>    - test.js
-  - test.ts       =>    - test.js, test.d.ts
-  - test.scss     =>    - (inline js)
-  - test.css      =>    - (inline js)
-  - test.png      =>    - (inline js OR 3dac04548057e393.png)
-```
-
 ## Usage
 
 ### Install
@@ -28,41 +10,197 @@ JS/TS/Vue/Scss/Less to a library, and jsdoc to a JSON.
 npm install --save-dev rollupx
 ```
 
+### Examples
+
+- [SingleFile](#singlefile)
+- [MultiFile](#multifile)
+- [MultiFormat](#multiformat)
+
+#### SingleFile
+
+- config
+
+```js
+// rollupx.config.js
+module.exports = {
+  inputFiles: ["index.ts"],
+  singleFile: true,
+  outputDir: "lib",
+};
+```
+
+- result
+
+```
+- src             =>  - lib
+  - index.ts      =>    - index.js & index.d.ts
+  - import1.ts    =>    - (bundle)
+  - import2.ts    =>    - (bundle)
+  - test.scss     =>    - (bundle)
+  - test.css      =>    - (bundle)
+  - test.png      =>    - test.png
+```
+
+#### MultiFile
+
+- config
+
+```js
+// rollupx.config.js
+module.exports = {
+  outputDir: "lib",
+};
+```
+
+- result
+
+```
+- src             =>  - lib
+  - index.ts      =>    - index.js & index.d.ts
+  - import1.ts    =>    - import1.js & import1.d.ts
+  - import2.ts    =>    - import2.js & import2.d.ts
+  - test.scss     =>    - (bundle)
+  - test.css      =>    - (bundle)
+  - test.png      =>    - test.png
+```
+
+#### MultiFormat
+
+- config
+
+```js
+// rollupx.config.js
+module.exports = {
+  outputDir: "lib",
+  formats: [
+    { format: "es", inputFiles: ["**/*"] },
+    { format: "esm", inputFiles: ["index.ts"], outputFile: "/esm/[name][ext]" },
+    { format: "esm", inputFiles: ["index.ts"], outputFile: "[name].esm.js" },
+    { format: "cjs", inputFiles: ["index.ts"], outputFile: "/cjs/[name][ext]" },
+    { format: "cjs", inputFiles: ["index.ts"], outputFile: "[name].cjs.js" },
+    { format: "umd", inputFiles: ["index.ts"], outputFile: "[name].umd[ext]" },
+  ],
+};
+```
+
+- result
+
+```
+- src             =>  - lib
+  - index.ts      =>    - index.js & index.d.ts
+  - import1.ts          - import1.js & import1.d.ts
+  - import2.ts          - import2.js & import2.d.ts
+  - test.scss     =>    - (bundle)
+  - test.css      =>    - (bundle)
+  - test.png      =>    - test.png
+
+  - index.ts      =>    - esm
+                  =>      - index.js
+
+  - index.ts      =>    - cjs
+                  =>      - index.js
+
+  - index.ts      =>    - index.ems.js
+  - index.ts      =>    - index.cjs.js
+  - index.ts      =>    - index.umd.js
+```
+
 ### Config
 
-- create a `rollupx.config.js` file in your project.
+#### types
+
+```ts
+export type Options = {
+  // 输出文件头信息
+  banner?: string;
+
+  // 输入文件目录，相对与 cwd，默认 src
+  inputDir?: string;
+  // 输出目录，相对于 cwd，默认 lib
+  outputDir?: string;
+  // 输入文件，支持 glob 规则，相对于 inputDir
+  inputFiles?: string[];
+  // 排除文件，支持 glob 规则，相对于 inputDir
+  excludeFiles?: string[];
+
+  // 指定输出类型
+  outputs?: ("js" | "styles" | "types" | "docs")[];
+
+  // 是否打包为单文件，默认 false 每个文件独立输出
+  singleFile?: boolean;
+
+  // 多种格式同时打包
+  formats?: Options[];
+
+  // 输出格式
+  format?: "amd" | "cjs" | "es" | "iife" | "umd" | "system";
+
+  // 输出文件地址，/ 开头时将基于 outputDir，例如：'/[name][ext]'
+  outputFile?: string;
+  // 模块导出名称
+  outputName?: string;
+  // 引入的全局属性，例如：{ jquery: '$' }
+  outputGlobals?: Record<string, string>;
+  // 引入的外链
+  outputPaths?: string[];
+  // 作为外部引入的库，例如：['jquery']
+  external?: string[];
+
+  // 扩展名配置
+  extensions?: string[];
+  // 路径别名配置
+  aliasConfig?: Record<string, string>;
+  // tsconfig.json 配置
+  tsConfig?: TsConfig;
+
+  // 样式目录名，相对于 inputDir
+  stylesDir?: string;
+  // 需要编译的样式文件，相对于 stylesDir，例如：index.scss 入口文件
+  stylesParseFiles?: string[];
+  // 需要拷贝的样式文件，相对于 stylesDir，例如：var.scss 变量文件
+  stylesCopyFiles?: string[];
+
+  // 输出的 d.ts 目录名
+  typesOutputDir?: string;
+  // 全局 d.ts 文件，相对于 cwd;
+  typesGlobal?: string;
+
+  // 文档目录名
+  docsOutputDir?: string;
+
+  // 是否统计模块占用情况，仅在 singleFile 为 true 时生效，默认为 false
+  stat?: boolean;
+};
+```
+
+#### default config
 
 ````js
 // project/rollupx.config.js
 // default config
 module.exports = {
-  // 文件头信息 String
   banner:
-    '/*!\n' +
-    ` * (rollupx banner) v${require('../package.json').version}\n` +
+    "/*!\n" +
+    ` * (rollupx banner) v1.0.0\n` +
     ` * (c) 2019-${new Date().getFullYear()}\n` +
-    ' */\n',
+    " */\n",
 
-  // 输入目录 String
-  inputDir: 'src',
-
-  // 输出目录 String
-  outputDir: 'dist',
-
-  // 输入文件 String[]，基于 inputDir，规则为 [glob](https://github.com/isaacs/node-glob) 语句
+  inputDir: "src",
+  outputDir: "dist",
   // multi file
-  inputFiles: ['**/*'],
+  inputFiles: ["**/*"],
   // single file
-  // inputFiles: ["index.*"],
+  // inputFiles: ['index.*'],
 
-  // 排除输入的文件
-  excludeFiles: ['**/+(__tests__|__specs__)/**', '**/*.spec.*'],
+  excludeFiles: ["**/+(__tests__|__specs__)/**", "**/*.spec.*"],
 
-  // 输出类型
-  outputs: ['js', 'styles', 'types', 'docs'],
+  // output types
+  outputs: ["js", "styles", "types", "docs"],
+
+  singleFile: false,
 
   /**
-   * 自定义打包格式，例如:
+   * custom build format, example:
    * ```
    * // rollupx.config.js
    * export default {
@@ -80,45 +218,34 @@ module.exports = {
    * ```
    */
   /** @type {'amd' | 'cjs' | 'es' | 'iife' | 'umd' | 'system'} */
-  format: 'es',
+  format: "es",
   outputName: undefined,
   outputGlobals: undefined,
   outputPaths: undefined,
   external: undefined,
 
-  // 扩展名 String[]
-  extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+  extensions: [".js", ".jsx", ".ts", ".tsx", ".vue"],
+  aliasConfig: {
+    "@": "src",
+    "~": process.cwd() + "/node_modules/",
+  },
+  tsConfig: undefined,
 
-  // 别名配置 Object
-  aliasConfig: { '@': 'src', '~': 'node_modules' },
-
-  // TS 配置文件 Object
-  tsConfig: require('./tsconfig.json'),
-
-  // 样式目录 String，基于 inputDir
-  stylesDir: '',
-
-  // 需要编译的文件 String[]，基于 stylesDir，例如：["index.scss"]；["**/*"] 为编译所有样式文件。
+  stylesDir: "",
   stylesParseFiles: [],
-  // 需要拷贝的样式文件 String[]，基于 stylesDir，例如：["var.scss"]；["**/*"] 为复制所有样式文件。
   stylesCopyFiles: [],
 
-  // 类型文件输出目录 String，继承 outputDir，例如："types"
-  typesOutputDir: '',
+  // inherit outputDir
+  typesOutputDir: "",
+  typesGlobal: "global.d.ts",
 
-  // 全局的类型文件 String，相对于根目录
-  typesGlobal: 'global.d.ts',
+  docsOutputDir: "",
 
-  // 文档目录名
-  docsOutputDir: '',
-
-  // 是否单文件（不按文件分模块） Boolean
-  singleFile: false,
-
-  // 是否统计体积，仅在 singleFile 为 true 时生效，默认为 false
-  stat: false
+  stat: false,
 };
 ````
+
+#### recommend config
 
 - recommend use the rollupx babel config `babel.config.js` [babel.config.js](./babel.config.js)
 
@@ -126,8 +253,8 @@ example in your `project/babel.config.js`:
 
 ```js
 module.exports = {
-  extends: 'rollupx/babel.config.js',
-  exclude: 'node_modules/**'
+  extends: "rollupx/babel.config.js",
+  exclude: "node_modules/**",
 };
 ```
 
