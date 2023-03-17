@@ -13,5 +13,7 @@ HelloWorld.install = (vue: VueConstructor) => {
   vue.component('HelloWorld', HelloWorld);
 };
 
+export const test = 1;
+
 // Vue.component()
 export default HelloWorld;
