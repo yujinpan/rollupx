@@ -1,4 +1,4 @@
-import rollup from 'rollup';
+import rollup, { OutputOptions } from 'rollup';
 
 import type { Options } from './config';
 
@@ -34,7 +34,7 @@ function buildInternal(options: Options) {
     files
       .map((item) => generateRollupConfig(item, options))
       .map((option) => {
-        const outputs = Array.isArray(option.output)
+        const outputs: OutputOptions[] = Array.isArray(option.output)
           ? option.output
           : [option.output];
         return rollup.rollup(option).then((bundle) => {

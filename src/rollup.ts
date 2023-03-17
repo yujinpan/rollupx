@@ -16,7 +16,7 @@ import sass from 'sass';
 import type { Options } from './config';
 import type { RollupBabelInputPluginOptions } from '@rollup/plugin-babel';
 import type { TemplateOptions } from '@vue/component-compiler';
-import type { RollupOptions } from 'rollup';
+import type { OutputOptions, RollupOptions } from 'rollup';
 
 import {
   getPostcssPlugins,
@@ -55,7 +55,7 @@ export function generateRollupConfig(filePath: string, options: Options) {
       : path.join(path.dirname(relativePath), outputFilename),
   );
 
-  const output = {
+  const output: OutputOptions = {
     file: outputFile,
     format,
     banner: banner,
