@@ -114,15 +114,13 @@ export function suffixTo(file: string, suffix = '') {
 }
 
 export function mergeProps<T extends object>(source: T, target: T): T {
-  for (const key in source) {
-    if (key in target) {
-      const sourceItem = source[key];
-      const targetItem = target[key];
-      if (isPlainObj(sourceItem) && isPlainObj(targetItem)) {
-        mergeProps(sourceItem as object, targetItem as object);
-      } else {
-        source[key] = targetItem;
-      }
+  for (const key in target) {
+    const sourceItem = source[key];
+    const targetItem = target[key];
+    if (isPlainObj(sourceItem) && isPlainObj(targetItem)) {
+      mergeProps(sourceItem as object, targetItem as object);
+    } else {
+      source[key] = targetItem;
     }
   }
   return source;
