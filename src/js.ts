@@ -36,12 +36,11 @@ function buildInternal(options: Options) {
     files
       .map((item) => generateRollupConfig(item, options))
       .map((option) => {
-        let { output } = option;
-        if (!Array.isArray(output)) {
-          output = [output];
-        }
+        const outputs = Array.isArray(option.output)
+          ? option.output
+          : [option.output];
         return rollup.rollup(option).then((bundle) => {
-          return Promise.all(output.map(bundle.write));
+          return Promise.all(outputs.map(bundle.write));
         });
       }),
   );
