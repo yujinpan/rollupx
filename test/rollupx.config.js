@@ -6,12 +6,26 @@ module.exports = {
   },
 
   formats: [
-    { format: 'es' },
-    { format: 'esm', inputFiles: ['index.ts'], outputFile: '/esm/[name][ext]' },
-    { format: 'esm', inputFiles: ['index.ts'], outputFile: '[name].esm.js' },
-    { format: 'cjs', inputFiles: ['index.ts'], outputFile: '/cjs/[name][ext]' },
-    { format: 'cjs', inputFiles: ['index.ts'], outputFile: '[name].cjs.js' },
-    { format: 'umd', inputFiles: ['index.ts'], outputFile: '[name].umd[ext]' },
+    // { format: 'es' },
+    { format: 'es', inputFiles: ['**/*'], outputDir: 'test/es' },
+    { format: 'cjs', inputFiles: ['**/*'], outputDir: 'test/cjs' },
+    {
+      format: 'cjs',
+      inputFiles: ['index.ts'],
+      outputFile: '[name].cjs.js',
+      singleFile: true,
+      external: ['vue'],
+    },
+    {
+      format: 'umd',
+      inputFiles: ['index.ts'],
+      outputFile: '[name].umd[ext]',
+      singleFile: true,
+      external: ['vue'],
+      outputGlobals: {
+        vue: 'Vue',
+      },
+    },
   ],
 
   // format: 'umd',
