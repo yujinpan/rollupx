@@ -19,8 +19,14 @@ export type Options = {
   // 是否打包为单文件，默认 false 每个文件独立输出
   singleFile?: boolean;
 
+  // 多种格式同时打包
+  formats?: Options[];
+
   // 输出格式
   format?: 'amd' | 'cjs' | 'es' | 'iife' | 'umd' | 'system';
+
+  // 输出文件地址，/ 开头时将基于 outputDir，例如：'/[name][ext]'
+  outputFile?: string;
   // 模块导出名称
   outputName?: string;
   // 引入的全局属性，例如：{ jquery: '$' }

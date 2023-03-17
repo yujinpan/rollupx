@@ -23,7 +23,6 @@ import {
   getSassDefaultOptions,
   isNodeModules,
   styleExtensions,
-  suffixTo,
   transformToRelativePath,
 } from './utils';
 
@@ -42,12 +41,20 @@ export function generateRollupConfig(filePath: string, options: Options) {
   } = options;
   const rollupConfig = getRollupBaseConfig(options);
   const relativePath = path.relative(inputDir, filePath);
+  const fileTemplate = options.outputFile || '[name][ext]';
+
+  const filename = path.basename(relativePath, path.extname(relativePath));
+  const outputFilename = fileTemplate
+    .replace('[name]', filename)
+    .replace('[ext]', '.js');
+
   const outputFile = path.join(
     outputDir,
-    path.dirname(relativePath) +
-      '/' +
-      suffixTo(path.basename(relativePath), '.js'),
+    outputFilename.startsWith('/')
+      ? outputFilename
+      : path.join(path.dirname(relativePath), outputFilename),
   );
+
   let output;
   if (format === 'es') {
     output = {
@@ -60,12 +67,13 @@ export function generateRollupConfig(filePath: string, options: Options) {
       file: outputFile,
       format,
       banner: banner,
-      name: outputName,
+      name: outputName || 'Bundle',
       globals: outputGlobals,
       paths: outputPaths,
       plugins: [terser()],
     };
   }
+
   return {
     ...rollupConfig,
     input: filePath,
