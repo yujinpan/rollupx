@@ -1,9 +1,11 @@
 // 主组件
 import '@/components/Test.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
+
 import '@/styles/index.scss';
 import { VueConstructor } from 'vue';
 import el from 'el-select-tree';
+
 alert(el);
 
 // @ts-ignore

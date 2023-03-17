@@ -2,7 +2,7 @@ module.exports = {
   outputDir: 'test',
   aliasConfig: {
     '@': 'src',
-    test: './'
+    test: './',
   },
 
   // format: 'umd',
@@ -20,5 +20,5 @@ module.exports = {
   stylesCopyFiles: ['**/*'],
   // typesOutputDir: 'test',
   // typesGlobal: 'src/global.d.ts'
-  docsOutputDir: 'docs'
+  docsOutputDir: 'docs',
 };
