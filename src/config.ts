@@ -26,6 +26,7 @@ export type Options = {
   format?: 'amd' | 'cjs' | 'es' | 'iife' | 'umd' | 'system';
 
   // 输出文件地址，/ 开头时将基于 outputDir，例如：'/[name][ext]'
+  // [dir] 文件夹名 [name] 文件名 [ext] 扩展名
   outputFile?: string;
   // 模块导出名称
   outputName?: string;

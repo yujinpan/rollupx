@@ -26,6 +26,7 @@ module.exports = {
         vue: 'Vue',
       },
     },
+    { format: 'es', inputFiles: ['test.js'], outputFile: '[dir]-[name][ext]' },
   ],
 
   // format: 'umd',

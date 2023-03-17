@@ -43,8 +43,10 @@ export function generateRollupConfig(filePath: string, options: Options) {
   const relativePath = path.relative(inputDir, filePath);
   const fileTemplate = options.outputFile || '[name][ext]';
 
+  const dir = path.basename(path.dirname(relativePath));
   const filename = path.basename(relativePath, path.extname(relativePath));
   const outputFilename = fileTemplate
+    .replace('[dir]', dir)
     .replace('[name]', filename)
     .replace('[ext]', '.js');
 
