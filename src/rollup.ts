@@ -55,23 +55,19 @@ export function generateRollupConfig(filePath: string, options: Options) {
       : path.join(path.dirname(relativePath), outputFilename),
   );
 
-  let output;
-  if (format === 'es') {
-    output = {
-      file: outputFile,
-      format,
-      banner: banner,
-    };
-  } else {
-    output = {
-      file: outputFile,
-      format,
-      banner: banner,
+  const output = {
+    file: outputFile,
+    format,
+    banner: banner,
+  };
+
+  if (format === 'iife' || format === 'umd') {
+    Object.assign(output, {
       name: outputName || 'Bundle',
       globals: outputGlobals,
       paths: outputPaths,
       plugins: [terser()],
-    };
+    });
   }
 
   return {
@@ -111,6 +107,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
   const assetsReg = /\.(png|svg|jpe?g|gif|webp)$/;
   const vuePluginReg = /rollup-plugin-vue/;
 
+  const isModule = ['es', 'cjs'].includes(format);
   const isNotES = format !== 'es';
   const babelOptions: RollupBabelInputPluginOptions = {
     extensions: extensions,
@@ -137,7 +134,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     relativePlugin(
       aliasConfig,
       extensions.concat(styleExtensions),
-      singleFile || isNotES ? false : undefined,
+      singleFile || !isModule ? false : undefined,
     ),
     resolve({
       extensions,
@@ -177,7 +174,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
       // fix the postcss import path is absolute
       inject(cssVariableName) {
         return (
-          `import styleInject from 'style-inject/dist/style-inject.es.js';\n` +
+          `import styleInject from 'style-inject';\n` +
           `styleInject(${cssVariableName});`
         );
       },
@@ -216,30 +213,32 @@ function getRollupBaseConfig(options: Options): RollupOptions {
 
   return {
     plugins,
-    external: isNotES
-      ? external
-      : (id, parentId) => {
-          // 内部 - 入口文件
-          if (parentId === undefined) return false;
+    external:
+      !isModule || external
+        ? external
+        : (id, parentId) => {
+            // 内部 - 入口文件
+            if (parentId === undefined) return false;
 
-          // 内部 - 编译的临时文件需要编译
-          if (vuePluginReg.test(id)) return false;
+            // 内部 - 编译的临时文件需要编译
+            if (vuePluginReg.test(id)) return false;
 
-          // 外部 - 第三方模块跳过
-          if (isNodeModules(parentId, id, extensions, aliasConfig)) return true;
+            // 外部 - 第三方模块跳过
+            if (isNodeModules(parentId, id, extensions, aliasConfig))
+              return true;
 
-          // 内部 - css/json 需要编译
-          if (/\.(scss|sass|less|css|json)$/.test(id)) return false;
+            // 内部 - css/json 需要编译
+            if (/\.(scss|sass|less|css|json)$/.test(id)) return false;
 
-          // 内部 - 图片资源直使用 copyPlugin
-          if (assetsReg.test(id)) return false;
+            // 内部 - 图片资源直使用 copyPlugin
+            if (assetsReg.test(id)) return false;
 
-          // 内部 - js 文件单文件模式需要编译
-          if (singleFile) return false;
+            // 内部 - js 文件单文件模式需要编译
+            if (singleFile) return false;
 
-          // 内部 - 多文件模式则跳过
-          return true;
-        },
+            // 内部 - 多文件模式则跳过
+            return true;
+          },
     onwarn(warning, warn) {
       if (
         warning.code === 'CIRCULAR_DEPENDENCY' ||
