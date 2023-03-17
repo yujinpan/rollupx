@@ -10,13 +10,11 @@ export async function build(options: Options) {
     ? options.formats.map((item) => ({ ...options, ...item }))
     : [options];
 
-  if (optionsArr.length > 1) {
-    optionsArr.slice(1).forEach((item) => {
-      if (!item.outputFile) {
-        item.outputFile = `[name].${item.format}[ext]`;
-      }
-    });
-  }
+  optionsArr.slice(1).forEach((item) => {
+    if (!item.outputFile) {
+      item.outputFile = `[name].${item.format}[ext]`;
+    }
+  });
 
   return Promise.all(optionsArr.map(buildInternal));
 }
