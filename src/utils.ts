@@ -208,9 +208,7 @@ export function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
       const code = file.contents.toString();
       const scripts = parseComponent(code);
 
-      if (!scripts.script) return cb();
-
-      const lang = scripts.script.lang || 'js';
+      const lang = scripts.script?.lang || 'js';
 
       if (!languages.includes(lang)) return cb();
 
