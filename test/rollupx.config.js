@@ -2,8 +2,32 @@ module.exports = {
   outputDir: 'test',
   aliasConfig: {
     '@': 'src',
-    test: './'
+    test: './',
   },
+
+  formats: [
+    // { format: 'es' },
+    { format: 'es', inputFiles: ['**/*'], outputDir: 'test/es' },
+    { format: 'cjs', inputFiles: ['**/*'], outputDir: 'test/cjs' },
+    {
+      format: 'cjs',
+      inputFiles: ['index.ts'],
+      outputFile: '[name].cjs.js',
+      singleFile: true,
+      external: ['vue'],
+    },
+    {
+      format: 'umd',
+      inputFiles: ['index.ts'],
+      outputFile: '[name].umd[ext]',
+      singleFile: true,
+      external: ['vue'],
+      outputGlobals: {
+        vue: 'Vue',
+      },
+    },
+    { format: 'es', inputFiles: ['test.js'], outputFile: '[dir]-[name][ext]' },
+  ],
 
   // format: 'umd',
   // external: ['vue'],
@@ -20,5 +44,5 @@ module.exports = {
   stylesCopyFiles: ['**/*'],
   // typesOutputDir: 'test',
   // typesGlobal: 'src/global.d.ts'
-  docsOutputDir: 'docs'
+  docsOutputDir: 'docs',
 };

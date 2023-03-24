@@ -4,13 +4,13 @@ module.exports = {
       '@vue/app',
       {
         // fix: @babel/plugin-transform-runtime option's absoluteRuntime default is false
-        absoluteRuntime: false
-      }
+        absoluteRuntime: false,
+      },
     ],
-    '@babel/preset-typescript'
+    '@babel/preset-typescript',
   ],
   plugins: [
     '@babel/plugin-proposal-export-default-from',
-    '@babel/plugin-proposal-optional-chaining'
-  ]
+    '@babel/plugin-proposal-optional-chaining',
+  ],
 };

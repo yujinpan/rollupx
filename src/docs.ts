@@ -1,10 +1,13 @@
-const gulp = require('gulp');
-const ts = require('gulp-typescript');
-const through = require('through2');
-const jsdocToMarkdown = require('jsdoc-to-markdown');
-const prettier = require('prettier');
-const fs = require('fs');
-const utils = require('./utils');
+import fs from 'fs';
+import gulp from 'gulp';
+import ts from 'gulp-typescript';
+import jsdocToMarkdown from 'jsdoc-to-markdown';
+import prettier from 'prettier';
+import through from 'through2';
+
+import type { Options } from './config';
+
+import { gulpPickVueScript } from './utils';
 
 const compilerOptions = {
   strict: false,
@@ -12,26 +15,23 @@ const compilerOptions = {
   module: 'commonjs',
   isolatedModules: true,
   allowJs: true,
-  jsx: 'preserve'
+  jsx: 'preserve',
 };
 
-/**
- * @param {import('./config')} options
- */
-async function build(options) {
+export async function build(options: Options) {
   const { inputDir, docsOutputDir } = options;
 
-  fs.rmSync(docsOutputDir, { recursive: true });
+  fs.rmSync(docsOutputDir, { recursive: true, force: true });
 
   return new Promise((resolve) => {
     const files = ['/**/*.js', '/**/*.ts', '/**/*.tsx', '/**/*.vue'].map(
-      (item) => inputDir + item
+      (item) => inputDir + item,
     );
     gulp
       .src(files, { allowEmpty: true })
-      .pipe(utils.gulpPickVueScript())
+      .pipe(gulpPickVueScript())
       .pipe(ts(compilerOptions))
-      .on('error', () => {})
+      .on('error', () => undefined)
       .pipe(gulpJsToDocData())
       .pipe(gulp.dest(docsOutputDir))
       .on('finish', resolve);
@@ -43,14 +43,14 @@ function gulpJsToDocData() {
     const docs = Array.from(
       jsdocToMarkdown.getTemplateDataSync({
         source: file.contents,
-        'no-cache': true
-      })
+        'no-cache': true,
+      }),
     );
     if (docs.length) {
       file.contents = Buffer.from(
         prettier.format(JSON.stringify(docs), {
-          parser: 'json'
-        })
+          parser: 'json',
+        }),
       );
       file.extname = '.json';
       cb(null, file);
@@ -59,5 +59,3 @@ function gulpJsToDocData() {
     }
   });
 }
-
-module.exports = build;
