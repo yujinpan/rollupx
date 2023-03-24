@@ -15,7 +15,6 @@ import sass from 'sass';
 
 import type { Options } from './config';
 import type { RollupBabelInputPluginOptions } from '@rollup/plugin-babel';
-import type { TemplateOptions } from '@vue/component-compiler';
 import type { OutputOptions, RollupOptions } from 'rollup';
 
 import {
@@ -107,7 +106,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     options;
 
   const assetsReg = /\.(png|svg|jpe?g|gif|webp)$/;
-  const vuePluginReg = /rollup-plugin-vue/;
+  const vuePluginReg = /\?vue&/;
 
   const isModule = ['es', 'cjs'].includes(format);
   const isNotES = format !== 'es';
@@ -155,19 +154,11 @@ function getRollupBaseConfig(options: Options): RollupOptions {
       include: /node_modules/,
     }),
     vue({
-      css: false, // Dynamically inject css as a <style> tag
-      template: {
-        compilerOptions: {
-          whitespace: 'condense', // 丢弃模版空格
-        },
-      } as TemplateOptions,
-      // https://github.com/vuejs/rollup-plugin-vue/issues/262
-      normalizer: '~vue-runtime-helpers/dist/normalize-component.js',
-      // https://github.com/vuejs/rollup-plugin-vue/issues/300#issuecomment-663098421
-      style: {
-        preprocessOptions: {
-          scss: getSassDefaultOptions(options),
-        },
+      // use "sass" preprocess
+      preprocessStyles: true,
+      preprocessOptions: getSassDefaultOptions(options),
+      compilerOptions: {
+        whitespace: 'condense',
       },
     }),
     postcss({

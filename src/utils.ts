@@ -1,10 +1,10 @@
+import { parse } from '@vue/compiler-sfc';
 import autoprefixer from 'autoprefixer';
 import glob from 'glob';
 import path from 'path';
 import postcssUrl from 'postcss-url';
 import resolve from 'resolve';
 import through from 'through2';
-import { parse } from '@vue/compiler-sfc';
 
 import type { Options } from './config';
 
@@ -213,7 +213,7 @@ export function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
       if (!languages.includes(lang)) return cb();
 
       file.contents = Buffer.from(
-        (scripts.script.content
+        (scripts.script
           ? scripts.script.content
           : `import { defineComponent } from 'vue';export default defineComponent({});`
         ).trim(),
