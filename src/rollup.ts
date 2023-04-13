@@ -11,7 +11,6 @@ import postcss from 'rollup-plugin-postcss';
 import { terser } from 'rollup-plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
 import vue from 'rollup-plugin-vue';
-import sass from 'sass';
 
 import type { Options } from './config';
 import type { RollupBabelInputPluginOptions } from '@rollup/plugin-babel';
@@ -177,7 +176,8 @@ function getRollupBaseConfig(options: Options): RollupOptions {
           name: 'sass',
           test: /\.(sass|scss)$/,
           process({ map }) {
-            const { css } = sass.renderSync({
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const { css } = require('sass').renderSync({
               file: this.id,
               ...getSassDefaultOptions(options),
             });

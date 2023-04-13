@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import postcss from 'postcss';
-import sass from 'sass';
 
 import type { Options } from './config';
 
@@ -56,7 +55,8 @@ export async function build(options: Options) {
         .replace(styleInputDir, styleOutputDir)
         .replace(cssSuffixReg, '.css');
 
-      const { css } = sass.renderSync({
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { css } = require('sass').renderSync({
         ...getSassDefaultOptions(options),
         file: filepath,
         outputStyle: 'expanded',

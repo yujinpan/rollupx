@@ -21,7 +21,7 @@ export async function build(options: Options) {
   }
 
   if (typesOutputDir !== outputDir) {
-    fs.rmSync(typesOutputDir, { recursive: true });
+    fs.rmSync(typesOutputDir, { recursive: true, force: true });
     fs.mkdirSync(typesOutputDir);
   }
 
