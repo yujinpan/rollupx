@@ -107,7 +107,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     options;
 
   const assetsReg = /\.(png|svg|jpe?g|gif|webp)$/;
-  const vuePluginReg = /rollup-plugin-vue/;
+  const vuePluginReg = /\?rollup-plugin-vue/;
 
   const isModule = ['es', 'cjs'].includes(format);
   const isNotES = format !== 'es';
@@ -145,10 +145,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     }),
     // 替换 env 文件的环境变量
     replace({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-      'process.env.VUE_APP_BASE_URL': JSON.stringify(
-        process.env.VUE_APP_BASE_URL,
-      ),
+      values: options.replace,
       preventAssignment: true,
     }),
     commonjs({
@@ -204,6 +201,10 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     }),
     json(),
   ];
+
+  if (options.node) {
+    process.env.VUE_CLI_BABEL_TARGET_NODE = 'true';
+  }
 
   if (stat && singleFile) {
     plugins.push(

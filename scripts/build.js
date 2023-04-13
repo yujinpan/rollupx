@@ -1,37 +1,40 @@
 const typescript = require('@rollup/plugin-typescript');
-const { globSync } = require('eslint-import-resolver-typescript');
 const fs = require('fs');
-const { resolve } = require('path');
+const { resolve, sep } = require('path');
 const rollup = require('rollup');
 
 async function build() {
-  const dist = resolve(__dirname, '../lib');
-  fs.rmSync(dist, { recursive: true, force: true });
-  fs.mkdirSync(dist, { recursive: true });
+  const buildModule = resolve(__dirname, '_build.js');
 
-  rollup
+  await rollup
     .rollup({
-      input: globSync(resolve(__dirname, '../src/*.ts')),
+      input: resolve(__dirname, '../src/build.ts'),
       plugins: [
         typescript({
           tsconfig: resolve(__dirname, '../tsconfig.app.json'),
         }),
       ],
-      external: () => true,
+      external: (id, importer, isResolved) => {
+        if (isResolved) {
+          if (id.includes('node_modules') || !id.startsWith(sep)) {
+            return true;
+          }
+        }
+      },
     })
-    .then((res) => {
-      return Promise.all[
-        (res.write({
-          format: 'cjs',
-          dir: resolve(dist, 'cjs'),
-          exports: 'auto',
-        }),
-        res.write({
-          format: 'es',
-          dir: resolve(dist, 'es'),
-        }))
-      ];
-    });
+    .then((res) =>
+      res.write({
+        file: buildModule,
+        format: 'cjs',
+      }),
+    );
+
+  // 生成临时 cjs 文件再使用 rollupx 打包
+  await require(buildModule).build(
+    require(resolve(__dirname, '../rollupx.config.js')),
+  );
+
+  fs.rmSync(buildModule);
 }
 
 build();
