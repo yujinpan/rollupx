@@ -12,6 +12,12 @@ JS/TS/Vue/Scss/Less to a library, and jsdoc to a JSON.
 npm install --save-dev rollupx
 ```
 
+vue2
+
+```
+npm install --save-dev rollupx rollup-plugin-vue@5
+```
+
 ### Examples
 
 - [SingleFile](#singlefile)
