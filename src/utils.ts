@@ -4,7 +4,6 @@ import path from 'path';
 import postcssUrl from 'postcss-url';
 import resolve from 'resolve';
 import through from 'through2';
-import { parseComponent } from 'vue-template-compiler';
 
 import type { Options } from './config';
 
@@ -206,7 +205,8 @@ export function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
   return through.obj(function (file, _, cb) {
     if (file.extname === '.vue') {
       const code = file.contents.toString();
-      const scripts = parseComponent(code);
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const scripts = require('@vue/compiler-sfc').parse(code).descriptor;
 
       const lang = scripts.script?.lang || 'js';
 
