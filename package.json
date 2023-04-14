@@ -34,8 +34,7 @@
     "publish:patch": "npm version patch && npm publish",
     "version": "npm run build",
     "postversion": "git push --all && git push --tags",
-    "build": "node scripts/build.js && npm run build:types",
-    "build:types": "rm -rf types && tsc --build tsconfig.types.json && eslint --fix types/* --quiet",
+    "build": "node scripts/build.js",
     "test": "jest"
   },
   "dependencies": {

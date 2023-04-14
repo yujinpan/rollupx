@@ -1,4 +1,3 @@
-import { parse } from '@vue/compiler-sfc';
 import autoprefixer from 'autoprefixer';
 import glob from 'glob';
 import path from 'path';
@@ -206,7 +205,8 @@ export function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
   return through.obj(function (file, _, cb) {
     if (file.extname === '.vue') {
       const code = file.contents.toString();
-      const scripts = parseComponent(code);
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const scripts = require('@vue/compiler-sfc').parse(code).descriptor;
 
       const lang = scripts.script?.lang || 'js';
 
@@ -245,14 +245,14 @@ export function printMsg(msg: string) {
   console.log(`\x1b[32m[rollupx] ${msg}\x1b[0m`);
 }
 
-export function printErr(name: string, err: any) {
+export function printErr(name: string, ...errs) {
   // eslint-disable-next-line no-console
-  console.log(`\x1b[31m[rollupx] ${name}\x1b[0m`, err);
+  console.log(`\x1b[31m[rollupx] ${name}\x1b[0m`, ...errs);
 }
 
-export function printWarn(name: string, warn: any) {
+export function printWarn(name: string, ...warn) {
   // eslint-disable-next-line no-console
-  console.log(`\x1b[33m[rollupx] ${name}\x1b[0m`, warn);
+  console.log(`\x1b[33m[rollupx] ${name}\x1b[0m`, ...warn);
 }
 
 export function toLowerCamelCase(str: string) {
@@ -267,10 +267,6 @@ export function toLowerCamelCase(str: string) {
     }
   }
   return result;
-}
-
-function parseComponent(id) {
-  return parse(id).descriptor;
 }
 
 export function getSassImporter(options: Options) {
