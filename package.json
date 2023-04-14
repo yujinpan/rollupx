@@ -32,6 +32,7 @@
   "scripts": {
     "publish:beta": "npm version prerelease --preid=beta && npm publish",
     "publish:patch": "npm version patch && npm publish",
+    "publish:minor": "npm version minor && npm publish",
     "version": "npm run build",
     "postversion": "git push --all && git push --tags",
     "build": "node scripts/build.js",
