@@ -245,14 +245,14 @@ export function printMsg(msg: string) {
   console.log(`\x1b[32m[rollupx] ${msg}\x1b[0m`);
 }
 
-export function printErr(name: string, err: any) {
+export function printErr(name: string, ...errs) {
   // eslint-disable-next-line no-console
-  console.log(`\x1b[31m[rollupx] ${name}\x1b[0m`, err);
+  console.log(`\x1b[31m[rollupx] ${name}\x1b[0m`, ...errs);
 }
 
-export function printWarn(name: string, warn: any) {
+export function printWarn(name: string, ...warn) {
   // eslint-disable-next-line no-console
-  console.log(`\x1b[33m[rollupx] ${name}\x1b[0m`, warn);
+  console.log(`\x1b[33m[rollupx] ${name}\x1b[0m`, ...warn);
 }
 
 export function toLowerCamelCase(str: string) {
