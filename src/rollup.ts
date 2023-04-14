@@ -105,7 +105,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     options;
 
   const assetsReg = /\.(png|svg|jpe?g|gif|webp)$/;
-  const vuePluginReg = /\?vue/;
+  const vuePluginReg = /\?vue&/;
 
   const isModule = ['es', 'cjs'].includes(format);
   const isNotES = format !== 'es';

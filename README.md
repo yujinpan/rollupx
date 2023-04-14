@@ -1,5 +1,7 @@
 # rollupx
 
+> Now the 3.0-alpha version has been released, supporting vue3.
+
 JS/TS/Vue/Scss/Less to a library, and jsdoc to a JSON.
 
 ## Usage
@@ -313,14 +315,11 @@ $ rollupx --input-files=index.ts
     "@babel/runtime": "^7.x",
     "core-js": "^3.x",
     "style-inject": "^0.x",
-    "vue-runtime-helpers": "^1.x",
     // must be includes --- end
 
     // your package required external
-    "element-ui": "^2.x",
-    "vue": "^2.x",
-    "vue-class-component": "^7.x",
-    "vue-property-decorator": "^8.x"
+    "element-plus": "^2.x",
+    "vue": "^3.x"
   }
 }
 ```

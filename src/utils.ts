@@ -39,7 +39,7 @@ export function transformToRelativePath(
       // 尾部的 .vue 转换
       if (
         newSuffix !== false &&
-        !newPath.includes('rollup-plugin-vue') &&
+        !newPath.includes('?vue&') &&
         /\.(jsx|ts|tsx|vue)$/.test(newPath) &&
         !isNodeModules(filepath, newPath, extensions, aliasConfig)
       ) {
@@ -215,7 +215,7 @@ export function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
       file.contents = Buffer.from(
         (scripts.script
           ? scripts.script.content
-          : `import { Vue } from 'vue-property-decorator';export default class extends Vue {}`
+          : `import { defineComponent } from 'vue';export default defineComponent({});`
         ).trim(),
       );
       file.extname = '.' + lang;

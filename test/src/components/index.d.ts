@@ -1,5 +1,8 @@
-import { Vue } from 'vue-property-decorator';
+/**
+ * 组件
+ * @class
+ */
 
-export default class HelloWorld extends Vue {
+export default class HelloWorld {
   private msg;
 }

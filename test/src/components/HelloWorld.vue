@@ -5,38 +5,24 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-/**
- * 组件
- * @class
- */
-@Component({
-  // 利于 IDE 自动提示
-  name: 'HelloWorld',
-})
-export default class HelloWorld extends Vue {
-  @Prop() private msg!: string;
-
-  /**
-   * 构造函数
-   * @param {string} str
-   */
-  constructor(str: any) {
-    super(str);
+export default defineComponent({
+  props: {
+    msg: {
+      type: String,
+      default: 'test'
+    }
   }
-
-  /**
-   * 测试
-   */
-  test() {}
-}
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+@import 'module1/test.scss';
 @import '~module1/test.scss';
 @import '~@/styles/common-variables.scss';
+@import '@/styles/index.scss';
 @import '~element-ui/lib/theme-chalk/index.css';
 
 h3 {
