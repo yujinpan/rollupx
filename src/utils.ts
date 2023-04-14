@@ -4,6 +4,7 @@ import path from 'path';
 import postcssUrl from 'postcss-url';
 import resolve from 'resolve';
 import through from 'through2';
+import { SFCDescriptor } from 'vue/packages/compiler-sfc';
 
 import type { Options } from './config';
 
@@ -206,17 +207,15 @@ export function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
     if (file.extname === '.vue') {
       const code = file.contents.toString();
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const scripts = require('@vue/compiler-sfc').parse(code).descriptor;
+      const parsed = require('@vue/compiler-sfc').parse(code);
+      const { script } = (parsed.descriptor || parsed) as SFCDescriptor;
 
-      const lang = scripts.script?.lang || 'js';
+      const lang = script?.lang || 'js';
 
       if (!languages.includes(lang)) return cb();
 
       file.contents = Buffer.from(
-        (scripts.script
-          ? scripts.script.content
-          : `import { defineComponent } from 'vue';export default defineComponent({});`
-        ).trim(),
+        (script ? script.content : `export default {};`).trim(),
       );
       file.extname = '.' + lang;
     }
