@@ -10,7 +10,6 @@ import path from 'path';
 import postcss from 'rollup-plugin-postcss';
 import { terser } from 'rollup-plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
-import vue from 'rollup-plugin-vue';
 
 import type { Options } from './config';
 import type { RollupBabelInputPluginOptions } from '@rollup/plugin-babel';
@@ -20,6 +19,7 @@ import {
   getPostcssPlugins,
   getSassDefaultOptions,
   isNodeModules,
+  readPkgVersion,
   styleExtensions,
   transformToRelativePath,
 } from './utils';
@@ -105,7 +105,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     options;
 
   const assetsReg = /\.(png|svg|jpe?g|gif|webp)$/;
-  const vuePluginReg = /\?vue&/;
+  const vuePluginReg = /\?(vue|rollup-plugin-vue)/;
 
   const isModule = ['es', 'cjs'].includes(format);
   const isNotES = format !== 'es';
@@ -149,14 +149,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     commonjs({
       include: /node_modules/,
     }),
-    vue({
-      // use "sass" preprocess
-      preprocessStyles: true,
-      preprocessOptions: getSassDefaultOptions(options),
-      compilerOptions: {
-        whitespace: 'condense',
-      },
-    }),
+    vuePlugin(options),
     postcss({
       minimize: true,
       // custom inject，require [style-inject] package
@@ -295,4 +288,40 @@ function copy(src, dest) {
     write.on('finish', resolve);
     read.pipe(write);
   });
+}
+
+function vuePlugin(options: Options) {
+  const vuePluginVueVersion = readPkgVersion('rollup-plugin-vue');
+
+  return (
+    vuePluginVueVersion &&
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require('rollup-plugin-vue')(
+      vuePluginVueVersion.startsWith('6')
+        ? {
+            // use "sass" preprocess
+            preprocessStyles: true,
+            preprocessOptions: getSassDefaultOptions(options),
+            compilerOptions: {
+              whitespace: 'condense',
+            },
+          }
+        : ({
+            css: false, // Dynamically inject css as a <style> tag
+            template: {
+              compilerOptions: {
+                whitespace: 'condense', // 丢弃模版空格
+              },
+            },
+            // https://github.com/vuejs/rollup-plugin-vue/issues/262
+            normalizer: '~vue-runtime-helpers/dist/normalize-component.js',
+            // https://github.com/vuejs/rollup-plugin-vue/issues/300#issuecomment-663098421
+            style: {
+              preprocessOptions: {
+                scss: getSassDefaultOptions(options),
+              },
+            },
+          } as any),
+    )
+  );
 }

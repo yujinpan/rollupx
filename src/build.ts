@@ -8,9 +8,17 @@ import { build as buildDocs } from './docs';
 import { build as buildJS } from './js';
 import { build as buildStyles } from './styles';
 import { build as buildTypes } from './types';
-import { mergeProps, printErr, runTask, toLowerCamelCase } from './utils';
+import {
+  mergeProps,
+  printErr,
+  readPkgVersion,
+  runTask,
+  toLowerCamelCase,
+} from './utils';
 
 export async function build(options: Options = {}) {
+  if (!validateVueVersion()) return;
+
   if (Array.isArray(options.extensions)) {
     options.extensions = config.extensions.concat(options.extensions);
   }
@@ -73,4 +81,28 @@ export async function build(options: Options = {}) {
   if (options.outputs.includes('docs') && options.docsOutputDir) {
     await runTask('build docs', buildDocs(options));
   }
+}
+
+function validateVueVersion() {
+  const vueVersion = readPkgVersion('vue');
+  const vuePluginVersion = readPkgVersion('rollup-plugin-vue');
+
+  if (vueVersion && vuePluginVersion) {
+    if (vueVersion.startsWith('2') && !vuePluginVersion.startsWith('5')) {
+      printErr(
+        `Vue2 need rollup-plugin-vue@5, try "npm i -D rollup-plugin-vue@5".`,
+      );
+      return false;
+    } else if (
+      vueVersion.startsWith('3') &&
+      !vuePluginVersion.startsWith('6')
+    ) {
+      printErr(
+        `Vue3 need rollup-plugin-vue@6, try "npm i -D rollup-plugin-vue@6".`,
+      );
+      return false;
+    }
+  }
+
+  return true;
 }

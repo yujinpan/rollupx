@@ -4,9 +4,9 @@ import path from 'path';
 import postcssUrl from 'postcss-url';
 import resolve from 'resolve';
 import through from 'through2';
-import { SFCDescriptor } from 'vue/packages/compiler-sfc';
 
 import type { Options } from './config';
+import type { SFCDescriptor } from '@vue/compiler-sfc';
 
 export const styleExtensions = ['.scss', '.sass', '.less', '.css'];
 
@@ -301,4 +301,13 @@ export function getPostcssPlugins(options: Options) {
       assetsPath: options.outputDir,
     }),
   ];
+}
+
+export function readPkgVersion(name: string) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require(`${name}/package.json`).version;
+  } catch (e) {
+    return undefined;
+  }
 }
