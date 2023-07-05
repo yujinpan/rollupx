@@ -67,6 +67,7 @@ export function generateRollupConfig(filePath: string, options: Options) {
       globals: outputGlobals,
       paths: outputPaths,
       plugins: [terser()],
+      inlineDynamicImports: true,
     });
   }
 
