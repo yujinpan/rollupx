@@ -80,7 +80,7 @@ export function generateRollupConfig(filePath: string, options: Options) {
 /**
  * 将文件中的缩写路径转换为相对路径
  */
-function relativePlugin(
+export function relativePlugin(
   aliasConfig: Options['aliasConfig'],
   extensions: Options['extensions'],
   newSuffix: string | false,

@@ -4,7 +4,6 @@ import path from 'path';
 import type { Options } from './config';
 
 import config from './config';
-import { build as buildDocs } from './docs';
 import { build as buildJS } from './js';
 import { build as buildStyles } from './styles';
 import { build as buildTypes } from './types';
@@ -75,11 +74,6 @@ export async function build(options: Options = {}) {
   // build types
   if (options.outputs.includes('types')) {
     await runTask('build types', buildTypes(options));
-  }
-
-  // build docs
-  if (options.outputs.includes('docs') && options.docsOutputDir) {
-    await runTask('build docs', buildDocs(options));
   }
 }
 

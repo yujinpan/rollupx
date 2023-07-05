@@ -3,7 +3,6 @@ import glob from 'glob';
 import path from 'path';
 import postcssUrl from 'postcss-url';
 import resolve from 'resolve';
-import through from 'through2';
 
 import type { Options } from './config';
 import type { SFCDescriptor } from '@vue/compiler-sfc';
@@ -199,28 +198,23 @@ export function removeComment(codes: string) {
   return codes.replace(/^\s*(\/\/|\/\*|\*|<).*$/gm, '');
 }
 
-/**
- * gulp 获取 vue 的 script 内容插件
- */
-export function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
-  return through.obj(function (file, _, cb) {
-    if (file.extname === '.vue') {
-      const code = file.contents.toString();
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const parsed = require('@vue/compiler-sfc').parse(code);
-      const { script } = (parsed.descriptor || parsed) as SFCDescriptor;
+export function pickVueScript(code: string): string {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const parsed = require('@vue/compiler-sfc').parse(code);
+  const { script } = (parsed.descriptor || parsed) as SFCDescriptor;
 
-      const lang = script?.lang || 'js';
+  return script?.content || 'export default {};';
+}
 
-      if (!languages.includes(lang)) return cb();
+export function rollupPluginVueScript() {
+  return {
+    name: 'vue-script',
+    transform(code, id) {
+      if (!/\.vue$/.test(id)) return code;
 
-      file.contents = Buffer.from(
-        (script ? script.content : `export default {};`).trim(),
-      );
-      file.extname = '.' + lang;
-    }
-    cb(null, file);
-  });
+      return pickVueScript(code);
+    },
+  };
 }
 
 /**

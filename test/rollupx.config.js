@@ -44,5 +44,4 @@ module.exports = {
   stylesCopyFiles: ['**/*'],
   // typesOutputDir: 'test',
   // typesGlobal: 'src/global.d.ts'
-  docsOutputDir: 'docs',
 };

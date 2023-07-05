@@ -14,7 +14,7 @@ export type Options = {
   excludeFiles?: string[];
 
   // 指定输出类型
-  outputs?: ('js' | 'styles' | 'types' | 'docs')[];
+  outputs?: ('js' | 'styles' | 'types')[];
 
   // 是否打包为单文件，默认 false 每个文件独立输出
   singleFile?: boolean;
@@ -86,7 +86,7 @@ const defaultOptions: Options = {
   excludeFiles: ['**/+(__tests__|__specs__)/**', '**/*.spec.*'],
 
   // output types
-  outputs: ['js', 'styles', 'types', 'docs'],
+  outputs: ['js', 'styles', 'types'],
 
   singleFile: false,
 

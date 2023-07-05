@@ -1,13 +1,17 @@
 import fs from 'fs';
-import gulp from 'gulp';
-import ts from 'gulp-typescript';
+import makeDir from 'make-dir';
 import path from 'path';
-import through from 'through2';
+import typescript, {
+  CompilerOptions,
+  JsxEmit,
+  ModuleKind,
+  ModuleResolutionKind,
+  ScriptTarget,
+} from 'typescript';
 
 import type { Options } from './config';
-import type { TsConfig } from 'gulp-typescript/release/types';
 
-import { gulpPickVueScript, transformToRelativePath } from './utils';
+import { getFiles, pickVueScript, transformToRelativePath } from './utils';
 
 export async function build(options: Options) {
   const { inputDir, outputDir, inputFiles, excludeFiles, typesGlobal } =
@@ -25,56 +29,59 @@ export async function build(options: Options) {
     fs.mkdirSync(typesOutputDir);
   }
 
-  const compilerOptions: TsConfig['compilerOptions'] = {
+  const compilerOptions: CompilerOptions = {
     ...tsConfig.compilerOptions,
     strict: false,
     declaration: true,
     emitDeclarationOnly: true,
+    declarationDir: typesOutputDir,
+    paths: options.aliasConfig,
   };
 
-  return new Promise((resolve) => {
-    const files = inputFiles.map((item) => path.resolve(inputDir, item));
-    if (typesGlobal) {
-      files.push(typesGlobal);
+  const files = getFiles(inputFiles, inputDir, /\.(ts|tsx|vue)$/, [
+    ...excludeFiles,
+    '**/*.d.ts',
+  ]).map((file) => {
+    let content = fs.readFileSync(file).toString();
+    if (file.endsWith('.vue')) {
+      content = pickVueScript(content);
     }
-
-    gulp
-      .src(files, {
-        allowEmpty: true,
-        ignore: [...excludeFiles, '**/!(*.ts|*.tsx|*.vue)'],
-      })
-      .pipe(gulpPickVueScript(['ts', 'tsx']))
-      .pipe(gulpToRelativePath(options))
-      .pipe(ts(compilerOptions))
-      .on('error', () => undefined)
-      .dts.pipe(gulp.dest(typesOutputDir))
-      .on('finish', resolve);
-  });
-}
-
-function gulpToRelativePath(options: Options) {
-  const { aliasConfig, extensions } = options;
-  return through.obj(function (file, _, cb) {
-    file.contents = Buffer.from(
-      transformToRelativePath(
-        file.contents.toString(),
-        file.path,
-        aliasConfig,
-        extensions,
-        '',
-      ),
+    content = transformToRelativePath(
+      content,
+      file,
+      options.aliasConfig,
+      options.extensions,
+      false,
     );
-    cb(null, file);
+
+    const temp = file
+      .replace(/\.(ts|vue)$/, '.temp.ts')
+      .replace(/\.tsx$/, '.temp.tsx');
+    fs.writeFileSync(temp, content);
+
+    return temp;
   });
+
+  const host = typescript.createCompilerHost(compilerOptions);
+  host.writeFile = async (fileName, text) => {
+    const outputFileName = fileName.replace(/\.temp\.d\.(ts|tsx)$/, '.d.ts');
+    await makeDir(path.dirname(outputFileName));
+    fs.writeFileSync(outputFileName, text);
+  };
+  const program = typescript.createProgram(files, compilerOptions, host);
+
+  program.emit();
+
+  files.forEach((item) => fs.rmSync(item, { force: true }));
 }
 
-function defaultTsConfig(): TsConfig {
+function defaultTsConfig(): { compilerOptions: CompilerOptions } {
   return {
     compilerOptions: {
-      target: 'ESNext',
-      module: 'ESNext',
-      jsx: 'preserve',
-      moduleResolution: 'node',
+      target: ScriptTarget.ESNext,
+      module: ModuleKind.ESNext,
+      jsx: JsxEmit.Preserve,
+      moduleResolution: ModuleResolutionKind.NodeJs,
       experimentalDecorators: true,
       allowSyntheticDefaultImports: true,
       skipLibCheck: true,
