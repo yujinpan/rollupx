@@ -3,6 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import { nodeResolve as resolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
+import url from '@rollup/plugin-url';
 import { createFilter, FilterPattern } from '@rollup/pluginutils';
 import fs from 'fs';
 import makeDir from 'make-dir';
@@ -181,9 +182,6 @@ function getRollupBaseConfig(options: Options): RollupOptions {
       ],
     }),
     babel(babelOptions),
-    copyPlugin({
-      include: assetsReg,
-    }),
     json(),
   ];
 
@@ -195,6 +193,23 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     plugins.push(
       visualizer({
         filename: './stat/statistics.html',
+      }),
+    );
+  }
+
+  if (isModule) {
+    plugins.push(
+      copyPlugin({
+        include: assetsReg,
+      }),
+    );
+  }
+  // umd/iife 不复制图片等静态资源
+  else {
+    plugins.push(
+      url({
+        include: assetsReg,
+        limit: Infinity,
       }),
     );
   }
