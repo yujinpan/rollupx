@@ -1,4 +1,4 @@
-import { TsConfig } from 'gulp-typescript/release/types';
+import { Obj } from '../test/src/types';
 
 export type Options = {
   // 输出文件头信息
@@ -42,7 +42,7 @@ export type Options = {
   // 路径别名配置
   aliasConfig?: Record<string, string>;
   // tsconfig.json 配置
-  tsConfig?: TsConfig;
+  tsConfig?: Obj;
 
   // 样式目录名，相对于 inputDir
   stylesDir?: string;
