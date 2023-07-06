@@ -3,6 +3,7 @@ import '@/components/Test.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
 import '@/styles/index.scss';
+import '@/plugins/index.css';
 import el from 'el-select-tree';
 import Vue from 'vue';
 

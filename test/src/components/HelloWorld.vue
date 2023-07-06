@@ -11,9 +11,9 @@ export default defineComponent({
   props: {
     msg: {
       type: String,
-      default: 'test'
-    }
-  }
+      default: 'test',
+    },
+  },
 });
 </script>
 
@@ -23,7 +23,6 @@ export default defineComponent({
 @import '~module1/test.scss';
 @import '~@/styles/common-variables.scss';
 @import '@/styles/index.scss';
-@import '~element-ui/lib/theme-chalk/index.css';
 
 h3 {
   margin: 40px 0 0;
