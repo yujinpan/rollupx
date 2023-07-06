@@ -20,6 +20,7 @@ import {
   getPostcssPlugins,
   getSassDefaultOptions,
   isNodeModules,
+  printWarn,
   readPkgVersion,
   styleExtensions,
   transformToRelativePath,
@@ -242,6 +243,23 @@ function getRollupBaseConfig(options: Options): RollupOptions {
             // 内部 - 多文件模式则跳过
             return true;
           },
+    onwarn({ loc, frame, message, code }) {
+      if (
+        code === 'SOURCEMAP_ERROR' ||
+        code === 'UNUSED_EXTERNAL_IMPORT' ||
+        code === 'EMPTY_BUNDLE' ||
+        code === 'THIS_IS_UNDEFINED'
+      ) {
+        return;
+      }
+
+      if (loc) {
+        printWarn(`${loc.file} (${loc.line}:${loc.column}) ${message}`);
+        if (frame) printWarn(frame);
+      } else {
+        printWarn(message);
+      }
+    },
   };
 }
 
