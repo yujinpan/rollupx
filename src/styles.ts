@@ -8,7 +8,7 @@ import {
   deDup,
   getFiles,
   getPostcssPlugins,
-  getSassDefaultOptions,
+  parseSass,
   styleExtensions,
   transformToRelativePath,
 } from './utils';
@@ -55,15 +55,8 @@ export async function build(options: Options) {
         .replace(styleInputDir, styleOutputDir)
         .replace(cssSuffixReg, '.css');
 
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { css } = require('sass').renderSync({
-        ...getSassDefaultOptions(options),
-        file: filepath,
-        outputStyle: 'expanded',
-      });
-
       return postcss(getPostcssPlugins(options))
-        .process(css, {
+        .process(parseSass(options, filepath), {
           from: filepath,
           to: outputPath,
         })

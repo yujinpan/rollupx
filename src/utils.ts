@@ -1,8 +1,11 @@
 import autoprefixer from 'autoprefixer';
+import fs from 'fs';
 import glob from 'glob';
 import path from 'path';
 import postcssUrl from 'postcss-url';
 import resolve from 'resolve';
+import sass from 'sass';
+import { pathToFileURL } from 'url';
 
 import type { Options } from './config';
 import type { SFCDescriptor } from '@vue/compiler-sfc';
@@ -233,9 +236,9 @@ export async function runTask(label: string, task: Promise<any>) {
   printMsg(`${label} completed!\n`);
 }
 
-export function printMsg(msg: string) {
+export function printMsg(msg: string, ...infos) {
   // eslint-disable-next-line no-console
-  console.log(`\x1b[32m[rollupx] ${msg}\x1b[0m`);
+  console.log(`\x1b[32m[rollupx] ${msg}\x1b[0m`, ...infos);
 }
 
 export function printErr(name: string, ...errs) {
@@ -264,17 +267,36 @@ export function toLowerCamelCase(str: string) {
 
 export function getSassImporter(options: Options) {
   return (url, filepath) => {
-    let file = toRelative(filepath, url, options.aliasConfig, styleExtensions);
-
-    // rollup-plugin-vue cannot parse '~', replace to 'node_modules' here
-    if (file.startsWith('~')) {
-      file = file.replace(/^~/, 'node_modules/');
-    }
-
     return {
-      file,
+      file: getSassRelativePath(options, url, filepath),
     };
   };
+}
+
+export function getSassRelativePath(options: Options, url, filepath) {
+  let file = toRelative(filepath, url, options.aliasConfig, styleExtensions);
+
+  // rollup-plugin-vue cannot parse '~', replace to 'node_modules' here
+  if (file.startsWith('~')) {
+    file = file.replace(/^~/, 'node_modules/');
+  }
+
+  const isNodeModules = file.startsWith('node_modules');
+
+  const fileDir = path.dirname(filepath);
+  const absolutePath = isNodeModules ? file : path.resolve(fileDir, file);
+  const existFile = glob
+    .sync(absolutePath)
+    .concat(
+      glob.sync(`${absolutePath}.{sass,scss,css}`),
+      glob.sync(`${absolutePath}/index.{sass,scss,css}`),
+    )[0];
+
+  if (existFile) {
+    file = existFile;
+  }
+
+  return file;
 }
 
 export function getSassDefaultOptions(options: Options) {
@@ -285,16 +307,77 @@ export function getSassDefaultOptions(options: Options) {
   };
 }
 
-export function getPostcssPlugins(options: Options) {
+export function getPostcssPlugins(options: Options & { inline?: boolean }) {
   return [
     autoprefixer(),
     postcssUrl({
-      url: 'copy',
-      relative: true,
-      basePath: options.inputDir,
-      assetsPath: options.outputDir,
+      url: options.inline ? 'inline' : 'copy',
+      maxSize: Infinity,
     }),
   ];
+}
+
+export function parseSass(options: Options, filepath) {
+  const result = sass.compile(filepath, {
+    importers: [
+      {
+        findFileUrl(url: string) {
+          return pathToFileURL(getSassRelativePath(options, url, filepath));
+        },
+      },
+    ],
+  });
+
+  // rebase code use source replaces
+  const replaces = [];
+  result.loadedUrls.forEach((item) => {
+    getCssRebaseUrlReplaces(
+      fs.readFileSync(item).toString(),
+      item.pathname,
+      filepath,
+    ).forEach(({ from, to }) => {
+      if (!replaces.find((item) => item.from === from)) {
+        replaces.push({ from, to });
+      }
+    });
+  });
+  replaces.forEach(({ from, to }) => {
+    result.css = result.css.replaceAll(from, to);
+  });
+
+  return result.css;
+}
+
+export function getCssUrls(code: string) {
+  return deDup(
+    removeComment(code)
+      .match(
+        // url('...')
+        new RegExp('url\\([^)]*\\)', 'g'),
+      )
+      ?.map((item) => item.replace(/.*\(['"]?([^'"]+)['"]?\).*/, '$1')) || [],
+  );
+}
+
+export function getCssRebaseUrlReplaces(
+  code: string,
+  from: string,
+  to: string,
+) {
+  const replaces = [];
+  const urls = getCssUrls(code);
+  urls.forEach((url) => {
+    const sourcePath = path.resolve(path.dirname(from), url);
+    if (glob.sync(sourcePath, { root: from })) {
+      const toPath = path.relative(path.dirname(to), sourcePath);
+
+      replaces.push({
+        from: url,
+        to: toPath,
+      });
+    }
+  });
+  return replaces;
 }
 
 export function readPkgVersion(name: string) {

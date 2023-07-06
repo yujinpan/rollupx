@@ -20,6 +20,7 @@ import {
   getPostcssPlugins,
   getSassDefaultOptions,
   isNodeModules,
+  parseSass,
   printWarn,
   readPkgVersion,
   styleExtensions,
@@ -163,7 +164,10 @@ function getRollupBaseConfig(options: Options): RollupOptions {
           `styleInject(${cssVariableName});`
         );
       },
-      plugins: getPostcssPlugins(options),
+      plugins: getPostcssPlugins({
+        ...options,
+        inline: !isModule,
+      }),
       // plugins will need the path
       to: path.resolve(options.outputDir, './index.css'),
       loaders: [
@@ -172,12 +176,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
           name: 'sass',
           test: /\.(sass|scss)$/,
           process({ map }) {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const { css } = require('sass').renderSync({
-              file: this.id,
-              ...getSassDefaultOptions(options),
-            });
-            return { code: css, map };
+            return { code: parseSass(options, this.id), map };
           },
         },
       ],
