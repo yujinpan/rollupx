@@ -242,17 +242,6 @@ function getRollupBaseConfig(options: Options): RollupOptions {
             // 内部 - 多文件模式则跳过
             return true;
           },
-    onwarn(warning, warn) {
-      if (
-        warning.code === 'CIRCULAR_DEPENDENCY' ||
-        warning.code === 'UNUSED_EXTERNAL_IMPORT' ||
-        warning.code === 'EMPTY_BUNDLE' ||
-        warning.code === 'THIS_IS_UNDEFINED'
-      )
-        return;
-
-      warn(warning);
-    },
   };
 }
 
