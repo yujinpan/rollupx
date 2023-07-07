@@ -73,17 +73,12 @@ export function toRelative(
   const aliasKey = findAliasKey(resolvePath, aliasConfig);
 
   if (aliasKey) {
+    const suffix = resolvePath.slice(aliasKey.length);
+
     resolvePath = path
       .relative(
         path.dirname(filepath),
-        resolve.sync(
-          resolvePath.replace(
-            new RegExp('^' + aliasKey),
-            aliasConfig[aliasKey] +
-              (aliasConfig[aliasKey].endsWith('/') ? '' : '/'),
-          ),
-          { extensions },
-        ),
+        resolve.sync(path.join(aliasConfig[aliasKey], suffix), { extensions }),
       )
       // fix: windows path will be \
       .split(path.sep)
