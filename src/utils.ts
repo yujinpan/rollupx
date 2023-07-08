@@ -198,10 +198,20 @@ export function removeComment(codes: string) {
 
 export function pickVueScript(code: string): string {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const parsed = require('@vue/compiler-sfc').parse(code);
-  const { script } = (parsed.descriptor || parsed) as SFCDescriptor;
+  const compiler = require('@vue/compiler-sfc');
+  const isVue2 = readPkgVersion('@vue/compiler-sfc')[0] === '2';
 
-  return script?.content || 'export default {};';
+  let content = '';
+  if (isVue2) {
+    const { script } = compiler.parseComponent(code);
+    content = script?.content;
+  } else {
+    const parsed = compiler.parse(code);
+    const { script } = parsed.descriptor;
+    content = script?.content;
+  }
+
+  return content || 'export default {};';
 }
 
 export function rollupPluginVueScript() {
