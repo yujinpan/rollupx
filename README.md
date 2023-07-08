@@ -327,8 +327,9 @@ $ rollupx --input-files=index.ts
 
 ### @TODO
 
-- [ ] `url(...)` in style file can not be rebase path when multi-level nested import.
-- [ ] `rollup-plugin-vue@5(vue2)` has not updated for two years, required packages version too low:
+- [ ] use esbuild
+- [x] `url(...)` in style file can not be rebase path when multi-level nested import.
+- [x] `rollup-plugin-vue@5(vue2)` has not updated for two years, required packages version too low:
   - `postcss@7`
-- [ ] `gulp@4` has not updated for three years, required packages version too low:
+- [x] `gulp@4` has not updated for three years, required packages version too low:
   - `glob-parent`
