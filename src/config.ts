@@ -53,8 +53,6 @@ export type Options = {
 
   // 输出的 d.ts 目录名
   typesOutputDir?: string;
-  // 全局 d.ts 文件，相对于 cwd;
-  typesGlobal?: string;
 
   // 是否统计模块占用情况，仅在 singleFile 为 true 时生效，默认为 false
   stat?: boolean;
@@ -125,7 +123,6 @@ const defaultOptions: Options = {
 
   // inherit outputDir
   typesOutputDir: '',
-  typesGlobal: 'global.d.ts',
 
   stat: false,
 

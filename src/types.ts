@@ -14,10 +14,7 @@ import type { Options } from './config';
 import { getFiles, pickVueScript, transformToRelativePath } from './utils';
 
 export async function build(options: Options) {
-  const { inputDir, outputDir, inputFiles, excludeFiles, typesGlobal } =
-    options;
-
-  const tsConfig = options.tsConfig || defaultTsConfig();
+  const { inputDir, outputDir, inputFiles, excludeFiles } = options;
 
   let typesOutputDir = path.resolve(options.typesOutputDir);
   if (typesOutputDir === process.cwd()) {
@@ -29,13 +26,33 @@ export async function build(options: Options) {
     fs.mkdirSync(typesOutputDir);
   }
 
+  const paths = {};
+  for (const key in options.aliasConfig) {
+    paths[path.join(key, '/*')] = [options.aliasConfig[key]];
+  }
+
   const compilerOptions: CompilerOptions = {
-    ...tsConfig.compilerOptions,
+    ...options.tsConfig?.compilerOptions,
+    target: ScriptTarget.ESNext,
+    module: ModuleKind.ESNext,
+    moduleResolution: ModuleResolutionKind.NodeJs,
+    resolveJsonModule: true,
+    composite: true,
+
+    // vue
+    jsx: JsxEmit.Preserve,
+    useDefineForClassFields: false,
+    preserveValueImports: true,
+
+    experimentalDecorators: true,
+    allowSyntheticDefaultImports: true,
+    skipLibCheck: true,
+    allowJs: true,
     strict: false,
     declaration: true,
     emitDeclarationOnly: true,
     declarationDir: typesOutputDir,
-    paths: options.aliasConfig,
+    paths,
   };
 
   const files = getFiles(inputFiles, inputDir, /\.(ts|tsx|vue)$/, [
@@ -51,12 +68,12 @@ export async function build(options: Options) {
       file,
       options.aliasConfig,
       options.extensions,
-      false,
+      '',
     );
 
     const temp = file
-      .replace(/\.(ts|vue)$/, '.temp.ts')
-      .replace(/\.tsx$/, '.temp.tsx');
+      .replace(/\.ts$/, '.temp.ts')
+      .replace(/\.(tsx|vue)$/, '.temp.tsx');
     fs.writeFileSync(temp, content);
 
     return temp;
@@ -73,19 +90,4 @@ export async function build(options: Options) {
   program.emit();
 
   files.forEach((item) => fs.rmSync(item, { force: true }));
-}
-
-function defaultTsConfig(): { compilerOptions: CompilerOptions } {
-  return {
-    compilerOptions: {
-      target: ScriptTarget.ESNext,
-      module: ModuleKind.ESNext,
-      jsx: JsxEmit.Preserve,
-      moduleResolution: ModuleResolutionKind.NodeJs,
-      experimentalDecorators: true,
-      allowSyntheticDefaultImports: true,
-      skipLibCheck: true,
-      allowJs: true,
-    },
-  };
 }
