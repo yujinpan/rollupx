@@ -62,6 +62,9 @@ export type Options = {
 
   // 全局替换变量，例如：{ 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV) }
   replace?: Record<string, string>;
+
+  // 组合式 API
+  compositionAPI?: boolean;
 };
 
 const defaultOptions: Options = {
