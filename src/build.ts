@@ -4,7 +4,6 @@ import path from 'path';
 import type { Options } from './config';
 
 import config from './config';
-import { build as buildDocs } from './docs';
 import { build as buildJS } from './js';
 import { build as buildStyles } from './styles';
 import { build as buildTypes } from './types';
@@ -55,8 +54,22 @@ export async function build(options: Options = {}) {
   // init alias
   const aliasConfig = options.aliasConfig;
   for (const key in aliasConfig) {
+    if (key === '~') continue;
+
+    // 移除 key 后面的 /
+    let newKey = key;
+    if (newKey !== '/' && newKey.endsWith('/')) {
+      newKey = newKey.slice(0, -1);
+    }
+
     // ~ 为 scss @import 语法前缀
-    aliasConfig[key] = aliasConfig['~' + key] = path.resolve(aliasConfig[key]);
+    aliasConfig[newKey] = aliasConfig['~' + newKey] = path.resolve(
+      aliasConfig[key],
+    );
+
+    if (newKey !== key) {
+      delete aliasConfig[key];
+    }
   }
 
   // build js
@@ -75,11 +88,6 @@ export async function build(options: Options = {}) {
   // build types
   if (options.outputs.includes('types')) {
     await runTask('build types', buildTypes(options));
-  }
-
-  // build docs
-  if (options.outputs.includes('docs') && options.docsOutputDir) {
-    await runTask('build docs', buildDocs(options));
   }
 }
 

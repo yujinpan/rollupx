@@ -43,6 +43,4 @@ module.exports = {
   stylesParseFiles: ['**/*.scss'],
   stylesCopyFiles: ['**/*'],
   // typesOutputDir: 'test',
-  // typesGlobal: 'src/global.d.ts'
-  docsOutputDir: 'docs',
 };

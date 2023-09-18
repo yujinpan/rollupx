@@ -1,9 +1,11 @@
 import autoprefixer from 'autoprefixer';
+import fs from 'fs';
 import glob from 'glob';
 import path from 'path';
 import postcssUrl from 'postcss-url';
 import resolve from 'resolve';
-import through from 'through2';
+import sass from 'sass';
+import { pathToFileURL } from 'url';
 
 import type { Options } from './config';
 import type { SFCDescriptor } from '@vue/compiler-sfc';
@@ -71,17 +73,12 @@ export function toRelative(
   const aliasKey = findAliasKey(resolvePath, aliasConfig);
 
   if (aliasKey) {
+    const suffix = resolvePath.slice(aliasKey.length);
+
     resolvePath = path
       .relative(
         path.dirname(filepath),
-        resolve.sync(
-          resolvePath.replace(
-            new RegExp('^' + aliasKey),
-            aliasConfig[aliasKey] +
-              (aliasConfig[aliasKey].endsWith('/') ? '' : '/'),
-          ),
-          { extensions },
-        ),
+        resolve.sync(path.join(aliasConfig[aliasKey], suffix), { extensions }),
       )
       // fix: windows path will be \
       .split(path.sep)
@@ -199,28 +196,33 @@ export function removeComment(codes: string) {
   return codes.replace(/^\s*(\/\/|\/\*|\*|<).*$/gm, '');
 }
 
-/**
- * gulp 获取 vue 的 script 内容插件
- */
-export function gulpPickVueScript(languages = ['js', 'jsx', 'ts', 'tsx']) {
-  return through.obj(function (file, _, cb) {
-    if (file.extname === '.vue') {
-      const code = file.contents.toString();
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const parsed = require('@vue/compiler-sfc').parse(code);
-      const { script } = (parsed.descriptor || parsed) as SFCDescriptor;
+export function pickVueScript(code: string): string {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const compiler = require('@vue/compiler-sfc');
+  const isVue2 = readPkgVersion('@vue/compiler-sfc')[0] === '2';
 
-      const lang = script?.lang || 'js';
+  let content = '';
+  if (isVue2) {
+    const { script } = compiler.parseComponent(code);
+    content = script?.content;
+  } else {
+    const parsed = compiler.parse(code);
+    const { script } = parsed.descriptor;
+    content = script?.content;
+  }
 
-      if (!languages.includes(lang)) return cb();
+  return content || 'export default {};';
+}
 
-      file.contents = Buffer.from(
-        (script ? script.content : `export default {};`).trim(),
-      );
-      file.extname = '.' + lang;
-    }
-    cb(null, file);
-  });
+export function rollupPluginVueScript() {
+  return {
+    name: 'vue-script',
+    transform(code, id) {
+      if (!/\.vue$/.test(id)) return code;
+
+      return pickVueScript(code);
+    },
+  };
 }
 
 /**
@@ -239,9 +241,9 @@ export async function runTask(label: string, task: Promise<any>) {
   printMsg(`${label} completed!\n`);
 }
 
-export function printMsg(msg: string) {
+export function printMsg(msg: string, ...infos) {
   // eslint-disable-next-line no-console
-  console.log(`\x1b[32m[rollupx] ${msg}\x1b[0m`);
+  console.log(`\x1b[32m[rollupx] ${msg}\x1b[0m`, ...infos);
 }
 
 export function printErr(name: string, ...errs) {
@@ -270,17 +272,36 @@ export function toLowerCamelCase(str: string) {
 
 export function getSassImporter(options: Options) {
   return (url, filepath) => {
-    let file = toRelative(filepath, url, options.aliasConfig, styleExtensions);
-
-    // rollup-plugin-vue cannot parse '~', replace to 'node_modules' here
-    if (file.startsWith('~')) {
-      file = file.replace(/^~/, 'node_modules/');
-    }
-
     return {
-      file,
+      file: getSassRelativePath(options, url, filepath),
     };
   };
+}
+
+export function getSassRelativePath(options: Options, url, filepath) {
+  let file = toRelative(filepath, url, options.aliasConfig, styleExtensions);
+
+  // rollup-plugin-vue cannot parse '~', replace to 'node_modules' here
+  if (file.startsWith('~')) {
+    file = file.replace(/^~/, 'node_modules/');
+  }
+
+  const isNodeModules = file.startsWith('node_modules');
+
+  const fileDir = path.dirname(filepath);
+  const absolutePath = isNodeModules ? file : path.resolve(fileDir, file);
+  const existFile = glob
+    .sync(absolutePath)
+    .concat(
+      glob.sync(`${absolutePath}.{sass,scss,css}`),
+      glob.sync(`${absolutePath}/index.{sass,scss,css}`),
+    )[0];
+
+  if (existFile) {
+    file = existFile;
+  }
+
+  return file;
 }
 
 export function getSassDefaultOptions(options: Options) {
@@ -291,16 +312,77 @@ export function getSassDefaultOptions(options: Options) {
   };
 }
 
-export function getPostcssPlugins(options: Options) {
+export function getPostcssPlugins(options: Options & { inline?: boolean }) {
   return [
     autoprefixer(),
     postcssUrl({
-      url: 'copy',
-      relative: true,
-      basePath: options.inputDir,
-      assetsPath: options.outputDir,
+      url: options.inline ? 'inline' : 'copy',
+      maxSize: Infinity,
     }),
   ];
+}
+
+export function parseSass(options: Options, filepath) {
+  const result = sass.compile(filepath, {
+    importers: [
+      {
+        findFileUrl(url: string) {
+          return pathToFileURL(getSassRelativePath(options, url, filepath));
+        },
+      },
+    ],
+  });
+
+  // rebase code use source replaces
+  const replaces = [];
+  result.loadedUrls.forEach((item) => {
+    getCssRebaseUrlReplaces(
+      fs.readFileSync(item).toString(),
+      item.pathname,
+      filepath,
+    ).forEach(({ from, to }) => {
+      if (!replaces.find((item) => item.from === from)) {
+        replaces.push({ from, to });
+      }
+    });
+  });
+  replaces.forEach(({ from, to }) => {
+    result.css = result.css.replaceAll(from, to);
+  });
+
+  return result.css;
+}
+
+export function getCssUrls(code: string) {
+  return deDup(
+    removeComment(code)
+      .match(
+        // url('...')
+        new RegExp('url\\([^)]*\\)', 'g'),
+      )
+      ?.map((item) => item.replace(/.*\(['"]?([^'"]+)['"]?\).*/, '$1')) || [],
+  );
+}
+
+export function getCssRebaseUrlReplaces(
+  code: string,
+  from: string,
+  to: string,
+) {
+  const replaces = [];
+  const urls = getCssUrls(code);
+  urls.forEach((url) => {
+    const sourcePath = path.resolve(path.dirname(from), url);
+    if (glob.sync(sourcePath, { root: from })) {
+      const toPath = path.relative(path.dirname(to), sourcePath);
+
+      replaces.push({
+        from: url,
+        to: toPath,
+      });
+    }
+  });
+  return replaces;
 }
 
 export function readPkgVersion(name: string) {

@@ -3,6 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import { nodeResolve as resolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
+import url from '@rollup/plugin-url';
 import { createFilter, FilterPattern } from '@rollup/pluginutils';
 import fs from 'fs';
 import makeDir from 'make-dir';
@@ -19,6 +20,8 @@ import {
   getPostcssPlugins,
   getSassDefaultOptions,
   isNodeModules,
+  parseSass,
+  printWarn,
   readPkgVersion,
   styleExtensions,
   transformToRelativePath,
@@ -67,6 +70,7 @@ export function generateRollupConfig(filePath: string, options: Options) {
       globals: outputGlobals,
       paths: outputPaths,
       plugins: [terser()],
+      inlineDynamicImports: true,
     });
   }
 
@@ -80,7 +84,7 @@ export function generateRollupConfig(filePath: string, options: Options) {
 /**
  * 将文件中的缩写路径转换为相对路径
  */
-function relativePlugin(
+export function relativePlugin(
   aliasConfig: Options['aliasConfig'],
   extensions: Options['extensions'],
   newSuffix: string | false,
@@ -119,6 +123,9 @@ function getRollupBaseConfig(options: Options): RollupOptions {
           // fix: @babel/plugin-transform-runtime option's absoluteRuntime default is false
           absoluteRuntime: false,
           useBuiltIns: isNotES ? 'entry' : 'usage',
+          jsx: {
+            compositionAPI: options.compositionAPI,
+          },
         },
       ],
       '@babel/preset-typescript',
@@ -160,7 +167,10 @@ function getRollupBaseConfig(options: Options): RollupOptions {
           `styleInject(${cssVariableName});`
         );
       },
-      plugins: getPostcssPlugins(options),
+      plugins: getPostcssPlugins({
+        ...options,
+        inline: !isModule,
+      }),
       // plugins will need the path
       to: path.resolve(options.outputDir, './index.css'),
       loaders: [
@@ -169,20 +179,12 @@ function getRollupBaseConfig(options: Options): RollupOptions {
           name: 'sass',
           test: /\.(sass|scss)$/,
           process({ map }) {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const { css } = require('sass').renderSync({
-              file: this.id,
-              ...getSassDefaultOptions(options),
-            });
-            return { code: css, map };
+            return { code: parseSass(options, this.id), map };
           },
         },
       ],
     }),
     babel(babelOptions),
-    copyPlugin({
-      include: assetsReg,
-    }),
     json(),
   ];
 
@@ -194,6 +196,23 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     plugins.push(
       visualizer({
         filename: './stat/statistics.html',
+      }),
+    );
+  }
+
+  if (isModule) {
+    plugins.push(
+      copyPlugin({
+        include: assetsReg,
+      }),
+    );
+  }
+  // umd/iife 不复制图片等静态资源
+  else {
+    plugins.push(
+      url({
+        include: assetsReg,
+        limit: Infinity,
       }),
     );
   }
@@ -226,16 +245,22 @@ function getRollupBaseConfig(options: Options): RollupOptions {
             // 内部 - 多文件模式则跳过
             return true;
           },
-    onwarn(warning, warn) {
+    onwarn({ loc, frame, message, code }) {
       if (
-        warning.code === 'CIRCULAR_DEPENDENCY' ||
-        warning.code === 'UNUSED_EXTERNAL_IMPORT' ||
-        warning.code === 'EMPTY_BUNDLE' ||
-        warning.code === 'THIS_IS_UNDEFINED'
-      )
+        code === 'SOURCEMAP_ERROR' ||
+        code === 'UNUSED_EXTERNAL_IMPORT' ||
+        code === 'EMPTY_BUNDLE' ||
+        code === 'THIS_IS_UNDEFINED'
+      ) {
         return;
+      }
 
-      warn(warning);
+      if (loc) {
+        printWarn(`${loc.file} (${loc.line}:${loc.column}) ${message}`);
+        if (frame) printWarn(frame);
+      } else {
+        printWarn(message);
+      }
     },
   };
 }

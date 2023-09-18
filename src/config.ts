@@ -1,4 +1,4 @@
-import { TsConfig } from 'gulp-typescript/release/types';
+import { Obj } from '../test/src/types';
 
 export type Options = {
   // 输出文件头信息
@@ -14,7 +14,7 @@ export type Options = {
   excludeFiles?: string[];
 
   // 指定输出类型
-  outputs?: ('js' | 'styles' | 'types' | 'docs')[];
+  outputs?: ('js' | 'styles' | 'types')[];
 
   // 是否打包为单文件，默认 false 每个文件独立输出
   singleFile?: boolean;
@@ -42,7 +42,7 @@ export type Options = {
   // 路径别名配置
   aliasConfig?: Record<string, string>;
   // tsconfig.json 配置
-  tsConfig?: TsConfig;
+  tsConfig?: Obj;
 
   // 样式目录名，相对于 inputDir
   stylesDir?: string;
@@ -53,11 +53,6 @@ export type Options = {
 
   // 输出的 d.ts 目录名
   typesOutputDir?: string;
-  // 全局 d.ts 文件，相对于 cwd;
-  typesGlobal?: string;
-
-  // 文档目录名
-  docsOutputDir?: string;
 
   // 是否统计模块占用情况，仅在 singleFile 为 true 时生效，默认为 false
   stat?: boolean;
@@ -67,6 +62,9 @@ export type Options = {
 
   // 全局替换变量，例如：{ 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV) }
   replace?: Record<string, string>;
+
+  // 组合式 API
+  compositionAPI?: boolean;
 };
 
 const defaultOptions: Options = {
@@ -86,7 +84,7 @@ const defaultOptions: Options = {
   excludeFiles: ['**/+(__tests__|__specs__)/**', '**/*.spec.*'],
 
   // output types
-  outputs: ['js', 'styles', 'types', 'docs'],
+  outputs: ['js', 'styles', 'types'],
 
   singleFile: false,
 
@@ -128,9 +126,6 @@ const defaultOptions: Options = {
 
   // inherit outputDir
   typesOutputDir: '',
-  typesGlobal: 'global.d.ts',
-
-  docsOutputDir: '',
 
   stat: false,
 

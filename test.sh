@@ -2,4 +2,4 @@
 
 npm run build
 cd test
-node ../bin/rollupx.js --outputs=js,styles,types,docs
+node ../bin/rollupx.js --outputs=js,styles,types

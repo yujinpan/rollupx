@@ -132,7 +132,7 @@ export type Options = {
   excludeFiles?: string[];
 
   // 指定输出类型
-  outputs?: ("js" | "styles" | "types" | "docs")[];
+  outputs?: ("js" | "styles" | "types")[];
 
   // 是否打包为单文件，默认 false 每个文件独立输出
   singleFile?: boolean;
@@ -170,11 +170,6 @@ export type Options = {
 
   // 输出的 d.ts 目录名
   typesOutputDir?: string;
-  // 全局 d.ts 文件，相对于 cwd;
-  typesGlobal?: string;
-
-  // 文档目录名
-  docsOutputDir?: string;
 
   // 是否统计模块占用情况，仅在 singleFile 为 true 时生效，默认为 false
   stat?: boolean;
@@ -203,7 +198,7 @@ module.exports = {
   excludeFiles: ["**/+(__tests__|__specs__)/**", "**/*.spec.*"],
 
   // output types
-  outputs: ["js", "styles", "types", "docs"],
+  outputs: ["js", "styles", "types"],
 
   singleFile: false,
 
@@ -245,9 +240,6 @@ module.exports = {
 
   // inherit outputDir
   typesOutputDir: "",
-  typesGlobal: "global.d.ts",
-
-  docsOutputDir: "",
 
   stat: false,
 };
@@ -332,8 +324,9 @@ $ rollupx --input-files=index.ts
 
 ### @TODO
 
-- [ ] `url(...)` in style file can not be rebase path when multi-level nested import.
-- [ ] `rollup-plugin-vue@5(vue2)` has not updated for two years, required packages version too low:
+- [ ] use esbuild
+- [x] `url(...)` in style file can not be rebase path when multi-level nested import.
+- [x] `rollup-plugin-vue@5(vue2)` has not updated for two years, required packages version too low:
   - `postcss@7`
-- [ ] `gulp@4` has not updated for three years, required packages version too low:
+- [x] `gulp@4` has not updated for three years, required packages version too low:
   - `glob-parent`
