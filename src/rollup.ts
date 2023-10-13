@@ -35,6 +35,7 @@ export function generateRollupConfig(filePath: string, options: Options) {
     inputDir,
     outputDir,
     banner,
+    footer,
     format,
     outputName,
     outputGlobals,
@@ -61,7 +62,8 @@ export function generateRollupConfig(filePath: string, options: Options) {
   const output: OutputOptions = {
     file: outputFile,
     format,
-    banner: banner,
+    banner,
+    footer,
   };
 
   if (format === 'iife' || format === 'umd') {

@@ -1,8 +1,9 @@
 import { Obj } from '../test/src/types';
 
 export type Options = {
-  // 输出文件头信息
+  // 输出文件头/尾信息
   banner?: string;
+  footer?: string;
 
   // 输入文件目录，相对与 cwd，默认 src
   inputDir?: string;
