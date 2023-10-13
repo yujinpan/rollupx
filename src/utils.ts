@@ -4,11 +4,9 @@ import glob from 'glob';
 import path from 'path';
 import postcssUrl from 'postcss-url';
 import resolve from 'resolve';
-import sass from 'sass';
 import { pathToFileURL } from 'url';
 
 import type { Options } from './config';
-import type { SFCDescriptor } from '@vue/compiler-sfc';
 
 export const styleExtensions = ['.scss', '.sass', '.less', '.css'];
 
@@ -323,7 +321,8 @@ export function getPostcssPlugins(options: Options & { inline?: boolean }) {
 }
 
 export function parseSass(options: Options, filepath) {
-  const result = sass.compile(filepath, {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const result = require('sass').compile(filepath, {
     importers: [
       {
         findFileUrl(url: string) {
