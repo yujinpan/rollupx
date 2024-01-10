@@ -3,7 +3,7 @@ import rollup, { OutputOptions } from 'rollup';
 import type { Options } from './config';
 
 import { generateRollupConfig } from './rollup';
-import { getFiles, suffixTo } from './utils';
+import { getFiles, getSuffixPattern, suffixTo } from './utils';
 
 export async function build(options: Options) {
   const optionsArr = options.formats
@@ -19,15 +19,21 @@ export async function build(options: Options) {
   return Promise.all(optionsArr.map(buildInternal));
 }
 
-function buildInternal(options: Options) {
-  const { inputFiles, excludeFiles, inputDir, extensions } = options;
-  const jsSuffixReg = new RegExp(
-    `(${extensions.map((item) => '\\' + item).join('|')})$`,
-  );
-  const files = getFiles(inputFiles, inputDir, jsSuffixReg, [
+export function getJsFiles({
+  extensions,
+  inputDir,
+  inputFiles,
+  excludeFiles,
+}: Options) {
+  return getFiles(inputFiles, inputDir, getSuffixPattern(extensions), [
     ...excludeFiles,
     '**/*.d.ts',
   ]);
+}
+
+function buildInternal(options: Options) {
+  const files = getJsFiles(options);
+
   validate(files);
 
   return Promise.all(

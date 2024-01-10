@@ -66,6 +66,9 @@ export type Options = {
 
   // 组合式 API
   compositionAPI?: boolean;
+
+  // 监听模式
+  watch?: boolean;
 };
 
 const defaultOptions: Options = {

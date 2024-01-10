@@ -134,6 +134,10 @@ export function getFiles(arrPattern, dir, includeReg, excludes = []) {
   );
 }
 
+export function getSuffixPattern(extensions: string[]) {
+  return new RegExp(`(${extensions.map((item) => '\\' + item).join('|')})$`);
+}
+
 export function deDup(arr: any[]) {
   return Array.from(new Set(arr));
 }

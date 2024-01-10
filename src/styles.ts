@@ -13,23 +13,12 @@ import {
   transformToRelativePath,
 } from './utils';
 
-const cssSuffixReg = /\.(scss|sass|less|css)$/;
-
 export async function build(options: Options) {
-  const {
-    inputDir,
-    outputDir,
-    stylesDir,
-    stylesParseFiles,
-    stylesCopyFiles,
-    aliasConfig,
-  } = options;
+  const { inputDir, outputDir, stylesDir, aliasConfig } = options;
   const styleInputDir = path.resolve(inputDir, stylesDir);
   const styleOutputDir = path.resolve(outputDir, stylesDir);
 
-  const parseFiles = getFiles(stylesParseFiles, styleInputDir, cssSuffixReg);
-  const copyFiles = getFiles(stylesCopyFiles, styleInputDir, cssSuffixReg);
-  const allFiles = parseFiles.concat(copyFiles);
+  const { parseFiles, copyFiles, allFiles } = getCssFiles(options);
 
   deDup(allFiles.map((item) => path.dirname(item))).forEach((item) => {
     const dir = item.replace(styleInputDir, styleOutputDir);
@@ -65,4 +54,21 @@ export async function build(options: Options) {
         });
     }),
   );
+}
+
+export const cssSuffixReg = /\.(scss|sass|less|css)$/;
+
+export function getCssFiles(options: Options) {
+  const { inputDir, stylesDir, stylesParseFiles, stylesCopyFiles } = options;
+  const styleInputDir = path.resolve(inputDir, stylesDir);
+
+  const parseFiles = getFiles(stylesParseFiles, styleInputDir, cssSuffixReg);
+  const copyFiles = getFiles(stylesCopyFiles, styleInputDir, cssSuffixReg);
+  const allFiles = parseFiles.concat(copyFiles);
+
+  return {
+    parseFiles,
+    copyFiles,
+    allFiles,
+  };
 }

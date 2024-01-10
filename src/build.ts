@@ -1,28 +1,128 @@
+import chokidar from 'chokidar';
 import fs from 'fs';
+import debounce from 'lodash/debounce';
 import path from 'path';
 
 import type { Options } from './config';
 
 import config from './config';
-import { build as buildJS } from './js';
-import { build as buildStyles } from './styles';
+import { build as buildJS, getJsFiles } from './js';
+import { build as buildStyles, cssSuffixReg, getCssFiles } from './styles';
 import { build as buildTypes } from './types';
 import {
+  getSuffixPattern,
   mergeProps,
   printErr,
+  printMsg,
   readPkgVersion,
   runTask,
   toLowerCamelCase,
 } from './utils';
 
-export async function build(options: Options = {}) {
-  if (!validateVueVersion()) return;
+export async function build(options: Options = {}, _clear = true) {
+  await normalizeOptions(options);
+
+  if (_clear) {
+    // clear
+    fs.rmSync(options.outputDir, { recursive: true, force: true });
+    fs.mkdirSync(options.outputDir);
+  }
+
+  // build js
+  if (options.outputs.includes('js') && options.inputFiles.length) {
+    await runTask('build js', buildJS(options));
+  }
+
+  // build styles
+  if (
+    options.outputs.includes('styles') &&
+    fs.existsSync(path.resolve(options.inputDir, options.stylesDir)) &&
+    (options.stylesCopyFiles.length || options.stylesParseFiles.length)
+  ) {
+    await runTask('build styles', buildStyles(options));
+  }
+
+  // build types
+  if (options.outputs.includes('types') && options.inputFiles.length) {
+    await runTask('build types', buildTypes(options));
+  }
+}
+
+export async function watch(options: Options = {}) {
+  await normalizeOptions(options);
+
+  let inputFilesJs = getJsFiles(options);
+  let { parseFiles, copyFiles } = getCssFiles(options);
+
+  const inputFiles: string[] = [];
+  const stylesParseFiles: string[] = [];
+  const stylesCopyFiles: string[] = [];
+
+  let buildPromise = Promise.resolve();
+  const buildDebounce = debounce(async () => {
+    await buildPromise;
+
+    printMsg(`[${new Date().toLocaleTimeString()} Update files]:`, {
+      inputFiles,
+      stylesParseFiles,
+      stylesCopyFiles,
+    });
+
+    buildPromise = build(
+      {
+        ...options,
+        inputFiles: [...inputFiles],
+        stylesParseFiles: [...stylesParseFiles],
+        stylesCopyFiles: [...stylesCopyFiles],
+      },
+      false,
+    );
+
+    inputFiles.length = 0;
+    stylesParseFiles.length = 0;
+    stylesCopyFiles.length = 0;
+  }, 200);
+
+  const jsSuffixPattern = getSuffixPattern(options.extensions);
+  const handleAdd = (path: string) => {
+    if (jsSuffixPattern.test(path)) {
+      inputFilesJs = getJsFiles(options);
+      handleChange(path);
+    } else if (cssSuffixReg.test(path)) {
+      const result = getCssFiles(options);
+      parseFiles = result.parseFiles;
+      copyFiles = result.copyFiles;
+      handleChange(path);
+    }
+  };
+  const handleChange = (path: string) => {
+    if (inputFilesJs.includes(path)) {
+      inputFiles.push(path);
+      buildDebounce();
+    } else if (parseFiles.includes(path)) {
+      stylesParseFiles.push(path);
+      buildDebounce();
+    } else if (copyFiles.includes(path)) {
+      stylesCopyFiles.push(path);
+      buildDebounce();
+    }
+  };
+
+  const watcher = chokidar.watch(options.inputDir, {
+    ignored: '**/*.d.ts',
+  });
+  watcher.on('add', handleAdd);
+  watcher.on('change', handleChange);
+}
+
+async function normalizeOptions(options: Options = {}) {
+  if (!validateVueVersion()) return Promise.reject();
 
   if (Array.isArray(options.extensions)) {
     options.extensions = config.extensions.concat(options.extensions);
   }
 
-  options = mergeProps(config, options);
+  Object.assign(options, mergeProps(config, options));
 
   // parse arguments
   const args = process.argv.slice(2);
@@ -47,10 +147,6 @@ export async function build(options: Options = {}) {
   options.inputDir = path.resolve(options.inputDir);
   options.outputDir = path.resolve(options.outputDir);
 
-  // clear
-  fs.rmSync(options.outputDir, { recursive: true, force: true });
-  fs.mkdirSync(options.outputDir);
-
   // init alias
   const aliasConfig = options.aliasConfig;
   for (const key in aliasConfig) {
@@ -72,23 +168,7 @@ export async function build(options: Options = {}) {
     }
   }
 
-  // build js
-  if (options.outputs.includes('js')) {
-    await runTask('build js', buildJS(options));
-  }
-
-  // build styles
-  if (
-    options.outputs.includes('styles') &&
-    fs.existsSync(path.resolve(options.inputDir, options.stylesDir))
-  ) {
-    await runTask('build styles', buildStyles(options));
-  }
-
-  // build types
-  if (options.outputs.includes('types')) {
-    await runTask('build types', buildTypes(options));
-  }
+  return options;
 }
 
 function validateVueVersion() {

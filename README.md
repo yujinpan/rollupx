@@ -173,6 +173,18 @@ export type Options = {
 
   // 是否统计模块占用情况，仅在 singleFile 为 true 时生效，默认为 false
   stat?: boolean;
+
+  // 是否为 node 模块
+  node?: boolean;
+
+  // 全局替换变量，例如：{ 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV) }
+  replace?: Record<string, string>;
+
+  // 组合式 API
+  compositionAPI?: boolean;
+
+  // 监听模式
+  watch?: boolean;
 };
 ```
 

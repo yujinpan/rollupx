@@ -43,4 +43,6 @@ module.exports = {
   stylesParseFiles: ['**/*.scss'],
   stylesCopyFiles: ['**/*'],
   // typesOutputDir: 'test',
+
+  watch: true,
 };
