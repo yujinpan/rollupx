@@ -61,17 +61,8 @@ export async function build(options: Options) {
           to: outputPath,
         })
         .then((result) => {
-          fs.writeFileSync(outputPath, removeElementComments(result.css));
+          fs.writeFileSync(outputPath, result.css);
         });
     }),
-  );
-}
-
-function removeElementComments(css: string) {
-  return Buffer.from(
-    css.replace(
-      /(@charset\s"UTF-8";\n)?\/\*\sElement\sChalk\sVariables(.|\n)*-{5,}\s?\*\/(\s|\n)?/gm,
-      '',
-    ),
   );
 }
