@@ -38,7 +38,9 @@ function buildInternal(options: Options) {
           ? option.output
           : [option.output];
         return rollup.rollup(option).then((bundle) => {
-          return Promise.all(outputs.map(bundle.write));
+          return Promise.all(outputs.map(bundle.write)).finally(() =>
+            bundle.close(),
+          );
         });
       }),
   );
