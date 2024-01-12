@@ -109,7 +109,7 @@ export async function watch(options: Options = {}) {
   };
 
   const watcher = chokidar.watch(options.inputDir, {
-    ignored: '**/*.d.ts',
+    ignored: ['**/*.d.ts', '**/*.temp.*'],
   });
   watcher.on('add', handleAdd);
   watcher.on('change', handleChange);
