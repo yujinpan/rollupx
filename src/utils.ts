@@ -36,7 +36,14 @@ export function transformToRelativePath(
   if (imports) {
     imports.forEach((item) => {
       const oldPath = item.replace(/.*['"](.+)['"].*/, '$1');
-      let newPath = toRelative(filepath, oldPath, aliasConfig, extensions);
+      const relative = toRelative(filepath, oldPath, aliasConfig, extensions);
+
+      let newPath = normalizeFilePath(
+        relative,
+        extensions,
+        path.dirname(filepath),
+      );
+
       // 尾部的 .vue 转换
       if (
         newSuffix !== false &&
@@ -81,11 +88,8 @@ export function toRelative(
       // fix: windows path will be \
       .split(path.sep)
       .join('/');
-    resolvePath = resolvePath.startsWith('.')
-      ? resolvePath
-      : './' + resolvePath;
 
-    return resolvePath;
+    return normalizeRelativePath(resolvePath);
   } else {
     // not alias path
     if (resolvePath.startsWith('~')) {
@@ -104,8 +108,50 @@ export function toRelative(
   }
 }
 
+// ./utils => ./utils.js
+// ./utils => ./utils/index.js
+export function normalizeFilePath(
+  relativePath: string,
+  extensions?: string[],
+  base = '/',
+): string {
+  if (!relativePath.startsWith('.')) return relativePath;
+
+  try {
+    return normalizeRelativePath(
+      path.relative(
+        base,
+        resolve.sync(path.resolve(base, relativePath), { extensions }),
+      ),
+    );
+  } catch (e) {
+    return relativePath;
+  }
+}
+
+export function normalizeRelativePath(filePath: string) {
+  return filePath.startsWith('.') ? filePath : './' + filePath;
+}
+
 export function suffixTo(file: string, suffix = '') {
   return file.replace(/\.[^.]+$/, suffix);
+}
+
+export function readFileTempExt(fileTemp: string) {
+  const filename = parseFileTemp(fileTemp, '', 'name');
+  return filename.slice(filename.indexOf('.'));
+}
+
+export function parseFileTemp(
+  fileTemp: string,
+  dir: string,
+  name: string,
+  ext = '.js',
+) {
+  return fileTemp
+    .replace('[dir]', dir)
+    .replace('[name]', name)
+    .replace('[ext]', ext);
 }
 
 export function mergeProps<T extends object>(source: T, target: T): T {

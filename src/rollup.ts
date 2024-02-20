@@ -20,8 +20,10 @@ import {
   getPostcssPlugins,
   getSassDefaultOptions,
   isNodeModules,
+  parseFileTemp,
   parseSass,
   printWarn,
+  readFileTempExt,
   readPkgVersion,
   styleExtensions,
   transformToRelativePath,
@@ -47,10 +49,7 @@ export function generateRollupConfig(filePath: string, options: Options) {
 
   const dir = path.basename(path.dirname(relativePath));
   const filename = path.basename(relativePath, path.extname(relativePath));
-  const outputFilename = fileTemplate
-    .replace('[dir]', dir)
-    .replace('[name]', filename)
-    .replace('[ext]', '.js');
+  const outputFilename = parseFileTemp(fileTemplate, dir, filename);
 
   const outputFile = path.join(
     outputDir,
@@ -143,7 +142,11 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     relativePlugin(
       aliasConfig,
       extensions.concat(styleExtensions),
-      singleFile || !isModule ? false : undefined,
+      singleFile || !isModule
+        ? false
+        : options.outputFile
+        ? readFileTempExt(options.outputFile)
+        : undefined,
     ),
     resolve({
       extensions,
