@@ -3,13 +3,13 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import { nodeResolve as resolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
+import terser from '@rollup/plugin-terser';
 import url from '@rollup/plugin-url';
 import { createFilter, FilterPattern } from '@rollup/pluginutils';
 import fs from 'fs';
 import makeDir from 'make-dir';
 import path from 'path';
 import postcss from 'rollup-plugin-postcss';
-import { terser } from 'rollup-plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
 
 import type { Options } from './config';
