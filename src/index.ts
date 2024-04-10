@@ -23,7 +23,7 @@ async function readConfig(): Promise<Options> {
     }
   }
   if (fs.existsSync(configPath)) {
-    return import(configPath).then((res) => ({ ...res }));
+    return import(configPath).then((res) => ({ ...(res.default || res) }));
   }
 }
 
