@@ -115,7 +115,7 @@ function getRollupBaseConfig(options: Options): RollupOptions {
   const isModule = ['es', 'cjs'].includes(format);
   const isNotES = format !== 'es';
   const babelOptions: RollupBabelInputPluginOptions = {
-    extensions: extensions,
+    extensions,
     babelHelpers: isNotES ? 'bundled' : 'runtime',
     presets: [
       [
@@ -136,6 +136,12 @@ function getRollupBaseConfig(options: Options): RollupOptions {
       '@babel/plugin-proposal-optional-chaining',
     ],
   };
+
+  if (options.node) {
+    babelOptions.configFile = false;
+    babelOptions.babelHelpers = 'bundled';
+    babelOptions.presets = ['@babel/preset-typescript'];
+  }
 
   const plugins: RollupOptions['plugins'] = [
     // 全部 js/css 文件转换为相对路径
@@ -192,10 +198,6 @@ function getRollupBaseConfig(options: Options): RollupOptions {
     babel(babelOptions),
     json(),
   ];
-
-  if (options.node) {
-    process.env.VUE_CLI_BABEL_TARGET_NODE = 'true';
-  }
 
   if (stat && singleFile) {
     plugins.push(
