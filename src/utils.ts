@@ -283,7 +283,10 @@ export async function runTask(label: string, task: Promise<any>) {
   printMsg(`${label} start...`);
   // eslint-disable-next-line no-console
   console.time(`${label} time`);
-  await task.catch((e) => printErr(`${label} error!`, e));
+  await task.catch((e) => {
+    printErr(`${label} error!`);
+    return Promise.reject(e);
+  });
   // eslint-disable-next-line no-console
   console.timeEnd(`${label} time`);
   printMsg(`${label} completed!\n`);
