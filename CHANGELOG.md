@@ -1,3 +1,5 @@
+## [3.1.11-beta.3](https://github.com/yujinpan/rollupx/compare/v3.1.11-beta.2...v3.1.11-beta.3) (2024-04-12)
+
 ## [3.1.11-beta.2](https://github.com/yujinpan/rollupx/compare/v3.1.11-beta.1...v3.1.11-beta.2) (2024-04-12)
 
 ### Features
