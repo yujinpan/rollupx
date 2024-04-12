@@ -1,3 +1,9 @@
+## [3.1.11-beta.2](https://github.com/yujinpan/rollupx/compare/v3.1.11-beta.1...v3.1.11-beta.2) (2024-04-12)
+
+### Features
+
+- add build progress ([57d162b](https://github.com/yujinpan/rollupx/commit/57d162be4f4919ab316c967ee9f26eca910642ba))
+
 ## [3.1.11-beta.1](https://github.com/yujinpan/rollupx/compare/v3.1.11-beta.0...v3.1.11-beta.1) (2024-04-11)
 
 ### Bug Fixes
