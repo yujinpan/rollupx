@@ -8,12 +8,17 @@ import {
   deDup,
   getFiles,
   getPostcssPlugins,
+  Observable,
+  ProgressEvent,
   parseSass,
   styleExtensions,
   transformToRelativePath,
 } from './utils';
 
-export async function build(options: Options) {
+export async function build(
+  options: Options,
+  _progressObservable: Observable<ProgressEvent>,
+) {
   const { inputDir, outputDir, stylesDir, aliasConfig } = options;
   const styleInputDir = path.resolve(inputDir, stylesDir);
   const styleOutputDir = path.resolve(outputDir, stylesDir);
@@ -23,6 +28,11 @@ export async function build(options: Options) {
   deDup(allFiles.map((item) => path.dirname(item))).forEach((item) => {
     const dir = item.replace(styleInputDir, styleOutputDir);
     !fs.existsSync(dir) && fs.mkdirSync(dir, { recursive: true });
+  });
+
+  _progressObservable.dispatch({
+    type: 'progress:add-total',
+    addTotal: copyFiles.length + parseFiles.length,
   });
 
   // 注意：由于外部引用的 node_modules 与库的目录不同，所以这里拷贝的 scss 文件的 ～ 缩写不进行替换
@@ -36,6 +46,10 @@ export async function build(options: Options) {
       dest,
       transformToRelativePath(code, item, copyAliasConfig, styleExtensions),
     );
+
+    _progressObservable.dispatch({
+      type: 'progress:next',
+    });
   });
 
   return Promise.all(
@@ -51,7 +65,12 @@ export async function build(options: Options) {
         })
         .then((result) => {
           fs.writeFileSync(outputPath, result.css);
-        });
+        })
+        .finally(() =>
+          _progressObservable.dispatch({
+            type: 'progress:next',
+          }),
+        );
     }),
   );
 }

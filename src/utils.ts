@@ -1,4 +1,5 @@
 import autoprefixer from 'autoprefixer';
+import { Progress } from 'cmd-ops';
 import fs from 'fs';
 import glob from 'glob';
 import path from 'path';
@@ -273,23 +274,79 @@ export function rollupPluginVueScript() {
   };
 }
 
-/**
- * run task
- * @param {string} label
- * @param {Promise} task
- * @return {Promise<void>}
- */
-export async function runTask(label: string, task: Promise<any>) {
-  printMsg(`${label} start...`);
-  // eslint-disable-next-line no-console
-  console.time(`${label} time`);
-  await task.catch((e) => {
-    printErr(`${label} error!`);
-    return Promise.reject(e);
-  });
-  // eslint-disable-next-line no-console
-  console.timeEnd(`${label} time`);
-  printMsg(`${label} completed!\n`);
+export interface Task {
+  (progressObservable: Observable<ProgressEvent>): any;
+}
+
+export class TaskRunner {
+  private progressObservable: Observable<ProgressEvent>;
+
+  constructor(private readonly name: string, private readonly task: Task) {}
+
+  async start() {
+    const progress = new Progress({
+      title: this.name,
+      titleWidth: 12,
+      countWidth: 6,
+      total: 0,
+      bar: true,
+    });
+
+    this.progressObservable = new Observable<ProgressEvent>();
+
+    this.progressObservable.on('progress:add-total', (e) => {
+      progress.update(progress.current, progress.total + e.addTotal);
+    });
+    this.progressObservable.on('progress:next', (e) => {
+      progress.update(progress.current + (e.addDone || 1));
+    });
+
+    await this.task(this.progressObservable)
+      .then(() => progress.end())
+      .catch((e) => {
+        progress.end();
+        printErr(`${this.name} task error!`);
+        return Promise.reject(e);
+      });
+  }
+
+  static start(
+    name: string,
+    task: (progressObservable: Observable<ProgressEvent>) => any,
+  ) {
+    return new TaskRunner(name, task).start();
+  }
+}
+
+export interface ProgressEvent extends ObservableEvent {
+  type: 'progress:next' | 'progress:add-total';
+  addTotal?: number;
+  addDone?: number;
+}
+
+export type ObservableEvent = {
+  type: string;
+  [key: string]: any;
+};
+
+export type ObservableListener<T extends ObservableEvent> = (e: T) => void;
+
+export class Observable<T extends ObservableEvent> {
+  private listeners: Record<string, ObservableListener<T>[]> = {};
+
+  on(type: T['type'], listener: ObservableListener<T>) {
+    const listeners = (this.listeners[type] = this.listeners[type] || []);
+    listeners.push(listener);
+  }
+  un(type: T['type'], listener: ObservableListener<T>) {
+    const index = this.listeners[type]?.indexOf(listener);
+    if (index > -1) {
+      this.listeners[type].splice(index, 1);
+    }
+  }
+  dispatch(e: T) {
+    this.listeners[e.type]?.forEach((item) => item(e));
+  }
 }
 
 export function printMsg(msg: string, ...infos) {

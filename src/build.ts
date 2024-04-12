@@ -15,7 +15,7 @@ import {
   printErr,
   printMsg,
   readPkgVersion,
-  runTask,
+  TaskRunner,
   toLowerCamelCase,
 } from './utils';
 
@@ -30,7 +30,9 @@ export async function build(options: Options = {}, _clear = true) {
 
   // build js
   if (options.outputs.includes('js') && options.inputFiles.length) {
-    await runTask('build js', buildJS(options));
+    await TaskRunner.start('build js', (progressObservable) =>
+      buildJS(options, progressObservable),
+    );
   }
 
   // build styles
@@ -39,12 +41,16 @@ export async function build(options: Options = {}, _clear = true) {
     fs.existsSync(path.resolve(options.inputDir, options.stylesDir)) &&
     (options.stylesCopyFiles.length || options.stylesParseFiles.length)
   ) {
-    await runTask('build styles', buildStyles(options));
+    await TaskRunner.start('build styles', (progressObservable) =>
+      buildStyles(options, progressObservable),
+    );
   }
 
   // build types
   if (options.outputs.includes('types') && options.inputFiles.length) {
-    await runTask('build types', buildTypes(options));
+    await TaskRunner.start('build types', (progressObservable) =>
+      buildTypes(options, progressObservable),
+    );
   }
 }
 

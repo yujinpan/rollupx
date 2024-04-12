@@ -76,6 +76,7 @@
     "@types/jest": "^29.0.3",
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/eslint-config-typescript": "^11.0.0",
+    "cmd-ops": "^1.0.1-beta.1",
     "element-plus": "*",
     "eslint": "^8.19.0",
     "eslint-import-resolver-typescript": "^3.5.1",

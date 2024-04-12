@@ -11,9 +11,18 @@ import typescript, {
 
 import type { Options } from './config';
 
-import { getFiles, pickVueScript, transformToRelativePath } from './utils';
+import {
+  getFiles,
+  Observable,
+  pickVueScript,
+  ProgressEvent,
+  transformToRelativePath,
+} from './utils';
 
-export async function build(options: Options) {
+export async function build(
+  options: Options,
+  _progressObservable: Observable<ProgressEvent>,
+) {
   const { inputDir, outputDir, inputFiles, excludeFiles } = options;
 
   let typesOutputDir = path.resolve(options.typesOutputDir);
@@ -79,6 +88,11 @@ export async function build(options: Options) {
     return temp;
   });
 
+  _progressObservable.dispatch({
+    type: 'progress:add-total',
+    addTotal: files.length,
+  });
+
   const host = typescript.createCompilerHost(compilerOptions);
   host.writeFile = async (fileName, text) => {
     const outputFileName = fileName.replace(/\.temp\.d\.(ts|tsx)$/, '.d.ts');
@@ -90,4 +104,9 @@ export async function build(options: Options) {
   program.emit();
 
   files.forEach((item) => fs.rmSync(item, { force: true }));
+
+  _progressObservable.dispatch({
+    type: 'progress:next',
+    addDone: files.length,
+  });
 }

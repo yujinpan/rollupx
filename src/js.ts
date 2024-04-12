@@ -3,9 +3,18 @@ import rollup, { OutputOptions } from 'rollup';
 import type { Options } from './config';
 
 import { generateRollupConfig } from './rollup';
-import { getFiles, getSuffixPattern, suffixTo } from './utils';
+import {
+  getFiles,
+  getSuffixPattern,
+  Observable,
+  ProgressEvent,
+  suffixTo,
+} from './utils';
 
-export async function build(options: Options) {
+export async function build(
+  options: Options,
+  _progressObservable: Observable<ProgressEvent>,
+) {
   const optionsArr = options.formats
     ? options.formats.map((item) => ({ ...options, ...item }))
     : [options];
@@ -16,7 +25,9 @@ export async function build(options: Options) {
     }
   });
 
-  return Promise.all(optionsArr.map(buildInternal));
+  return Promise.all(
+    optionsArr.map((item) => buildInternal(item, _progressObservable)),
+  );
 }
 
 export function getJsFiles({
@@ -31,10 +42,18 @@ export function getJsFiles({
   ]);
 }
 
-function buildInternal(options: Options) {
+function buildInternal(
+  options: Options,
+  _progressObservable: Observable<ProgressEvent>,
+) {
   const files = getJsFiles(options);
 
   validate(files);
+
+  _progressObservable.dispatch({
+    type: 'progress:add-total',
+    addTotal: files.length,
+  });
 
   return Promise.all(
     files
@@ -43,11 +62,16 @@ function buildInternal(options: Options) {
         const outputs: OutputOptions[] = Array.isArray(option.output)
           ? option.output
           : [option.output];
-        return rollup.rollup(option).then((bundle) => {
-          return Promise.all(outputs.map(bundle.write)).finally(() =>
-            bundle.close(),
+        return rollup
+          .rollup(option)
+          .then((bundle) => {
+            return Promise.all(outputs.map(bundle.write)).finally(() =>
+              bundle.close(),
+            );
+          })
+          .finally(() =>
+            _progressObservable.dispatch({ type: 'progress:next' }),
           );
-        });
       }),
   );
 }
