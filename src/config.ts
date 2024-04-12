@@ -1,5 +1,3 @@
-import { Obj } from '../test/src/types';
-
 export type Options = {
   // 输出文件头/尾信息
   banner?: string;
@@ -43,7 +41,7 @@ export type Options = {
   // 路径别名配置
   aliasConfig?: Record<string, string>;
   // tsconfig.json 配置
-  tsConfig?: Obj;
+  tsConfig?: any;
 
   // 样式目录名，相对于 inputDir
   stylesDir?: string;
