@@ -25,7 +25,7 @@ export async function build(options: Options = {}, _clear = true) {
   if (_clear) {
     // clear
     fs.rmSync(options.outputDir, { recursive: true, force: true });
-    fs.mkdirSync(options.outputDir);
+    fs.mkdirSync(options.outputDir, { recursive: true });
   }
 
   // build js
