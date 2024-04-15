@@ -1,3 +1,9 @@
+## [3.1.11](https://github.com/yujinpan/rollupx/compare/v3.1.11-beta.3...v3.1.11) (2024-04-15)
+
+### Bug Fixes
+
+- outputDir maybe multi levels ([1cc586a](https://github.com/yujinpan/rollupx/commit/1cc586aa1090d3cd48aa2569d464ce96a644bc6e))
+
 ## [3.1.11-beta.3](https://github.com/yujinpan/rollupx/compare/v3.1.11-beta.2...v3.1.11-beta.3) (2024-04-12)
 
 ## [3.1.11-beta.2](https://github.com/yujinpan/rollupx/compare/v3.1.11-beta.1...v3.1.11-beta.2) (2024-04-12)
