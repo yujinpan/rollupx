@@ -62,16 +62,13 @@ function buildInternal(
         const outputs: OutputOptions[] = Array.isArray(option.output)
           ? option.output
           : [option.output];
-        return rollup
-          .rollup(option)
-          .then((bundle) => {
-            return Promise.all(outputs.map(bundle.write)).finally(() =>
-              bundle.close(),
-            );
-          })
-          .finally(() =>
-            _progressObservable.dispatch({ type: 'progress:next' }),
+        return rollup.rollup(option).then((bundle) => {
+          _progressObservable.dispatch({ type: 'progress:next' });
+
+          return Promise.all(outputs.map(bundle.write)).finally(() =>
+            bundle.close(),
           );
+        });
       }),
   );
 }
