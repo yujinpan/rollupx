@@ -80,33 +80,33 @@ export async function build(
       '',
     );
 
-    const temp = file
-      .replace(/\.ts$/, '.temp.ts')
-      .replace(/\.(tsx|vue)$/, '.temp.tsx');
-    fs.writeFileSync(temp, content);
+    const tempFile = path.join(
+      typesOutputDir,
+      path.relative(inputDir, file.replace(/\.vue$/, '.tsx')),
+    );
 
-    return temp;
-  });
+    makeDir.sync(path.dirname(tempFile));
+    fs.writeFileSync(tempFile, content);
 
-  _progressObservable.dispatch({
-    type: 'progress:add-total',
-    addTotal: files.length,
+    return tempFile;
   });
 
   const host = typescript.createCompilerHost(compilerOptions);
   host.writeFile = async (fileName, text) => {
-    const outputFileName = fileName.replace(/\.temp\.d\.(ts|tsx)$/, '.d.ts');
-    await makeDir(path.dirname(outputFileName));
-    fs.writeFileSync(outputFileName, text);
+    _progressObservable.dispatch({
+      type: 'progress:add-total',
+      addTotal: 1,
+    });
+
+    fs.writeFileSync(fileName, text);
+
+    _progressObservable.dispatch({
+      type: 'progress:next',
+    });
   };
   const program = typescript.createProgram(files, compilerOptions, host);
 
   program.emit();
 
   files.forEach((item) => fs.rmSync(item, { force: true }));
-
-  _progressObservable.dispatch({
-    type: 'progress:next',
-    addDone: files.length,
-  });
 }
