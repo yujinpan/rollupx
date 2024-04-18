@@ -1,3 +1,10 @@
+## [3.1.12](https://github.com/yujinpan/rollupx/compare/v3.1.11...v3.1.12) (2024-04-18)
+
+### Bug Fixes
+
+- exclude bundle write in js progress ([e5678b5](https://github.com/yujinpan/rollupx/commit/e5678b5ae2dc94ec1f66144e22225c87a52ed0f9))
+- types parse twice and progress not change ([3ddd7cd](https://github.com/yujinpan/rollupx/commit/3ddd7cde7cc12f7df90d3c24e7c1f1ed8e9f97f7))
+
 ## [3.1.11](https://github.com/yujinpan/rollupx/compare/v3.1.11-beta.3...v3.1.11) (2024-04-15)
 
 ### Bug Fixes
