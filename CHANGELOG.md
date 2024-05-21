@@ -1,3 +1,9 @@
+## [3.1.13-beta.0](https://github.com/yujinpan/rollupx/compare/v3.1.12...v3.1.13-beta.0) (2024-05-21)
+
+### Bug Fixes
+
+- custom alias is invalid in node_modules ([cd99bf7](https://github.com/yujinpan/rollupx/commit/cd99bf720401acff09618d2be67dc51c79e96aba))
+
 ## [3.1.12](https://github.com/yujinpan/rollupx/compare/v3.1.11...v3.1.12) (2024-04-18)
 
 ### Bug Fixes
