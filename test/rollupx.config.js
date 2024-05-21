@@ -3,6 +3,7 @@ module.exports = {
   aliasConfig: {
     '@': 'src',
     test: './',
+    vue: 'vue/dist/vue.esm.js',
   },
 
   formats: [

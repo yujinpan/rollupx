@@ -84,7 +84,10 @@ export function toRelative(
     resolvePath = path
       .relative(
         path.dirname(filepath),
-        resolve.sync(path.join(aliasConfig[aliasKey], suffix), { extensions }),
+        resolve.sync(path.join(aliasConfig[aliasKey], suffix), {
+          extensions,
+          basedir: process.cwd(),
+        }),
       )
       // fix: windows path will be \
       .split(path.sep)

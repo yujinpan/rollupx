@@ -164,10 +164,12 @@ async function normalizeOptions(options: Options = {}) {
       newKey = newKey.slice(0, -1);
     }
 
+    const aliasPath = fs.existsSync(path.resolve(aliasConfig[key]))
+      ? path.resolve(aliasConfig[key])
+      : aliasConfig[key];
+
     // ~ 为 scss @import 语法前缀
-    aliasConfig[newKey] = aliasConfig['~' + newKey] = path.resolve(
-      aliasConfig[key],
-    );
+    aliasConfig[newKey] = aliasConfig['~' + newKey] = aliasPath;
 
     if (newKey !== key) {
       delete aliasConfig[key];
