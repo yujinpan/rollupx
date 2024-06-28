@@ -122,7 +122,11 @@ export async function watch(options: Options = {}) {
 }
 
 async function normalizeOptions(options: Options = {}) {
-  if (!validateVueVersion()) return Promise.reject();
+  if (
+    (!options.outputs || options.outputs.includes('js')) &&
+    !validateVueVersion()
+  )
+    return Promise.reject();
 
   if (Array.isArray(options.extensions)) {
     options.extensions = config.extensions.concat(options.extensions);
