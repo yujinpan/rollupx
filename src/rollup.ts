@@ -97,16 +97,20 @@ export function relativePlugin(
     name: 'rollup-plugin-relative',
     transform(code, id) {
       if (!id.includes('node_modules')) {
-        return {
-          code: transformToRelativePath(
-            code,
-            id,
-            aliasConfig,
-            extensions,
-            newSuffix,
-          ),
-          map: null,
-        };
+        const resultCode = transformToRelativePath(
+          code,
+          id,
+          aliasConfig,
+          extensions,
+          newSuffix,
+        );
+
+        if (resultCode !== code) {
+          return {
+            code: resultCode,
+            map: null,
+          };
+        }
       }
     },
   };
@@ -151,16 +155,6 @@ function getRollupBaseConfig(options: Options): RollupOptions {
   }
 
   const plugins: RollupOptions['plugins'] = [
-    // 全部 js/css 文件转换为相对路径
-    relativePlugin(
-      aliasConfig,
-      extensions.concat(styleExtensions),
-      singleFile || !isModule
-        ? false
-        : options.outputFile
-        ? readFileTempExt(options.outputFile)
-        : undefined,
-    ),
     alias({ entries: aliasConfig }),
     resolve({
       extensions,
@@ -176,6 +170,16 @@ function getRollupBaseConfig(options: Options): RollupOptions {
       include: /node_modules/,
     }),
     vuePlugin(options),
+    // 全部 js/css 文件转换为相对路径
+    relativePlugin(
+      aliasConfig,
+      extensions.concat(styleExtensions),
+      singleFile || !isModule
+        ? false
+        : options.outputFile
+        ? readFileTempExt(options.outputFile)
+        : undefined,
+    ),
     postcss({
       minimize: true,
       // custom inject，require [style-inject] package
