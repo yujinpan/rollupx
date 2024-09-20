@@ -3,7 +3,7 @@ module.exports = {
   aliasConfig: {
     '@': 'src',
     test: './',
-    vue: 'vue/dist/vue.esm.js',
+    // vue: 'vue/dist/vue.esm.js',
   },
 
   formats: [
@@ -47,5 +47,5 @@ module.exports = {
 
   // watch: true,
 
-  sourceMap: 'inline',
+  sourceMap: true,
 };
