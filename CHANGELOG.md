@@ -1,3 +1,13 @@
+## [3.1.13](https://github.com/yujinpan/rollupx/compare/v3.1.13-beta.0...v3.1.13) (2024-09-20)
+
+### Bug Fixes
+
+- validate error when outputs without js ([9e2750b](https://github.com/yujinpan/rollupx/commit/9e2750bc908ff46c7be8fa9e2969d497eb62561a))
+
+### Features
+
+- supported source map ([871f5aa](https://github.com/yujinpan/rollupx/commit/871f5aa0b9640433b660fbebc994d18f91b4bf8f))
+
 ## [3.1.13-beta.0](https://github.com/yujinpan/rollupx/compare/v3.1.12...v3.1.13-beta.0) (2024-05-21)
 
 ### Bug Fixes
