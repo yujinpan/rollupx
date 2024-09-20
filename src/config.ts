@@ -1,3 +1,5 @@
+import { OutputOptions } from 'rollup';
+
 export type Options = {
   // 输出文件头/尾信息
   banner?: string;
@@ -67,6 +69,9 @@ export type Options = {
 
   // 监听模式
   watch?: boolean;
+
+  // 源文件
+  sourceMap?: OutputOptions['sourcemap'];
 };
 
 const defaultOptions: Options = {

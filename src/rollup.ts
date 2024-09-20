@@ -10,6 +10,7 @@ import { createFilter, FilterPattern } from '@rollup/pluginutils';
 import fs from 'fs';
 import makeDir from 'make-dir';
 import path from 'path';
+import { InputPluginOption } from 'rollup';
 import postcss from 'rollup-plugin-postcss';
 import { visualizer } from 'rollup-plugin-visualizer';
 
@@ -64,6 +65,7 @@ export function generateRollupConfig(filePath: string, options: Options) {
     format,
     banner,
     footer,
+    sourcemap: options.sourceMap,
   };
 
   if (format === 'iife' || format === 'umd') {
@@ -90,18 +92,22 @@ export function relativePlugin(
   aliasConfig: Options['aliasConfig'],
   extensions: Options['extensions'],
   newSuffix: string | false,
-) {
+): InputPluginOption {
   return {
     name: 'rollup-plugin-relative',
     transform(code, id) {
-      if (id.includes('node_modules')) return code;
-      return transformToRelativePath(
-        code,
-        id,
-        aliasConfig,
-        extensions,
-        newSuffix,
-      );
+      if (!id.includes('node_modules')) {
+        return {
+          code: transformToRelativePath(
+            code,
+            id,
+            aliasConfig,
+            extensions,
+            newSuffix,
+          ),
+          map: null,
+        };
+      }
     },
   };
 }

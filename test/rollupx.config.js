@@ -46,4 +46,6 @@ module.exports = {
   // typesOutputDir: 'test',
 
   // watch: true,
+
+  sourceMap: 'inline',
 };
