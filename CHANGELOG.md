@@ -1,3 +1,9 @@
+## [3.1.14](https://github.com/yujinpan/rollupx/compare/v3.1.13...v3.1.14) (2024-09-20)
+
+### Bug Fixes
+
+- sourcemap generate error when use vue-plugin and relative-plugin ([bb4862b](https://github.com/yujinpan/rollupx/commit/bb4862be63c52db48a936d4cf7e31fd8556a94bf))
+
 ## [3.1.13](https://github.com/yujinpan/rollupx/compare/v3.1.13-beta.0...v3.1.13) (2024-09-20)
 
 ### Bug Fixes
